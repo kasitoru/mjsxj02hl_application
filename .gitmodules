@@ -1,0 +1,9 @@
+[submodule "yyjson"]
+	path = yyjson
+	url = https://github.com/ibireme/yyjson
+[submodule "mqtt/paho.mqtt.c"]
+	path = mqtt/paho.mqtt.c
+	url = https://github.com/eclipse/paho.mqtt.c
+[submodule "configs/inih"]
+	path = configs/inih
+	url = https://github.com/benhoyt/inih
