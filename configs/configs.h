@@ -25,6 +25,7 @@ typedef struct {
     struct {
         int motion;
         int humanoid;
+        int timeout;
     } alarm;
     
     // [mqtt]

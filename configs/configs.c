@@ -20,6 +20,7 @@ APPLICATION_CONFIGURATION APP_CFG = {
     // [alarm]
     .alarm.motion   = 150,                // Sensitivity (1-255)
     .alarm.humanoid = 150,                // Sensitivity (1-255)
+    .alarm.timeout  = 60,                 // Timeout (in seconds)
     
     // [mqtt]
     .mqtt.server    = "",                 // Address (empty for disable)
@@ -53,6 +54,8 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
         config->alarm.motion = atoi(value);
     } else if(MATCH("alarm", "humanoid")) {
         config->alarm.humanoid = atoi(value);
+    } else if(MATCH("alarm", "timeout")) {
+        config->alarm.timeout = atoi(value);
 
     // [mqtt]
     } else if(MATCH("mqtt", "server")) {

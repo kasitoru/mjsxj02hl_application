@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <unistd.h>
 #include <stdio.h>
 
 #include "./alarm.h"
@@ -7,6 +8,9 @@
 #include "./../../configs/configs.h"
 #include "./../../yyjson/src/yyjson.h"
 #include "./../../mqtt/mqtt.h"
+
+static pthread_t timeout_thread;
+static int alarm_time_motion, alarm_time_humanoid;
 
 // MQTT send info
 bool alarm_state_mqtt(bool motion, bool humanoid) {
@@ -54,34 +58,85 @@ bool alarm_state_mqtt(bool motion, bool humanoid) {
     return result;
 }
 
+// State timeout (for pthread)
+void* alarm_state_timeout(void *args) {
+
+    logger("alarm", "alarm_state_timeout", LOGGER_LEVEL_DEBUG, "Function is called...");
+
+    bool alarm_state_motion, alarm_state_humanoid;
+    bool alarm_change_motion, alarm_change_humanoid;
+
+    alarm_time_motion = 0;
+    alarm_time_humanoid = 0;
+    
+    alarm_state_motion = false;
+    alarm_state_humanoid = false;
+
+    do {
+        alarm_change_motion = false;
+        alarm_change_humanoid = false;
+    
+        // Motion
+        if(alarm_time_motion > 0) {
+            if(alarm_state_motion) {
+                if((int) time(NULL) - alarm_time_motion > APP_CFG.alarm.timeout) {
+                    alarm_time_motion = 0;
+                    alarm_state_motion = false;
+                    alarm_change_motion = true;
+                }
+            } else {
+                alarm_state_motion = true;
+                alarm_change_motion = true;
+            }
+        }
+        
+        // Humanoid
+        if(alarm_time_humanoid > 0) {
+            if(alarm_state_humanoid) {
+                if((int) time(NULL) - alarm_time_humanoid > APP_CFG.alarm.timeout) {
+                    alarm_time_humanoid = 0;
+                    alarm_state_humanoid = false;
+                    alarm_change_humanoid = true;
+                }
+            } else {
+                alarm_state_humanoid = true;
+                alarm_change_humanoid = true;
+            }
+        }
+        
+        // State changed
+        if(alarm_change_motion || alarm_change_humanoid) {
+
+            // Logger
+            if(alarm_change_motion) { logger("alarm", "alarm_state_timeout", LOGGER_LEVEL_INFO, "Change %s status: %d", "motion", alarm_state_motion); }
+            if(alarm_change_humanoid) { logger("alarm", "alarm_state_timeout", LOGGER_LEVEL_INFO, "Change %s status: %d", "humanoid", alarm_state_humanoid); }
+        
+            // MQTT
+            if(mqtt_is_enabled() && mqtt_is_connected()) {
+                if(alarm_state_mqtt(alarm_state_motion, alarm_state_humanoid)) {
+                    logger("alarm", "alarm_state_timeout", LOGGER_LEVEL_INFO, "%s success.", "alarm_state_mqtt()");
+                } else logger("alarm", "alarm_state_timeout", LOGGER_LEVEL_ERROR, "%s error!", "alarm_state_mqtt()");
+            }
+        }
+        
+        sleep(1);
+        pthread_testcancel();
+    } while(true);
+}
+
 // Alarm callback
 int alarm_state_callback(LOCALSDK_ALARM_EVENT_INFO *eventInfo) {
-    static bool alarm_state_motion, alarm_state_humanoid;
-    switch(eventInfo->type) {
-        case LOCALSDK_ALARM_MOTION:
-            if((!!eventInfo->state) != alarm_state_motion) {
-                alarm_state_motion = !!eventInfo->state;
-                logger("alarm", "alarm_state_callback", LOGGER_LEVEL_INFO, "Change %s status: %d", "motion", alarm_state_motion);
-                if(mqtt_is_enabled() && mqtt_is_connected()) {
-                    if(alarm_state_mqtt(alarm_state_motion, alarm_state_humanoid)) {
-                        logger("alarm", "alarm_state_callback", LOGGER_LEVEL_INFO, "%s success.", "alarm_state_mqtt(LOCALSDK_ALARM_MOTION)");
-                    } else logger("alarm", "alarm_state_callback", LOGGER_LEVEL_ERROR, "%s error!", "alarm_state_mqtt(LOCALSDK_ALARM_MOTION)");
-                }
-            }
-            break;
-        case LOCALSDK_ALARM_HUMANOID:
-            if((!!eventInfo->state) != alarm_state_humanoid) {
-                alarm_state_humanoid = !!eventInfo->state;
-                logger("alarm", "alarm_state_callback", LOGGER_LEVEL_INFO, "Change %s status: %d", "humanoid", alarm_state_humanoid);
-                if(mqtt_is_enabled() && mqtt_is_connected()) {
-                    if(alarm_state_mqtt(alarm_state_motion, alarm_state_humanoid)) {
-                        logger("alarm", "alarm_state_callback", LOGGER_LEVEL_INFO, "%s success.", "alarm_state_mqtt(LOCALSDK_ALARM_HUMANOID)");
-                    } else logger("alarm", "alarm_state_callback", LOGGER_LEVEL_ERROR, "%s error!", "alarm_state_mqtt(LOCALSDK_ALARM_HUMANOID)");
-                }
-            }
-            break;
-        default:
-            logger("alarm", "alarm_state_callback", LOGGER_LEVEL_INFO, "Change %s status: %d", "unknown", eventInfo->state);
+    if(eventInfo->state) {
+        switch(eventInfo->type) {
+            case LOCALSDK_ALARM_MOTION:
+                alarm_time_motion = (int) time(NULL);
+                break;
+            case LOCALSDK_ALARM_HUMANOID:
+                alarm_time_humanoid = (int) time(NULL);
+                break;
+            default:
+                logger("alarm", "alarm_state_callback", LOGGER_LEVEL_INFO, "Change %s status: %d", "unknown", eventInfo->state);
+        }
     }
     return LOCALSDK_OK;
 }
@@ -97,15 +152,18 @@ bool alarm_init() {
                 logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_HUMANOID)");
                 if(local_sdk_alarm_state_set_callback(alarm_state_callback) == LOCALSDK_OK) {
                     logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_alarm_state_set_callback()");
-                    if(local_sdk_set_alarm_switch(LOCALSDK_ALARM_MOTION, true) == LOCALSDK_OK) {
-                        logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_set_alarm_switch(LOCALSDK_ALARM_MOTION)");
-                        if(local_sdk_set_alarm_switch(LOCALSDK_ALARM_HUMANOID, true) == LOCALSDK_OK) {
-                            logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_set_alarm_switch(LOCALSDK_ALARM_HUMANOID)");
-                            
-                            logger("alarm", "alarm_init", LOGGER_LEVEL_DEBUG, "Function completed.");
-                            return true;
-                        } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_set_alarm_switch(LOCALSDK_ALARM_HUMANOID)");
-                    } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_set_alarm_switch(LOCALSDK_ALARM_MOTION)");
+                    if(pthread_create(&timeout_thread, NULL, alarm_state_timeout, NULL) == 0) {
+                        logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "pthread_create(timeout_thread)");
+                        if(local_sdk_set_alarm_switch(LOCALSDK_ALARM_MOTION, true) == LOCALSDK_OK) {
+                            logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_set_alarm_switch(LOCALSDK_ALARM_MOTION)");
+                            if(local_sdk_set_alarm_switch(LOCALSDK_ALARM_HUMANOID, true) == LOCALSDK_OK) {
+                                logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_set_alarm_switch(LOCALSDK_ALARM_HUMANOID)");
+                                
+                                logger("alarm", "alarm_init", LOGGER_LEVEL_DEBUG, "Function completed.");
+                                return true;
+                            } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_set_alarm_switch(LOCALSDK_ALARM_HUMANOID)");
+                        } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_set_alarm_switch(LOCALSDK_ALARM_MOTION)");
+                    } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "pthread_create(timeout_thread)");
                 } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_alarm_state_set_callback()");
             } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_HUMANOID)");
         } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_MOTION)");
@@ -136,6 +194,16 @@ bool alarm_free() {
     } else {
         logger("alarm", "alarm_free", LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_set_alarm_switch(LOCALSDK_ALARM_MOTION)");
         result = false;
+    }
+    
+    // Stop timeout thread
+    if(timeout_thread) {
+        if(pthread_cancel(timeout_thread) == 0) {
+            logger("alarm", "alarm_free", LOGGER_LEVEL_INFO, "%s success.", "pthread_cancel(timeout_thread)");
+        } else {
+            logger("alarm", "alarm_free", LOGGER_LEVEL_WARNING, "%s error!", "pthread_cancel(timeout_thread)");
+            result = false;
+        }
     }
     
     // Clear alarm state callback
