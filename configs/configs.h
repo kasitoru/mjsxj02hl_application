@@ -25,7 +25,8 @@ typedef struct {
     struct {
         int motion_sens;
         int humanoid_sens;
-        int timeout;
+        int motion_timeout;
+        int humanoid_timeout;
     } alarm;
     
     // [mqtt]

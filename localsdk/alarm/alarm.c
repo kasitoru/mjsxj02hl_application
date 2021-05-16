@@ -79,7 +79,7 @@ void* alarm_state_timeout(void *args) {
         // Motion
         if(alarm_time_motion > 0) {
             if(alarm_state_motion) {
-                if((int) time(NULL) - alarm_time_motion > APP_CFG.alarm.timeout) {
+                if((int) time(NULL) - alarm_time_motion > APP_CFG.alarm.motion_timeout) {
                     alarm_time_motion = 0;
                     alarm_state_motion = false;
                     alarm_change_motion = true;
@@ -93,7 +93,7 @@ void* alarm_state_timeout(void *args) {
         // Humanoid
         if(alarm_time_humanoid > 0) {
             if(alarm_state_humanoid) {
-                if((int) time(NULL) - alarm_time_humanoid > APP_CFG.alarm.timeout) {
+                if((int) time(NULL) - alarm_time_humanoid > APP_CFG.alarm.humanoid_timeout) {
                     alarm_time_humanoid = 0;
                     alarm_state_humanoid = false;
                     alarm_change_humanoid = true;
