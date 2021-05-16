@@ -35,7 +35,7 @@ int localsdk_get_version();
 ********************/
 
 #define LOCALSDK_VIDEO_FPS                  20
-#define LOCALSDK_VIDEO_PAYLOAD_TYPE         2
+#define LOCALSDK_VIDEO_PAYLOAD_TYPE         1
 #define LOCALSDK_VIDEO_RCMODE_TYPE          2
 
 #define LOCALSDK_VIDEO_PRIMARY_CHANNEL      0
@@ -51,8 +51,8 @@ int localsdk_get_version();
 #define LOCALSDK_VIDEO_SECONDARY_HEIGHT     360
 
 typedef struct {
-    uint32_t unknown_0; // FIXME: what is it?
-    uint32_t unknown_1; // FIXME: what is it?
+    signed char *data;
+    uint32_t size;
     uint32_t index;
     uint32_t timestamp;
     uint16_t unknown_4; // FIXME: what is it?
@@ -143,17 +143,18 @@ int local_sdk_video_set_night_mode();
         AUDIO
 ********************/
 
-#define LOCALSDK_AUDIO_CHANNEL 0
+#define LOCALSDK_AUDIO_CHANNEL     0
+#define LOCALSDK_AUDIO_SAMPLE_RATE 8000
 
 typedef struct {
+    signed char *data;
     uint32_t size;
-    uint32_t unknown_2; // FIXME: what is it?
     uint32_t index;
     uint32_t timestamp;
 } LOCALSDK_G711_FRAME_INFO;
 
 typedef struct {
-    uint32_t unknown_0; // FIXME: what is it?
+    uint32_t sample_rate;
     uint32_t unknown_1; // FIXME: what is it?
     uint32_t unknown_2; // FIXME: what is it?
     uint32_t unknown_3; // FIXME: what is it?
@@ -209,6 +210,7 @@ int local_sdk_audio_destory();
 ********************/
 
 #define LOCALSDK_SPEAKER_DATA_FORMAT      1 // 0 - G711, 1 - PCM
+#define LOCALSDK_SPEAKER_SAMPLE_RATE      8000
 #define LOCALSDK_SPEAKER_G711_BUFFER_SIZE 320
 #define LOCALSDK_SPEAKER_PCM_BUFFER_SIZE  640
 #define LOCALSDK_SPEAKER_FEED_DATA_SLEEP  98000

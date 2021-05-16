@@ -6,23 +6,14 @@
 #include "./../localsdk.h"
 #include "./../../logger/logger.h"
 #include "./../../configs/configs.h"
+#include "./../../rtsp/rtsp.h"
 
 // Video capture callback
 int h26x_capture_callback(int chn, LOCALSDK_H26X_FRAME_INFO *frameInfo) {
-    if(frameInfo && frameInfo->unknown_1) {
-        // FIXME: how get data?
-        /*
-        logger("video", "h26x_capture_callback", LOGGER_LEVEL_DEBUG, "Function is called...");
-        logger("video", "h26x_capture_callback", LOGGER_LEVEL_DEBUG, "    frameInfo->unknown_0: %u\n", frameInfo->unknown_0);
-        logger("video", "h26x_capture_callback", LOGGER_LEVEL_DEBUG, "    frameInfo->unknown_1: %u\n", frameInfo->unknown_1);
-        logger("video", "h26x_capture_callback", LOGGER_LEVEL_DEBUG, "    frameInfo->index: %u\n", frameInfo->index);
-        logger("video", "h26x_capture_callback", LOGGER_LEVEL_DEBUG, "    frameInfo->timestamp: %u\n", frameInfo->timestamp);
-        logger("video", "h26x_capture_callback", LOGGER_LEVEL_DEBUG, "    frameInfo->unknown_4: %u\n", frameInfo->unknown_4);
-        logger("video", "h26x_capture_callback", LOGGER_LEVEL_DEBUG, "    frameInfo->unknown_5: %u\n", frameInfo->unknown_5);
-        logger("video", "h26x_capture_callback", LOGGER_LEVEL_DEBUG, "    frameInfo->unknown_6: %u\n", frameInfo->unknown_6);
-        logger("video", "h26x_capture_callback", LOGGER_LEVEL_DEBUG, "\n");
-        */
-        return LOCALSDK_OK;
+    if(frameInfo && frameInfo->size) {
+        if(rtsp_media_frame(frameInfo->data, frameInfo->size, frameInfo->timestamp, chn)) {
+            return LOCALSDK_OK;
+        } else logger("video", "h26x_capture_callback", LOGGER_LEVEL_ERROR, "%s error!", "rtsp_media_frame()");
     }
     return LOCALSDK_ERROR;
 }

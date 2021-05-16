@@ -10,8 +10,8 @@ OUTPUT := ./bin
 
 all: mkdirs mjsxj02hl
 
-mjsxj02hl: ./mjsxj02hl.c logger.o init.o configs.o inih.o video.o audio.o speaker.o alarm.o mqtt.o
-	$(TOOLCHAIN)$(CC) $(CCFLAGS) $(ARCH) ./mjsxj02hl.c $(OUTPUT)/objects/*.o -o $(OUTPUT)/mjsxj02hl
+mjsxj02hl: ./mjsxj02hl.c logger.o init.o configs.o inih.o video.o audio.o speaker.o alarm.o mqtt.o rtsp.o
+	$(TOOLCHAIN)$(CC) $(CCFLAGS) $(ARCH) ./mjsxj02hl.c $(OUTPUT)/objects/*.o ./rtsp/librtsp.a -o $(OUTPUT)/mjsxj02hl
 
 logger.o: ./logger/logger.c
 	$(TOOLCHAIN)$(CC) $(CCFLAGS) $(ARCH) -c ./logger/logger.c -o $(OUTPUT)/objects/logger.o
@@ -40,8 +40,15 @@ alarm.o: ./localsdk/alarm/alarm.c
 mqtt.o: ./mqtt/mqtt.c
 	$(TOOLCHAIN)$(CC) $(CCFLAGS) $(ARCH) -c ./mqtt/mqtt.c -o $(OUTPUT)/objects/mqtt.o
 
+librtsp.a:
+	make -C ./rtsp
+
+rtsp.o: ./rtsp/rtsp.c librtsp.a
+	$(TOOLCHAIN)$(CC) $(CCFLAGS) $(ARCH) -c ./rtsp/rtsp.c -o $(OUTPUT)/objects/rtsp.o
+
 mkdirs: clean
 	mkdir -p $(OUTPUT)/objects
 
 clean:
+	rm -f ./rtsp/librtsp/src/*.o
 	rm -rf $(OUTPUT)/*

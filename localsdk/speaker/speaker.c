@@ -18,7 +18,7 @@ bool speaker_init() {
     if(local_sdk_speaker_init() == LOCALSDK_OK) {
         logger("speaker", "speaker_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_speaker_init()");
         LOCALSDK_SPEAKER_OPTIONS speaker_options = {
-            .sample_rate = 8000,
+            .sample_rate = LOCALSDK_SPEAKER_SAMPLE_RATE,
             .unknown_1   = 16, // FIXME: what is it?
             .unknown_2   = 25, // FIXME: what is it?
             .unknown_3   = 1, // FIXME: what is it?
