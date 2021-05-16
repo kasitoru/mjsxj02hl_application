@@ -127,12 +127,13 @@ void* alarm_state_timeout(void *args) {
 // Alarm callback
 int alarm_state_callback(LOCALSDK_ALARM_EVENT_INFO *eventInfo) {
     if(eventInfo->state) {
+        int current_timestamp = (int) time(NULL);
         switch(eventInfo->type) {
             case LOCALSDK_ALARM_MOTION:
-                alarm_time_motion = (int) time(NULL);
+                alarm_time_motion = current_timestamp;
                 break;
             case LOCALSDK_ALARM_HUMANOID:
-                alarm_time_humanoid = (int) time(NULL);
+                alarm_time_humanoid = current_timestamp;
                 break;
             default:
                 logger("alarm", "alarm_state_callback", LOGGER_LEVEL_INFO, "Change %s status: %d", "unknown", eventInfo->state);
