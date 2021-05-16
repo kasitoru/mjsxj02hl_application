@@ -124,6 +124,17 @@ int local_sdk_video_get_jpeg(int chn, char *file);
 
 // TODO:
 int local_sdk_video_force_I_frame(int param_1);
+int local_sdk_video_set_brightness(int param_1, int param_2, int param_3, int param_4);
+int local_sdk_video_set_flip(int param_1, int param_2);
+int local_sdk_video_set_fps(int param_1, int param_2, int param_3, int param_4);
+int local_sdk_video_set_gop(int param_1, int param_2);
+int local_sdk_video_set_kbps(int param_1, int param_2);
+
+/********************
+        OSD
+********************/
+
+// TODO:
 int local_sdk_video_osd_update_logo(int param_1, unsigned int param_2);
 int local_sdk_video_osd_update_rect();
 int local_sdk_video_osd_update_rect1();
@@ -131,13 +142,6 @@ int local_sdk_video_osd_update_rect2();
 int local_sdk_video_osd_update_rect3();
 int local_sdk_video_osd_update_rect_multi(int param_1, int param_2, int *param_3);
 int local_sdk_video_osd_update_timestamp(int param_1, int param_2, struct tm * timeptr);
-int local_sdk_video_set_brightness(int param_1, int param_2, int param_3, int param_4);
-int local_sdk_video_set_flip(int param_1, int param_2);
-int local_sdk_video_set_fps(int param_1, int param_2, int param_3, int param_4);
-int local_sdk_video_set_gop(int param_1, int param_2);
-int local_sdk_video_set_kbps(int param_1, int param_2);
-int local_sdk_video_set_daytime_mode();
-int local_sdk_video_set_night_mode();
 
 /********************
         AUDIO
@@ -323,6 +327,12 @@ int local_sdk_setup_keydown_set_callback(int timeout, int (*callback)());
 /********************
      NIGHT MODE
 ********************/
+
+// Color image
+int local_sdk_video_set_daytime_mode();
+
+// Grayscale image
+int local_sdk_video_set_night_mode();
 
 // Enable auto night mode
 int local_sdk_auto_night_light();
