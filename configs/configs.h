@@ -23,8 +23,8 @@ typedef struct {
     
     // [alarm]
     struct {
-        int motion;
-        int humanoid;
+        int motion_sens;
+        int humanoid_sens;
         int timeout;
     } alarm;
     

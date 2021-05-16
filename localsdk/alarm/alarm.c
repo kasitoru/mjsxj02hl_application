@@ -147,9 +147,9 @@ bool alarm_init() {
     logger("alarm", "alarm_init", LOGGER_LEVEL_DEBUG, "Function is called...");
     if(local_sdk_alarm_init(LOCALSDK_VIDEO_SECONDARY_WIDTH, LOCALSDK_VIDEO_SECONDARY_HEIGHT) == LOCALSDK_OK) {
         logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_alarm_init()");
-        if(local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_MOTION, APP_CFG.alarm.motion) == LOCALSDK_OK) {
+        if(local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_MOTION, APP_CFG.alarm.motion_sens) == LOCALSDK_OK) {
             logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_MOTION)");
-            if(local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_HUMANOID, APP_CFG.alarm.humanoid) == LOCALSDK_OK) {
+            if(local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_HUMANOID, APP_CFG.alarm.humanoid_sens) == LOCALSDK_OK) {
                 logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_HUMANOID)");
                 if(local_sdk_alarm_state_set_callback(alarm_state_callback) == LOCALSDK_OK) {
                     logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_alarm_state_set_callback()");
