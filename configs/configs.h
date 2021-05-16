@@ -27,6 +27,10 @@ typedef struct {
         int humanoid_sens;
         int motion_timeout;
         int humanoid_timeout;
+        char* motion_detect_exec;
+        char* humanoid_detect_exec;
+        char* motion_lost_exec;
+        char* humanoid_lost_exec;
     } alarm;
     
     // [mqtt]

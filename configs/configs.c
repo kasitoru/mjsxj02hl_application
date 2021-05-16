@@ -8,29 +8,33 @@
 // Default values
 APPLICATION_CONFIGURATION APP_CFG = {
     // [logger]
-    .logger.level           = LOGGER_LEVEL_DEBUG, // Log level
+    .logger.level               = LOGGER_LEVEL_DEBUG, // Log level
     
     // [video]
-    .video.flip             = false,              // Flip (true or false)
-    .video.mirror           = false,              // Mirror (true or false)
+    .video.flip                 = false,              // Flip (true or false)
+    .video.mirror               = false,              // Mirror (true or false)
     
     // [speaker]
-    .speaker.volume         = 75,                 // Volume (0-100)
+    .speaker.volume             = 75,                 // Volume (0-100)
     
     // [alarm]
-    .alarm.motion_sens      = 150,                // Motion sensitivity (1-255)
-    .alarm.humanoid_sens    = 150,                // Humanoid sensitivity (1-255)
-    .alarm.motion_timeout   = 60,                 // Motion timeout (in seconds)
-    .alarm.humanoid_timeout = 60,                 // Humanoid timeout (in seconds)
+    .alarm.motion_sens          = 150,                // Motion sensitivity (1-255)
+    .alarm.humanoid_sens        = 150,                // Humanoid sensitivity (1-255)
+    .alarm.motion_timeout       = 60,                 // Motion timeout (in seconds)
+    .alarm.humanoid_timeout     = 60,                 // Humanoid timeout (in seconds)
+    .alarm.motion_detect_exec   = "",                 // Execute the command when motion is detected
+    .alarm.humanoid_detect_exec = "",                 // Execute the command when humanoid is detected
+    .alarm.motion_lost_exec     = "",                 // Execute the command when motion is lost
+    .alarm.humanoid_lost_exec   = "",                 // Execute the command when humanoid is lost
     
     // [mqtt]
-    .mqtt.server            = "",                 // Address (empty for disable)
-    .mqtt.port              = 1883,               // Port
-    .mqtt.username          = "",                 // Username (empty for anonimous)
-    .mqtt.password          = "",                 // Password (empty for disable)
-    .mqtt.topic             = "mjsxj02hl",        // Topic name
-    .mqtt.qos               = 1,                  // Quality of Service (0, 1 or 2)
-    .mqtt.retain            = false,              // Retained messages
+    .mqtt.server                = "",                 // Address (empty for disable)
+    .mqtt.port                  = 1883,               // Port
+    .mqtt.username              = "",                 // Username (empty for anonimous)
+    .mqtt.password              = "",                 // Password (empty for disable)
+    .mqtt.topic                 = "mjsxj02hl",        // Topic name
+    .mqtt.qos                   = 1,                  // Quality of Service (0, 1 or 2)
+    .mqtt.retain                = false,              // Retained messages
 };
 
 // Handler for ini parser
@@ -59,6 +63,14 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
         config->alarm.motion_timeout = atoi(value);
     } else if(MATCH("alarm", "humanoid_timeout")) {
         config->alarm.humanoid_timeout = atoi(value);
+    } else if(MATCH("alarm", "motion_detect_exec")) {
+        config->alarm.motion_detect_exec = strdup(value);
+    } else if(MATCH("alarm", "humanoid_detect_exec")) {
+        config->alarm.humanoid_detect_exec = strdup(value);
+    } else if(MATCH("alarm", "motion_lost_exec")) {
+        config->alarm.motion_lost_exec = strdup(value);
+    } else if(MATCH("alarm", "humanoid_lost_exec")) {
+        config->alarm.humanoid_lost_exec = strdup(value);
 
     // [mqtt]
     } else if(MATCH("mqtt", "server")) {

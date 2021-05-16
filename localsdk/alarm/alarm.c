@@ -106,11 +106,41 @@ void* alarm_state_timeout(void *args) {
         
         // State changed
         if(alarm_change_motion || alarm_change_humanoid) {
-
-            // Logger
-            if(alarm_change_motion) { logger("alarm", "alarm_state_timeout", LOGGER_LEVEL_INFO, "Change %s status: %d", "motion", alarm_state_motion); }
-            if(alarm_change_humanoid) { logger("alarm", "alarm_state_timeout", LOGGER_LEVEL_INFO, "Change %s status: %d", "humanoid", alarm_state_humanoid); }
         
+            // Motion
+            if(alarm_change_motion) {
+                logger("alarm", "alarm_state_timeout", LOGGER_LEVEL_INFO, "Change %s status: %d", "motion", alarm_state_motion);
+                // Execute the command
+                if(alarm_state_motion && APP_CFG.alarm.motion_detect_exec && APP_CFG.alarm.motion_detect_exec[0]) {
+                    // Detect
+                    if(system(APP_CFG.alarm.motion_detect_exec) == 0) {
+                        logger("alarm", "alarm_state_timeout", LOGGER_LEVEL_INFO, "%s success.", "system(motion_detect_exec)");
+                    } else logger("alarm", "alarm_state_timeout", LOGGER_LEVEL_ERROR, "%s error!", "system(motion_detect_exec)");
+                } else if(!alarm_state_motion && APP_CFG.alarm.motion_lost_exec && APP_CFG.alarm.motion_lost_exec[0]) {
+                    // Lost
+                    if(system(APP_CFG.alarm.motion_lost_exec) == 0) {
+                        logger("alarm", "alarm_state_timeout", LOGGER_LEVEL_INFO, "%s success.", "system(motion_lost_exec)");
+                    } else logger("alarm", "alarm_state_timeout", LOGGER_LEVEL_ERROR, "%s error!", "system(motion_lost_exec)");
+                }
+            }
+            
+            // Humanoid
+            if(alarm_change_humanoid) {
+                logger("alarm", "alarm_state_timeout", LOGGER_LEVEL_INFO, "Change %s status: %d", "humanoid", alarm_state_motion);
+                // Execute the command
+                if(alarm_state_motion && APP_CFG.alarm.humanoid_detect_exec && APP_CFG.alarm.humanoid_detect_exec[0]) {
+                    // Detect
+                    if(system(APP_CFG.alarm.humanoid_detect_exec) == 0) {
+                        logger("alarm", "alarm_state_timeout", LOGGER_LEVEL_INFO, "%s success.", "system(humanoid_detect_exec)");
+                    } else logger("alarm", "alarm_state_timeout", LOGGER_LEVEL_ERROR, "%s error!", "system(humanoid_detect_exec)");
+                } else if(!alarm_state_humanoid && APP_CFG.alarm.humanoid_lost_exec && APP_CFG.alarm.humanoid_lost_exec[0]) {
+                    // Lost
+                    if(system(APP_CFG.alarm.humanoid_lost_exec) == 0) {
+                        logger("alarm", "alarm_state_timeout", LOGGER_LEVEL_INFO, "%s success.", "system(humanoid_lost_exec)");
+                    } else logger("alarm", "alarm_state_timeout", LOGGER_LEVEL_ERROR, "%s error!", "system(humanoid_lost_exec)");
+                }
+            }
+            
             // MQTT
             if(mqtt_is_enabled() && mqtt_is_connected()) {
                 if(alarm_state_mqtt(alarm_state_motion, alarm_state_humanoid)) {
