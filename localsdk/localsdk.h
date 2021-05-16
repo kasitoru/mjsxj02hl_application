@@ -320,14 +320,29 @@ int local_sdk_indicator_led_option(bool orange, bool blue);
 
 int local_sdk_setup_keydown_set_callback(int timeout, int (*callback)());
 
-// TODO:
+/********************
+     NIGHT MODE
+********************/
+
+// Enable auto night mode
 int local_sdk_auto_night_light();
+
+// Disable auto night mode
 int local_sdk_auto_night_off_light();
+
+// Enable manual night mode
 int local_sdk_open_night_light();
-int local_sdk_open_night_off_light();
+
+// Disable manual night mode
 int local_sdk_close_night_light();
+
+// Set night mode state callback
 int local_sdk_night_state_set_callback(int (*callback)(int state));
+
+// Opet IR-cut filter
 int local_sdk_open_ircut();
+
+// Close IR-cut filter
 int local_sdk_close_ircut();
 
 #ifdef __cplusplus

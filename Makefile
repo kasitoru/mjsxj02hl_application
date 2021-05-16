@@ -10,7 +10,7 @@ OUTPUT := ./bin
 
 all: mkdirs mjsxj02hl
 
-mjsxj02hl: ./mjsxj02hl.c logger.o init.o configs.o inih.o video.o audio.o speaker.o alarm.o mqtt.o rtsp.o
+mjsxj02hl: ./mjsxj02hl.c logger.o init.o configs.o inih.o video.o audio.o speaker.o alarm.o night.o mqtt.o rtsp.o
 	$(TOOLCHAIN)$(CC) $(CCFLAGS) $(ARCH) ./mjsxj02hl.c $(OUTPUT)/objects/*.o ./rtsp/librtsp.a -o $(OUTPUT)/mjsxj02hl
 
 logger.o: ./logger/logger.c
@@ -36,6 +36,9 @@ speaker.o: ./localsdk/speaker/speaker.c
 
 alarm.o: ./localsdk/alarm/alarm.c
 	$(TOOLCHAIN)$(CC) $(CCFLAGS) $(ARCH) -c ./localsdk/alarm/alarm.c -o $(OUTPUT)/objects/alarm.o
+
+night.o: ./localsdk/night/night.c
+	$(TOOLCHAIN)$(CC) $(CCFLAGS) $(ARCH) -c ./localsdk/night/night.c -o $(OUTPUT)/objects/night.o
 
 mqtt.o: ./mqtt/mqtt.c
 	$(TOOLCHAIN)$(CC) $(CCFLAGS) $(ARCH) -c ./mqtt/mqtt.c -o $(OUTPUT)/objects/mqtt.o

@@ -12,6 +12,7 @@
 #include "./audio/audio.h"
 #include "./speaker/speaker.h"
 #include "./alarm/alarm.h"
+#include "./night/night.h"
 #include "./../logger/logger.h"
 #include "./../configs/configs.h"
 
@@ -46,9 +47,12 @@ bool all_init() {
                                 logger("localsdk-init", "all_init", LOGGER_LEVEL_INFO, "%s success.", "speaker_init()");
                                 if(alarm_init()) {
                                     logger("localsdk-init", "all_init", LOGGER_LEVEL_INFO, "%s success.", "alarm_init()");
-                                    
-                                    logger("localsdk-init", "all_init", LOGGER_LEVEL_DEBUG, "Function completed.");
-                                    return true;
+                                    if(night_init()) {
+                                        logger("localsdk-init", "all_init", LOGGER_LEVEL_INFO, "%s success.", "night_init()");
+                                        
+                                        logger("localsdk-init", "all_init", LOGGER_LEVEL_DEBUG, "Function completed.");
+                                        return true;
+                                    } else logger("localsdk-init", "all_init", LOGGER_LEVEL_ERROR, "%s error!", "night_init()");
                                 } else logger("localsdk-init", "all_init", LOGGER_LEVEL_ERROR, "%s error!", "alarm_init()");
                             } else logger("localsdk-init", "all_init", LOGGER_LEVEL_ERROR, "%s error!", "speaker_init()");
                         } else logger("localsdk-init", "all_init", LOGGER_LEVEL_ERROR, "%s error!", "audio_init()");
@@ -68,6 +72,14 @@ bool all_init() {
 bool all_free() {
     bool result = true;
     logger("localsdk-init", "all_free", LOGGER_LEVEL_DEBUG, "Function is called...");
+    
+    // Free night mode
+    if(night_free()) {
+        logger("localsdk-init", "all_free", LOGGER_LEVEL_INFO, "%s success.", "night_free()");
+    } else {
+        logger("localsdk-init", "all_free", LOGGER_LEVEL_WARNING, "%s error!", "night_free()");
+        result = false;
+    }
     
     // Free alarm
     if(alarm_free()) {
@@ -101,7 +113,7 @@ bool all_free() {
         result = false;
     }
     
-    // Free video
+    // Free localsdk
     if(localsdk_destory() == LOCALSDK_OK) {
         logger("localsdk-init", "all_free", LOGGER_LEVEL_INFO, "%s success.", "localsdk_destory()");
     } else {
