@@ -21,6 +21,9 @@ extern "C"{
 // Set printf function for debug messages
 int localsdk_set_logprintf_func(int (*function)(const char*, ...));
 
+// Set shell function
+int localsdk_set_shellcall_func(int *param_1); // FIXME
+
 // Initialize SDK
 int localsdk_init();
 
