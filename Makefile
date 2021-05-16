@@ -50,5 +50,5 @@ mkdirs: clean
 	mkdir -p $(OUTPUT)/objects
 
 clean:
-	rm -f ./rtsp/librtsp/src/*.o
+	make clean -C ./rtsp
 	rm -rf $(OUTPUT)/*
