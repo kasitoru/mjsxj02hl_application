@@ -265,9 +265,9 @@ int local_sdk_speaker_clean_buf_data();
 
 typedef struct {
     uint32_t unknown_1; // FIXME: what is it?
-    uint32_t type; // type (motion/humanoid) FIXME: why double?
+    uint32_t type; // type (motion/humanoid)
     uint32_t unknown_3; // FIXME: what is it?
-    uint32_t state; // state (start/stop) FIXME: why double?
+    uint32_t state; // state (start/stop)
     uint32_t unknown_5; // FIXME: what is it?
     uint32_t unknown_6; // FIXME: what is it?
     uint32_t unknown_7; // FIXME: what is it?
