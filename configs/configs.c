@@ -9,6 +9,7 @@
 APPLICATION_CONFIGURATION APP_CFG = {
     // [logger]
     .logger.level               = LOGGER_LEVEL_DEBUG, // Log level
+    .logger.file                = "",                 // Write log to file
     
     // [video]
     .video.flip                 = false,              // Flip (true or false)
@@ -51,6 +52,8 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
     // [logger]
     if(MATCH("logger", "level")) {
         config->logger.level = atoi(value);
+    } else if(MATCH("logger", "file")) {
+        config->logger.file = strdup(value);
     
     // [video]
     } else if(MATCH("video", "flip")) {

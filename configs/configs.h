@@ -8,6 +8,7 @@ typedef struct {
     // [logger]
     struct {
         int level;
+        char* file;
     } logger;
 
     // [video]
