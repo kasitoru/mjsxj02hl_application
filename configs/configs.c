@@ -47,9 +47,13 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
 
     APPLICATION_CONFIGURATION* config = (APPLICATION_CONFIGURATION*) cfg;
     #define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0
-
+    
+    // [logger]
+    if(MATCH("logger", "level")) {
+        config->logger.level = atoi(value);
+    
     // [video]
-    if(MATCH("video", "flip")) {
+    } else if(MATCH("video", "flip")) {
         config->video.flip = (atoi(value) != 0);
     } else if(MATCH("video", "mirror")) {
         config->video.mirror = (atoi(value) != 0);
