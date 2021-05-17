@@ -43,6 +43,12 @@ typedef struct {
         int qos;
         int retain;
     } mqtt;
+    
+    // [night]
+    struct {
+        int mode;
+    } night;
+    
 } APPLICATION_CONFIGURATION;
 
 // Global configuration variable

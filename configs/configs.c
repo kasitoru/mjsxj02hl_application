@@ -35,6 +35,9 @@ APPLICATION_CONFIGURATION APP_CFG = {
     .mqtt.topic                 = "mjsxj02hl",        // Topic name
     .mqtt.qos                   = 1,                  // Quality of Service (0, 1 or 2)
     .mqtt.retain                = false,              // Retained messages
+    
+    // [night]
+    .night.mode                 = 2,                  // Night mode (0 = off, 1 = on, 2 = auto)
 };
 
 // Handler for ini parser
@@ -87,6 +90,10 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
         config->mqtt.qos = atoi(value);
     } else if(MATCH("mqtt", "retain")) {
         config->mqtt.retain = (atoi(value) != 0);
+
+    // [night]
+    } else if(MATCH("night", "mode")) {
+        config->night.mode = atoi(value);
 
     // unknown
     } else result = false;
