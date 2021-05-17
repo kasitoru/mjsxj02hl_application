@@ -206,12 +206,9 @@ bool alarm_init() {
                     logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_alarm_state_set_callback()");
                     if(pthread_create(&timeout_thread, NULL, alarm_state_timeout, NULL) == 0) {
                         logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "pthread_create(timeout_thread)");
-                        if(alarm_switch(true)) {
-                            logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "alarm_switch(true)");
-                        
-                            logger("alarm", "alarm_init", LOGGER_LEVEL_DEBUG, "Function completed.");
-                            return true;
-                        } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "alarm_switch(true)");
+
+                        logger("alarm", "alarm_init", LOGGER_LEVEL_DEBUG, "Function completed.");
+                        return true;
                     } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "pthread_create(timeout_thread)");
                 } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_alarm_state_set_callback()");
             } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_HUMANOID)");
