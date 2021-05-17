@@ -10,6 +10,7 @@
 
 #define MQTT_INFO_TOPIC          "info"
 #define MQTT_ALARM_TOPIC         "alarm"
+#define MQTT_NIGHT_TOPIC         "night"
 #define MQTT_COMMAND_TOPIC       "cmd"
 
 // Init mqtt
