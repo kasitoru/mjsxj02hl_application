@@ -172,6 +172,27 @@ int alarm_state_callback(LOCALSDK_ALARM_EVENT_INFO *eventInfo) {
     return LOCALSDK_OK;
 }
 
+// Enable or disable alarm
+bool alarm_switch(bool state) {
+    bool result = false;
+    logger("alarm", "alarm_switch", LOGGER_LEVEL_DEBUG, "Function is called...");
+    
+    // Switch alarm for motion
+    if(local_sdk_set_alarm_switch(LOCALSDK_ALARM_MOTION, state) == LOCALSDK_OK) {
+        logger("alarm", "alarm_switch", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_set_alarm_switch(LOCALSDK_ALARM_MOTION)");
+        result = true;
+    } else logger("alarm", "alarm_switch", LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_set_alarm_switch(LOCALSDK_ALARM_MOTION)");
+
+    // Switch alarm for humanoid
+    if(local_sdk_set_alarm_switch(LOCALSDK_ALARM_HUMANOID, state) == LOCALSDK_OK) {
+        logger("alarm", "alarm_switch", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_set_alarm_switch(LOCALSDK_ALARM_HUMANOID)");
+        result = true;
+    } else logger("alarm", "alarm_switch", LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_set_alarm_switch(LOCALSDK_ALARM_HUMANOID)");
+    
+    logger("alarm", "alarm_switch", LOGGER_LEVEL_DEBUG, "Function completed.");
+    return result;
+}
+
 // Init alarm
 bool alarm_init() {
     logger("alarm", "alarm_init", LOGGER_LEVEL_DEBUG, "Function is called...");
@@ -185,15 +206,12 @@ bool alarm_init() {
                     logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_alarm_state_set_callback()");
                     if(pthread_create(&timeout_thread, NULL, alarm_state_timeout, NULL) == 0) {
                         logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "pthread_create(timeout_thread)");
-                        if(local_sdk_set_alarm_switch(LOCALSDK_ALARM_MOTION, true) == LOCALSDK_OK) {
-                            logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_set_alarm_switch(LOCALSDK_ALARM_MOTION)");
-                            if(local_sdk_set_alarm_switch(LOCALSDK_ALARM_HUMANOID, true) == LOCALSDK_OK) {
-                                logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_set_alarm_switch(LOCALSDK_ALARM_HUMANOID)");
-                                
-                                logger("alarm", "alarm_init", LOGGER_LEVEL_DEBUG, "Function completed.");
-                                return true;
-                            } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_set_alarm_switch(LOCALSDK_ALARM_HUMANOID)");
-                        } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_set_alarm_switch(LOCALSDK_ALARM_MOTION)");
+                        if(alarm_switch(true)) {
+                            logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "alarm_switch(true)");
+                        
+                            logger("alarm", "alarm_init", LOGGER_LEVEL_DEBUG, "Function completed.");
+                            return true;
+                        } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "alarm_switch(true)");
                     } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "pthread_create(timeout_thread)");
                 } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_alarm_state_set_callback()");
             } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_HUMANOID)");
@@ -211,22 +229,14 @@ bool alarm_free() {
     bool result = true;
     logger("alarm", "alarm_free", LOGGER_LEVEL_DEBUG, "Function is called...");
     
-    // Disable alarm for humanoid
-    if(local_sdk_set_alarm_switch(LOCALSDK_ALARM_HUMANOID, false) == LOCALSDK_OK) {
-        logger("alarm", "alarm_free", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_set_alarm_switch(LOCALSDK_ALARM_HUMANOID)");
+    // Disable alarm
+    if(alarm_switch(false)) {
+        logger("alarm", "alarm_free", LOGGER_LEVEL_INFO, "%s success.", "alarm_switch(false)");
     } else {
-        logger("alarm", "alarm_free", LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_set_alarm_switch(LOCALSDK_ALARM_HUMANOID)");
+        logger("alarm", "alarm_free", LOGGER_LEVEL_WARNING, "%s error!", "alarm_switch(false)");
         result = false;
     }
-    
-    // Disable alarm for motion
-    if(local_sdk_set_alarm_switch(LOCALSDK_ALARM_MOTION, false) == LOCALSDK_OK) {
-        logger("alarm", "alarm_free", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_set_alarm_switch(LOCALSDK_ALARM_MOTION)");
-    } else {
-        logger("alarm", "alarm_free", LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_set_alarm_switch(LOCALSDK_ALARM_MOTION)");
-        result = false;
-    }
-    
+
     // Stop timeout thread
     if(timeout_thread) {
         if(pthread_cancel(timeout_thread) == 0) {

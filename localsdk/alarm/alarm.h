@@ -6,6 +6,9 @@
 // Init alarm
 bool alarm_init();
 
+// Enable or disable alarm
+bool alarm_switch(bool state);
+
 // Free alarm
 bool alarm_free();
 
