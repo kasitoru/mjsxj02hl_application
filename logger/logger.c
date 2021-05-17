@@ -18,6 +18,13 @@ int logger(const char *module, const char *function, const int level, const char
             va_list params;
             va_start(params, format);
             result = vprintf(template, params);
+            if(APP_CFG.logger.file && APP_CFG.logger.file[0]) {
+                FILE *file;
+                if(file = fopen(APP_CFG.logger.file, "a")) {
+                    vfprintf(file, template, params);
+                    fclose(file);
+                }
+            }
             va_end(params);
             free(template);
         }
