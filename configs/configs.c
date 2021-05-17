@@ -38,6 +38,7 @@ APPLICATION_CONFIGURATION APP_CFG = {
     
     // [night]
     .night.mode                 = 2,                  // Night mode (0 = off, 1 = on, 2 = auto)
+    .night.gray                 = 2,                  // Grayscale (0 = off, 1 = on, 2 = auto)
 };
 
 // Handler for ini parser
@@ -94,6 +95,8 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
     // [night]
     } else if(MATCH("night", "mode")) {
         config->night.mode = atoi(value);
+    } else if(MATCH("night", "gray")) {
+        config->night.gray = atoi(value);
 
     // unknown
     } else result = false;

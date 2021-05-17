@@ -47,6 +47,7 @@ typedef struct {
     // [night]
     struct {
         int mode;
+        int gray;
     } night;
     
 } APPLICATION_CONFIGURATION;
