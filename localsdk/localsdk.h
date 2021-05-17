@@ -102,9 +102,6 @@ int local_sdk_video_create(int chn, LOCALSDK_VIDEO_OPTIONS *options);
 // Set video parameters
 int local_sdk_video_set_parameters(int chn, LOCALSDK_VIDEO_OPTIONS *options);
 
-// Set video osd parameters
-int local_sdk_video_osd_set_parameters(int chn, LOCALSDK_OSD_OPTIONS *options);
-
 // Set video frame callback
 int local_sdk_video_set_encode_frame_callback(int chn, int (*callback)(LOCALSDK_H26X_FRAME_INFO *frameInfo));
 int local_sdk_video_set_yuv_frame_callback(int chn, int (*callback)(LOCALSDK_H26X_FRAME_INFO *frameInfo)); // FIXME: Need own structure?
@@ -130,19 +127,17 @@ int local_sdk_video_force_I_frame(int param_1);
 int local_sdk_video_set_brightness(int param_1, int param_2, int param_3, int param_4);
 int local_sdk_video_set_flip(int param_1, int param_2);
 int local_sdk_video_set_fps(int param_1, int param_2, int param_3, int param_4);
-int local_sdk_video_set_gop(int param_1, int param_2);
 int local_sdk_video_set_kbps(int param_1, int param_2);
 
 /********************
         OSD
 ********************/
 
+// Set osd parameters
+int local_sdk_video_osd_set_parameters(int chn, LOCALSDK_OSD_OPTIONS *options);
+
 // TODO:
 int local_sdk_video_osd_update_logo(int param_1, unsigned int param_2);
-int local_sdk_video_osd_update_rect();
-int local_sdk_video_osd_update_rect1();
-int local_sdk_video_osd_update_rect2();
-int local_sdk_video_osd_update_rect3();
 int local_sdk_video_osd_update_rect_multi(int param_1, int param_2, int *param_3);
 int local_sdk_video_osd_update_timestamp(int param_1, int param_2, struct tm * timeptr);
 
@@ -339,9 +334,6 @@ int local_sdk_video_set_night_mode();
 
 // Enable auto night mode
 int local_sdk_auto_night_light();
-
-// Disable auto night mode
-int local_sdk_auto_night_off_light();
 
 // Enable manual night mode
 int local_sdk_open_night_light();
