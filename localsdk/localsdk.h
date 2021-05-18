@@ -74,7 +74,7 @@ typedef struct {
     uint32_t unknown_7; // FIXME: what is it?
     uint32_t payload;
     uint32_t rcmode;
-    uint32_t unknown_10; // FIXME: what is it?
+    uint32_t gop;
     uint32_t screen_size;
     uint32_t unknown_12; // FIXME: what is it?
     uint32_t unknown_13; // FIXME: what is it?
