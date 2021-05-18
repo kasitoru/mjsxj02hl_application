@@ -7,8 +7,6 @@
 #include "./../../logger/logger.h"
 #include "./../../rtsp/rtsp.h"
 
-static pthread_mutex_t capture_mutex;
-
 // Audio capture callback
 int g711_capture_callback(LOCALSDK_G711_FRAME_INFO *frameInfo) {
     if(frameInfo && frameInfo->size) {
