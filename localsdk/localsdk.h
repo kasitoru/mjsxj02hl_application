@@ -175,7 +175,7 @@ typedef struct {
 int local_sdk_audio_init();
 
 // Create audio
-int local_sdk_audio_create(int chn, LOCALSDK_AUDIO_OPTIONS *options);
+int local_sdk_audio_create(int chn);
 
 // Set audio parameters
 int local_sdk_audio_set_parameters(int chn, LOCALSDK_AUDIO_OPTIONS *options);

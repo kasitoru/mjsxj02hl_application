@@ -24,23 +24,23 @@ bool audio_init() {
     if(local_sdk_audio_init() == LOCALSDK_OK) {
         logger("audio", "audio_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_audio_init()");
         // Init channel 0
-        LOCALSDK_AUDIO_OPTIONS audio_options = {
-            .sample_rate = LOCALSDK_AUDIO_SAMPLE_RATE,
-            .unknown_1   = 16, // FIXME: what is it?
-            .unknown_2   = 25, // FIXME: what is it?
-            .unknown_3   = 1, // FIXME: what is it?
-            .unknown_4   = 0, // FIXME: what is it?
-            .unknown_5   = 2, // FIXME: what is it?
-            .unknown_6   = 1, // FIXME: what is it?
-            .unknown_7   = 1, // FIXME: what is it?
-            .unknown_8   = 2, // FIXME: what is it?
-            .unknown_9   = 20, // FIXME: what is it?
-            .unknown_10  = 70, // FIXME: what is it?
-            .unknown_11  = 640, // FIXME: what is it?
-            .unknown_12  = 320, // FIXME: what is it?
-        };
-        if(local_sdk_audio_create(LOCALSDK_AUDIO_CHANNEL, &audio_options) == LOCALSDK_OK) {
+        if(local_sdk_audio_create(LOCALSDK_AUDIO_CHANNEL) == LOCALSDK_OK) {
             logger("audio", "audio_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_audio_create()");
+            LOCALSDK_AUDIO_OPTIONS audio_options = {
+                .sample_rate = LOCALSDK_AUDIO_SAMPLE_RATE,
+                .unknown_1   = 16, // FIXME: what is it?
+                .unknown_2   = 25, // FIXME: what is it?
+                .unknown_3   = 1, // FIXME: what is it?
+                .unknown_4   = 0, // FIXME: what is it?
+                .unknown_5   = 2, // FIXME: what is it?
+                .unknown_6   = 1, // FIXME: what is it?
+                .unknown_7   = 1, // FIXME: what is it?
+                .unknown_8   = 2, // FIXME: what is it?
+                .unknown_9   = 20, // FIXME: what is it?
+                .unknown_10  = 70, // FIXME: what is it?
+                .unknown_11  = 640, // FIXME: what is it?
+                .unknown_12  = 320, // FIXME: what is it?
+            };
             if(local_sdk_audio_set_parameters(LOCALSDK_AUDIO_CHANNEL, &audio_options) == LOCALSDK_OK) {
                 logger("audio", "audio_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_audio_set_parameters()");
                 if(local_sdk_audio_set_encode_frame_callback(LOCALSDK_AUDIO_CHANNEL, g711_capture_callback) == LOCALSDK_OK) {
