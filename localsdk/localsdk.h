@@ -214,18 +214,22 @@ int local_sdk_audio_destory();
 ********************/
 
 #define LOCALSDK_SPEAKER_DATA_FORMAT      1 // 0 - G711, 1 - PCM
+
 #define LOCALSDK_SPEAKER_SAMPLE_RATE      8000
+#define LOCALSDK_SPEAKER_BIT_DEPTH        16
+#define LOCALSDK_SPEAKER_TRACK_TYPE       1
+
 #define LOCALSDK_SPEAKER_G711_BUFFER_SIZE 320
 #define LOCALSDK_SPEAKER_PCM_BUFFER_SIZE  640
 #define LOCALSDK_SPEAKER_FEED_DATA_SLEEP  98000
 
 typedef struct {
-    uint32_t sample_rate; // FIXME: what is it?
-    uint32_t unknown_1; // FIXME: what is it?
+    uint32_t sample_rate;
+    uint32_t bit_depth;
     uint32_t unknown_2; // FIXME: what is it?
-    uint32_t unknown_3; // FIXME: what is it?
+    uint32_t track_type;
     uint32_t unknown_4; // FIXME: what is it?
-    uint32_t unknown_5; // FIXME: what is it?
+    uint32_t volume;
     uint32_t unknown_6; // FIXME: what is it?
     uint32_t unknown_7; // FIXME: what is it?
 } LOCALSDK_SPEAKER_OPTIONS;

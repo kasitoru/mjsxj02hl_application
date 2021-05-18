@@ -19,11 +19,11 @@ bool speaker_init() {
         logger("speaker", "speaker_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_speaker_init()");
         LOCALSDK_SPEAKER_OPTIONS speaker_options = {
             .sample_rate = LOCALSDK_SPEAKER_SAMPLE_RATE,
-            .unknown_1   = 16, // FIXME: what is it?
+            .bit_depth   = LOCALSDK_SPEAKER_BIT_DEPTH,
             .unknown_2   = 25, // FIXME: what is it?
-            .unknown_3   = 1, // FIXME: what is it?
+            .track_type  = LOCALSDK_SPEAKER_TRACK_TYPE,
             .unknown_4   = 30, // FIXME: what is it?
-            .unknown_5   = 70, // FIXME: what is it?
+            .volume      = 70,
             .unknown_6   = 640, // FIXME: what is it?
             .unknown_7   = 1, // FIXME: what is it?
         };
