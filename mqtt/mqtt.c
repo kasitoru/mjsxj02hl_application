@@ -80,10 +80,8 @@ void* mqtt_periodical(void *arg) {
     bool first = endless_cycle;
     do {
         
-        // Home Assistant discovery
-        // https://www.home-assistant.io/docs/mqtt/discovery/
+        // First iteration
         if(first) {
-            // TODO
             first = false;
         }
         
