@@ -18,12 +18,6 @@ extern "C"{
 
 #define LOCALSDK_CURRENT_VERSION  14
 
-#define LOCALSDK_G711_BUFFER_SIZE 320
-#define LOCALSDK_PCM_BUFFER_SIZE  640
-
-#define LOCALSDK_PCM_TRACK_TYPE   1 // WAV (8000 hz, 16-bit, mono)
-#define LOCALSDK_G711_TRACK_TYPE  2 // A-Law (8000 hz, 16-bit, mono)
-
 // Set printf function for debug messages
 int localsdk_set_logprintf_func(int (*function)(const char*, ...));
 
@@ -151,17 +145,20 @@ int local_sdk_video_osd_update_timestamp(int param_1, int param_2, struct tm * t
         AUDIO
 ********************/
 
-#define LOCALSDK_AUDIO_CHANNEL     0
-#define LOCALSDK_AUDIO_SAMPLE_RATE 8000
-#define LOCALSDK_AUDIO_BIT_DEPTH   16
-#define LOCALSDK_AUDIO_TRACK_TYPE  LOCALSDK_PCM_TRACK_TYPE
+#define LOCALSDK_AUDIO_CHANNEL          0
+#define LOCALSDK_AUDIO_SAMPLE_RATE      8000
+#define LOCALSDK_AUDIO_BIT_DEPTH        16
+#define LOCALSDK_AUDIO_TRACK_TYPE       1
+
+#define LOCALSDK_AUDIO_G711_BUFFER_SIZE 320
+#define LOCALSDK_AUDIO_PCM_BUFFER_SIZE  640
 
 typedef struct {
     signed char *data;
     uint32_t size;
     uint32_t index;
     uint32_t timestamp;
-} LOCALSDK_G711_FRAME_INFO;
+} LOCALSDK_AUDIO_G711_FRAME_INFO;
 
 typedef struct {
     uint32_t sample_rate;
@@ -195,10 +192,7 @@ int local_sdk_audio_set_aec_enable(int chn, bool state);
 int local_sdk_audio_set_volume(int chn, int value);
 
 // Set audio encode callback
-int local_sdk_audio_set_encode_frame_callback(int chn, int (*callback)(LOCALSDK_G711_FRAME_INFO *frameInfo));
-
-// Set audio pcm callback
-int local_sdk_audio_set_pcm_frame_callback(int chn, int (*callback)(LOCALSDK_G711_FRAME_INFO *frameInfo));
+int local_sdk_audio_set_encode_frame_callback(int chn, int (*callback)(LOCALSDK_AUDIO_G711_FRAME_INFO *frameInfo));
 
 // Start audio
 int local_sdk_audio_start();
@@ -221,13 +215,7 @@ int local_sdk_audio_destory();
 
 #define LOCALSDK_SPEAKER_SAMPLE_RATE 8000
 #define LOCALSDK_SPEAKER_BIT_DEPTH   16
-#define LOCALSDK_SPEAKER_TRACK_TYPE  LOCALSDK_PCM_TRACK_TYPE
-
-#if LOCALSDK_SPEAKER_TRACK_TYPE == LOCALSDK_PCM_TRACK_TYPE
-    #define LOCALSDK_SPEAKER_BUFFER_SIZE LOCALSDK_PCM_BUFFER_SIZE
-#elif LOCALSDK_SPEAKER_TRACK_TYPE == LOCALSDK_G711_TRACK_TYPE
-    #define LOCALSDK_SPEAKER_BUFFER_SIZE LOCALSDK_G711_BUFFER_SIZE
-#endif
+#define LOCALSDK_SPEAKER_TRACK_TYPE  1
 
 typedef struct {
     uint32_t sample_rate;
@@ -257,9 +245,6 @@ int local_sdk_speaker_unmute();
 
 // Start speaker
 int local_sdk_speaker_start();
-
-// Feed g711 data
-int local_sdk_speaker_feed_g711_data(void *data, int size);
 
 // Feed PCM data
 int local_sdk_speaker_feed_pcm_data(void *data, int size);

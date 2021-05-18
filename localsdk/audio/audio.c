@@ -9,11 +9,11 @@
 #include "./../../rtsp/rtsp.h"
 
 // Audio capture callback
-int g711_capture_callback(LOCALSDK_G711_FRAME_INFO *frameInfo) {
+int g711_capture_callback(LOCALSDK_AUDIO_G711_FRAME_INFO *frameInfo) {
     if(frameInfo && frameInfo->size) {
         if(rtsp_media_frame(frameInfo->data, frameInfo->size, frameInfo->timestamp, 2)) {
             return LOCALSDK_OK;
-        } else logger("audio", "g711_capture_callback", LOGGER_LEVEL_ERROR, "%s error!", "rtsp_g711_frame()");
+        } else logger("audio", "g711_capture_callback", LOGGER_LEVEL_ERROR, "%s error!", "rtsp_media_frame()");
     }
     return LOCALSDK_ERROR;
 }
@@ -39,8 +39,8 @@ bool audio_init() {
                 .unknown_8        = 2, // FIXME: what is it?
                 .unknown_9        = 20, // FIXME: what is it?
                 .volume           = APP_CFG.audio.volume,
-                .pcm_buffer_size  = LOCALSDK_PCM_BUFFER_SIZE,
-                .g711_buffer_size = LOCALSDK_G711_BUFFER_SIZE,
+                .pcm_buffer_size  = LOCALSDK_AUDIO_PCM_BUFFER_SIZE,
+                .g711_buffer_size = LOCALSDK_AUDIO_G711_BUFFER_SIZE,
             };
             if(local_sdk_audio_set_parameters(LOCALSDK_AUDIO_CHANNEL, &audio_options) == LOCALSDK_OK) {
                 logger("audio", "audio_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_audio_set_parameters()");

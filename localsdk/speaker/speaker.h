@@ -9,7 +9,7 @@ bool speaker_init();
 // Free speaker
 bool speaker_free();
 
-// Play media
+// Play media (WAV, 8000 hz, 16-bit, mono)
 bool speaker_play_media(char *filename);
 
 // Set volume

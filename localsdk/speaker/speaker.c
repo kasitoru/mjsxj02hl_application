@@ -21,10 +21,10 @@ bool speaker_init() {
             .sample_rate = LOCALSDK_SPEAKER_SAMPLE_RATE,
             .bit_depth   = LOCALSDK_SPEAKER_BIT_DEPTH,
             .unknown_2   = 25, // FIXME: what is it?
-            .track_type  = 1,
+            .track_type  = LOCALSDK_SPEAKER_TRACK_TYPE,
             .unknown_4   = 30, // FIXME: what is it?
             .volume      = APP_CFG.speaker.volume,
-            .buffer_size = LOCALSDK_SPEAKER_BUFFER_SIZE,
+            .buffer_size = LOCALSDK_AUDIO_PCM_BUFFER_SIZE,
             .unknown_7   = 1, // FIXME: what is it?
         };
         if(local_sdk_speaker_set_parameters(&speaker_options) == LOCALSDK_OK) {
@@ -51,7 +51,7 @@ bool speaker_free() {
     return true;
 }
 
-// Play media
+// Play media (WAV, 8000 hz, 16-bit, mono)
 bool speaker_play_media(char *filename) {
     bool result = true;
     logger("speaker", "speaker_play_media", LOGGER_LEVEL_DEBUG, "Function is called...");
@@ -61,9 +61,7 @@ bool speaker_play_media(char *filename) {
     if(media != NULL) {
         int error_counter = 0;
         logger("speaker", "speaker_play_media", LOGGER_LEVEL_INFO, "%s success.", "fopen()");
-        #if LOCALSDK_SPEAKER_TRACK_TYPE == LOCALSDK_PCM_TRACK_TYPE
-            fseek(media, 44, SEEK_SET); // Skip head
-        #endif
+        fseek(media, 44, SEEK_SET); // Skip head
         if(local_sdk_speaker_clean_buf_data() == LOCALSDK_OK) {
             logger("speaker", "speaker_play_media", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_speaker_clean_buf_data()");
         } else {
@@ -72,14 +70,10 @@ bool speaker_play_media(char *filename) {
         }
         while(!feof(media)) {
             error_counter = 0;
-            char *buffer = (char *) malloc(LOCALSDK_SPEAKER_BUFFER_SIZE);
-            size_t length = fread(buffer, 1, LOCALSDK_SPEAKER_BUFFER_SIZE, media);
+            char *buffer = (char *) malloc(LOCALSDK_AUDIO_PCM_BUFFER_SIZE);
+            size_t length = fread(buffer, 1, LOCALSDK_AUDIO_PCM_BUFFER_SIZE, media);
             while(true) {
-                #if LOCALSDK_SPEAKER_TRACK_TYPE == LOCALSDK_PCM_TRACK_TYPE
-                    if(local_sdk_speaker_feed_pcm_data(buffer, length) == LOCALSDK_OK || (error_counter >= 300)) break;
-                #elif LOCALSDK_SPEAKER_TRACK_TYPE == LOCALSDK_G711_TRACK_TYPE
-                    if(local_sdk_speaker_feed_g711_data(buffer, length) == LOCALSDK_OK || (error_counter >= 300)) break;
-                #endif
+                if(local_sdk_speaker_feed_pcm_data(buffer, length) == LOCALSDK_OK || (error_counter >= 300)) break;
                 usleep(98000);
                 error_counter++;
             }
