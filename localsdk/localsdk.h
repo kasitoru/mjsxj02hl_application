@@ -21,8 +21,8 @@ extern "C"{
 #define LOCALSDK_G711_BUFFER_SIZE 320
 #define LOCALSDK_PCM_BUFFER_SIZE  640
 
-#define LOCALSDK_PCM_TRACK_TYPE   1
-#define LOCALSDK_G711_TRACK_TYPE  2
+#define LOCALSDK_PCM_TRACK_TYPE   1 // WAV (8000 hz, 16-bit, mono)
+#define LOCALSDK_G711_TRACK_TYPE  2 // A-Law (8000 hz, 16-bit, mono)
 
 // Set printf function for debug messages
 int localsdk_set_logprintf_func(int (*function)(const char*, ...));

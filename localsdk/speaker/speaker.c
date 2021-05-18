@@ -21,7 +21,7 @@ bool speaker_init() {
             .sample_rate = LOCALSDK_SPEAKER_SAMPLE_RATE,
             .bit_depth   = LOCALSDK_SPEAKER_BIT_DEPTH,
             .unknown_2   = 25, // FIXME: what is it?
-            .track_type  = LOCALSDK_SPEAKER_TRACK_TYPE,
+            .track_type  = 1,
             .unknown_4   = 30, // FIXME: what is it?
             .volume      = APP_CFG.speaker.volume,
             .buffer_size = LOCALSDK_SPEAKER_BUFFER_SIZE,
