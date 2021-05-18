@@ -13,10 +13,16 @@ extern "C"{
        GENERAL
 ********************/
 
-#define LOCALSDK_OK              0
-#define LOCALSDK_ERROR           1
+#define LOCALSDK_OK               0
+#define LOCALSDK_ERROR            1
 
-#define LOCALSDK_CURRENT_VERSION 14
+#define LOCALSDK_CURRENT_VERSION  14
+
+#define LOCALSDK_G711_BUFFER_SIZE 320
+#define LOCALSDK_PCM_BUFFER_SIZE  640
+
+#define LOCALSDK_PCM_TRACK_TYPE   1
+#define LOCALSDK_G711_TRACK_TYPE  2
 
 // Set printf function for debug messages
 int localsdk_set_logprintf_func(int (*function)(const char*, ...));
@@ -148,7 +154,7 @@ int local_sdk_video_osd_update_timestamp(int param_1, int param_2, struct tm * t
 #define LOCALSDK_AUDIO_CHANNEL     0
 #define LOCALSDK_AUDIO_SAMPLE_RATE 8000
 #define LOCALSDK_AUDIO_BIT_DEPTH   16
-#define LOCALSDK_AUDIO_TRACK_TYPE  1
+#define LOCALSDK_AUDIO_TRACK_TYPE  LOCALSDK_PCM_TRACK_TYPE
 
 typedef struct {
     signed char *data;
@@ -169,8 +175,8 @@ typedef struct {
     uint32_t unknown_8; // FIXME: what is it?
     uint32_t unknown_9; // FIXME: what is it?
     uint32_t volume;
-    uint32_t unknown_11; // FIXME: what is it?
-    uint32_t unknown_12; // FIXME: what is it?
+    uint32_t pcm_buffer_size;
+    uint32_t g711_buffer_size;
 } LOCALSDK_AUDIO_OPTIONS;
 
 // Init audio
@@ -213,15 +219,15 @@ int local_sdk_audio_destory();
        SPEAKER
 ********************/
 
-#define LOCALSDK_SPEAKER_DATA_FORMAT      1 // 0 - G711, 1 - PCM
+#define LOCALSDK_SPEAKER_SAMPLE_RATE 8000
+#define LOCALSDK_SPEAKER_BIT_DEPTH   16
+#define LOCALSDK_SPEAKER_TRACK_TYPE  LOCALSDK_PCM_TRACK_TYPE
 
-#define LOCALSDK_SPEAKER_SAMPLE_RATE      8000
-#define LOCALSDK_SPEAKER_BIT_DEPTH        16
-#define LOCALSDK_SPEAKER_TRACK_TYPE       1
-
-#define LOCALSDK_SPEAKER_G711_BUFFER_SIZE 320
-#define LOCALSDK_SPEAKER_PCM_BUFFER_SIZE  640
-#define LOCALSDK_SPEAKER_FEED_DATA_SLEEP  98000
+#if LOCALSDK_SPEAKER_TRACK_TYPE == LOCALSDK_PCM_TRACK_TYPE
+    #define LOCALSDK_SPEAKER_BUFFER_SIZE LOCALSDK_PCM_BUFFER_SIZE
+#elif LOCALSDK_SPEAKER_TRACK_TYPE == LOCALSDK_G711_TRACK_TYPE
+    #define LOCALSDK_SPEAKER_BUFFER_SIZE LOCALSDK_G711_BUFFER_SIZE
+#endif
 
 typedef struct {
     uint32_t sample_rate;
@@ -230,7 +236,7 @@ typedef struct {
     uint32_t track_type;
     uint32_t unknown_4; // FIXME: what is it?
     uint32_t volume;
-    uint32_t unknown_6; // FIXME: what is it?
+    uint32_t buffer_size;
     uint32_t unknown_7; // FIXME: what is it?
 } LOCALSDK_SPEAKER_OPTIONS;
 
