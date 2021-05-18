@@ -23,7 +23,7 @@ bool speaker_init() {
             .unknown_2   = 25, // FIXME: what is it?
             .track_type  = LOCALSDK_SPEAKER_TRACK_TYPE,
             .unknown_4   = 30, // FIXME: what is it?
-            .volume      = 70,
+            .volume      = APP_CFG.speaker.volume,
             .unknown_6   = 640, // FIXME: what is it?
             .unknown_7   = 1, // FIXME: what is it?
         };
@@ -31,12 +31,9 @@ bool speaker_init() {
             logger("speaker", "speaker_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_speaker_set_parameters()");
             if(local_sdk_speaker_start() == LOCALSDK_OK) {
                 logger("speaker", "speaker_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_speaker_start()");
-                if(speaker_set_volume(APP_CFG.speaker.volume)) {
-                    logger("speaker", "speaker_init", LOGGER_LEVEL_INFO, "%s success.", "speaker_set_volume()");
-                    
-                    logger("speaker", "speaker_init", LOGGER_LEVEL_DEBUG, "Function completed.");
-                    return true;
-                } else logger("speaker", "speaker_init", LOGGER_LEVEL_ERROR, "%s error!", "speaker_set_volume()");
+                
+                logger("speaker", "speaker_init", LOGGER_LEVEL_DEBUG, "Function completed.");
+                return true;
             } else logger("speaker", "speaker_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_speaker_start()");
         } else logger("speaker", "speaker_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_speaker_set_parameters()");
     } else logger("speaker", "speaker_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_speaker_init()");
