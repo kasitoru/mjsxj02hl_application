@@ -147,6 +147,8 @@ int local_sdk_video_osd_update_timestamp(int param_1, int param_2, struct tm * t
 
 #define LOCALSDK_AUDIO_CHANNEL     0
 #define LOCALSDK_AUDIO_SAMPLE_RATE 8000
+#define LOCALSDK_AUDIO_BIT_DEPTH   16
+#define LOCALSDK_AUDIO_TRACK_TYPE  1
 
 typedef struct {
     signed char *data;
@@ -157,16 +159,16 @@ typedef struct {
 
 typedef struct {
     uint32_t sample_rate;
-    uint32_t unknown_1; // FIXME: what is it?
+    uint32_t bit_depth;
     uint32_t unknown_2; // FIXME: what is it?
-    uint32_t unknown_3; // FIXME: what is it?
+    uint32_t track_type;
     uint32_t unknown_4; // FIXME: what is it?
     uint32_t unknown_5; // FIXME: what is it?
     uint32_t unknown_6; // FIXME: what is it?
     uint32_t unknown_7; // FIXME: what is it?
     uint32_t unknown_8; // FIXME: what is it?
     uint32_t unknown_9; // FIXME: what is it?
-    uint32_t unknown_10; // FIXME: what is it?
+    uint32_t unknown_10; // FIXME: volume?
     uint32_t unknown_11; // FIXME: what is it?
     uint32_t unknown_12; // FIXME: what is it?
 } LOCALSDK_AUDIO_OPTIONS;

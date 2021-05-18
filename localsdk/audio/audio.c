@@ -28,16 +28,16 @@ bool audio_init() {
             logger("audio", "audio_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_audio_create()");
             LOCALSDK_AUDIO_OPTIONS audio_options = {
                 .sample_rate = LOCALSDK_AUDIO_SAMPLE_RATE,
-                .unknown_1   = 16, // FIXME: what is it?
+                .bit_depth   = LOCALSDK_AUDIO_BIT_DEPTH,
                 .unknown_2   = 25, // FIXME: what is it?
-                .unknown_3   = 1, // FIXME: what is it?
+                .track_type  = LOCALSDK_AUDIO_TRACK_TYPE,
                 .unknown_4   = 0, // FIXME: what is it?
                 .unknown_5   = 2, // FIXME: what is it?
                 .unknown_6   = 1, // FIXME: what is it?
                 .unknown_7   = 1, // FIXME: what is it?
                 .unknown_8   = 2, // FIXME: what is it?
                 .unknown_9   = 20, // FIXME: what is it?
-                .unknown_10  = 70, // FIXME: what is it?
+                .unknown_10  = 70, // FIXME: volume?
                 .unknown_11  = 640, // FIXME: what is it?
                 .unknown_12  = 320, // FIXME: what is it?
             };
