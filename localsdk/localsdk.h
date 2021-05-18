@@ -168,7 +168,7 @@ typedef struct {
     uint32_t unknown_7; // FIXME: what is it?
     uint32_t unknown_8; // FIXME: what is it?
     uint32_t unknown_9; // FIXME: what is it?
-    uint32_t unknown_10; // FIXME: volume?
+    uint32_t volume;
     uint32_t unknown_11; // FIXME: what is it?
     uint32_t unknown_12; // FIXME: what is it?
 } LOCALSDK_AUDIO_OPTIONS;

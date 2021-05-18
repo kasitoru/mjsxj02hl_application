@@ -5,6 +5,7 @@
 #include "./audio.h"
 #include "./../localsdk.h"
 #include "./../../logger/logger.h"
+#include "./../../configs/configs.h"
 #include "./../../rtsp/rtsp.h"
 
 // Audio capture callback
@@ -37,7 +38,7 @@ bool audio_init() {
                 .unknown_7   = 1, // FIXME: what is it?
                 .unknown_8   = 2, // FIXME: what is it?
                 .unknown_9   = 20, // FIXME: what is it?
-                .unknown_10  = 70, // FIXME: volume?
+                .volume      = APP_CFG.audio.volume,
                 .unknown_11  = 640, // FIXME: what is it?
                 .unknown_12  = 320, // FIXME: what is it?
             };

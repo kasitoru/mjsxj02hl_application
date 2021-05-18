@@ -16,6 +16,11 @@ typedef struct {
         bool flip;
         bool mirror;
     } video;
+
+    // [audio]
+    struct {
+        int volume;
+    } audio;
     
     // [speaker]
     struct {

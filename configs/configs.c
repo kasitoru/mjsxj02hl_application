@@ -14,6 +14,9 @@ APPLICATION_CONFIGURATION APP_CFG = {
     // [video]
     .video.flip                 = false,              // Flip (true or false)
     .video.mirror               = false,              // Mirror (true or false)
+
+    // [audio]
+    .audio.volume               = 70,                 // Volume (0-100)
     
     // [speaker]
     .speaker.volume             = 75,                 // Volume (0-100)
@@ -60,6 +63,10 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
         config->video.flip = (atoi(value) != 0);
     } else if(MATCH("video", "mirror")) {
         config->video.mirror = (atoi(value) != 0);
+
+    // [audio]
+    } else if(MATCH("audio", "volume")) {
+        config->audio.volume = atoi(value);
 
     // [speaker]
     } else if(MATCH("speaker", "volume")) {
