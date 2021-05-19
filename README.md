@@ -95,3 +95,17 @@ Running without arguments starts the main thread of the application.
 ## RTSP
 
 Network URL: `rtsp://<ip-address>:554`
+
+## MQTT
+
+### Input topics
+
+**Topic: mjsxj02hl/cmd**
+
+Execute the specified command on the device.
+
+Command | Parameters | Description | Example payload
+------- | ---------- | ----------- | ---------------
+`get_image` | `filename` (string) | Save the image to the specified file (JPEG, 640x360). | { "action": "get_image", "filename": "/mnt/mmc/image.jpg" }
+`set_volume` | `value` (integer) | Set volume level for speaker (0-100). | { "action": "set_volume", "value": 100 }
+`play_media` | `filename` (string) | Play the specified media file (WAV, 8000 hz, 16-bit, mono). | { "action": "play_media", "filename": "/mnt/mmc/media.wav" }
