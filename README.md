@@ -33,6 +33,49 @@ sudo cp -r dependencies/. /opt/hisi-linux/x86-arm/arm-himix100-linux/target/usr/
 make
 ```
 
+## Configuration
+
+Default config `/usr/app/share/mjsxj02hl.conf`:
+
+```ini
+[logger]
+level = 2              ; Log level (0 = disable, 1 = error, 2 = warning, 3 = info, 4 = debug)
+file =                 ; Write log to file (empty for disable)
+
+[video]
+flip = false           ; Flip image
+mirror = false         ; Mirror image
+
+[audio]
+volume = 70            ; Audio volume level (0-100)
+
+[speaker]
+volume = 70            ; Speaker volume level (0-100)
+
+[alarm]
+motion_sens = 150      ; Motion sensitivity (1-255)
+humanoid_sens = 150    ; Humanoid sensitivity (1-255)
+motion_timeout = 60    ; Motion timeout (in seconds)
+humanoid_timeout = 60  ; Humanoid timeout (in seconds)
+motion_detect_exec =   ; Execute the command when motion is detected (empty for disable)
+humanoid_detect_exec = ; Execute the command when humanoid is detected (empty for disable)
+motion_lost_exec =     ; Execute the command when motion is lost (empty for disable)
+humanoid_lost_exec =   ; Execute the command when humanoid is lost (empty for disable)
+
+[mqtt]
+server =               ; Address (empty for disable)
+port = 1883            ; Port
+username =             ; Username (empty for anonimous)
+password =             ; Password (empty for disable)
+topic = mjsxj02hl      ; Topic name
+qos = 1                ; Quality of Service (0, 1 or 2)
+retain = false         ; Retained messages
+
+[night]
+mode = 2               ; Night mode (0 = off, 1 = on, 2 = auto)
+gray = 2               ; Grayscale (0 = off, 1 = on, 2 = auto)
+```
+
 ## Usage
 
 ```bash
@@ -41,7 +84,7 @@ mjsxj02hl [<action> [options...]]
 
 Running without arguments starts the main thread of the application.
 
-***--config <filename>*** Specify the location of the configuration file for the main thread of application. Default path is `/usr/app/share/mjsxj02hl.conf`
+***--config <filename>*** Specify the location of the configuration file for the main thread of application.
 
 ***--factory-reset*** Reset device settings to default values. Attention: this action cannot be undone!
 
