@@ -131,3 +131,13 @@ Field | Description
 `free_configs` | The size of free space on the configs partition.
 `volume_level` | Current volume level of the speaker.
 `image_url` | URL address of the JPEG image from the camera.
+
+**Topic: mjsxj02hl/alarm**
+
+This is a topic where motion detection events is published.
+
+Field | Description
+----- | -----------
+`motion` | Motion detection state.
+`humanoid` | Humanoid detection state.
+`timestamp` | Current timestamp.
