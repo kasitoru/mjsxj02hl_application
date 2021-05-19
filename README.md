@@ -91,3 +91,7 @@ Running without arguments starts the main thread of the application.
 ***--get-image <filename>*** Output the camera image to a file. Requires a running main thread of mjsxj02hl application.
 
 ***--help*** Display help message.
+
+## RTSP
+
+Network URL: `rtsp://<ip-address>:554`
