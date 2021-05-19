@@ -141,3 +141,13 @@ Field | Description
 `motion` | Motion detection state.
 `humanoid` | Humanoid detection state.
 `timestamp` | Current timestamp.
+
+**Topic: mjsxj02hl/night**
+
+This is a topic where the state of night mode is published.
+
+Field | Description
+----- | -----------
+`state` | Night mode state.
+`gray` | Grayscale state.
+`timestamp` | Current timestamp.
