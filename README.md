@@ -32,3 +32,19 @@ sudo cp -r dependencies/. /opt/hisi-linux/x86-arm/arm-himix100-linux/target/usr/
 ```bash
 make
 ```
+
+## Usage
+
+```bash
+mjsxj02hl [<action> [options...]]
+```
+
+Running without arguments starts the main thread of the application.
+
+***--config <filename>*** Specify the location of the configuration file for the main thread of application. Default path is `/usr/app/share/mjsxj02hl.conf`
+
+***--factory-reset*** Reset device settings to default values. Attention: this action cannot be undone!
+
+***--get-image <filename>*** Output the camera image to a file. Requires a running main thread of mjsxj02hl application.
+
+***--help*** Display help message.
