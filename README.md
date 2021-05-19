@@ -109,3 +109,25 @@ Command | Parameters | Description | Example payload
 `get_image` | `filename` (string) | Save the image to the specified file (JPEG, 640x360). | { "action": "get_image", "filename": "/mnt/mmc/image.jpg" }
 `set_volume` | `value` (integer) | Set volume level for speaker (0-100). | { "action": "set_volume", "value": 100 }
 `play_media` | `filename` (string) | Play the specified media file (WAV, 8000 hz, 16-bit, mono). | { "action": "play_media", "filename": "/mnt/mmc/media.wav" }
+
+### Output topics
+
+**Topic: mjsxj02hl/info**
+
+This is a topic where general device state is published.
+
+Field | Description
+----- | -----------
+`sdk_version` | Version of localsdk library.
+`build_time` | Application compile timestamp.
+`startup` | Application startup timestamp.
+`timestamp` | Current timestamp.
+`ip_address` | IP address of the device.
+`total_ram` | The total size of RAM.
+`free_ram` | The size of the free RAM.
+`total_sdmem` | The total size of SD-card.
+`free_sdmem` | The size of free space on the SD-card.
+`total_configs` | Total size of the configs partition.
+`free_configs` | The size of free space on the configs partition.
+`volume_level` | Current volume level of the speaker.
+`image_url` | URL address of the JPEG image from the camera.
