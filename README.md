@@ -151,3 +151,10 @@ Field | Description
 `state` | Night mode state.
 `gray` | Grayscale state.
 `timestamp` | Current timestamp.
+
+## Third-party libraries
+
+* yyjson: https://github.com/ibireme/yyjson
+* inih: https://github.com/benhoyt/inih
+* paho.mqtt.c: https://github.com/eclipse/paho.mqtt.c
+* librtsp: https://github.com/xiaochangzhen/librtsp
