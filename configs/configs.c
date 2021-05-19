@@ -8,41 +8,41 @@
 // Default values
 APPLICATION_CONFIGURATION APP_CFG = {
     // [logger]
-    .logger.level               = LOGGER_LEVEL_DEBUG, // Log level
-    .logger.file                = "",                 // Write log to file
+    .logger.level               = LOGGER_LEVEL_WARNING, // Log level
+    .logger.file                = "",                   // Write log to file
     
     // [video]
-    .video.flip                 = false,              // Flip (true or false)
-    .video.mirror               = false,              // Mirror (true or false)
+    .video.flip                 = false,                // Flip (true or false)
+    .video.mirror               = false,                // Mirror (true or false)
 
     // [audio]
-    .audio.volume               = 70,                 // Volume (0-100)
+    .audio.volume               = 70,                   // Volume (0-100)
     
     // [speaker]
-    .speaker.volume             = 75,                 // Volume (0-100)
+    .speaker.volume             = 70,                   // Volume (0-100)
     
     // [alarm]
-    .alarm.motion_sens          = 150,                // Motion sensitivity (1-255)
-    .alarm.humanoid_sens        = 150,                // Humanoid sensitivity (1-255)
-    .alarm.motion_timeout       = 60,                 // Motion timeout (in seconds)
-    .alarm.humanoid_timeout     = 60,                 // Humanoid timeout (in seconds)
-    .alarm.motion_detect_exec   = "",                 // Execute the command when motion is detected
-    .alarm.humanoid_detect_exec = "",                 // Execute the command when humanoid is detected
-    .alarm.motion_lost_exec     = "",                 // Execute the command when motion is lost
-    .alarm.humanoid_lost_exec   = "",                 // Execute the command when humanoid is lost
+    .alarm.motion_sens          = 150,                  // Motion sensitivity (1-255)
+    .alarm.humanoid_sens        = 150,                  // Humanoid sensitivity (1-255)
+    .alarm.motion_timeout       = 60,                   // Motion timeout (in seconds)
+    .alarm.humanoid_timeout     = 60,                   // Humanoid timeout (in seconds)
+    .alarm.motion_detect_exec   = "",                   // Execute the command when motion is detected
+    .alarm.humanoid_detect_exec = "",                   // Execute the command when humanoid is detected
+    .alarm.motion_lost_exec     = "",                   // Execute the command when motion is lost
+    .alarm.humanoid_lost_exec   = "",                   // Execute the command when humanoid is lost
     
     // [mqtt]
-    .mqtt.server                = "",                 // Address (empty for disable)
-    .mqtt.port                  = 1883,               // Port
-    .mqtt.username              = "",                 // Username (empty for anonimous)
-    .mqtt.password              = "",                 // Password (empty for disable)
-    .mqtt.topic                 = "mjsxj02hl",        // Topic name
-    .mqtt.qos                   = 1,                  // Quality of Service (0, 1 or 2)
-    .mqtt.retain                = false,              // Retained messages
+    .mqtt.server                = "",                   // Address (empty for disable)
+    .mqtt.port                  = 1883,                 // Port
+    .mqtt.username              = "",                   // Username (empty for anonimous)
+    .mqtt.password              = "",                   // Password (empty for disable)
+    .mqtt.topic                 = "mjsxj02hl",          // Topic name
+    .mqtt.qos                   = 1,                    // Quality of Service (0, 1 or 2)
+    .mqtt.retain                = false,                // Retained messages
     
     // [night]
-    .night.mode                 = 2,                  // Night mode (0 = off, 1 = on, 2 = auto)
-    .night.gray                 = 2,                  // Grayscale (0 = off, 1 = on, 2 = auto)
+    .night.mode                 = 2,                    // Night mode (0 = off, 1 = on, 2 = auto)
+    .night.gray                 = 2,                    // Grayscale (0 = off, 1 = on, 2 = auto)
 };
 
 // Handler for ini parser
