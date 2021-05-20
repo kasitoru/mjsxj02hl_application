@@ -60,7 +60,7 @@ typedef struct {
     uint32_t timestamp;
     uint16_t unknown_4; // FIXME: what is it?
     uint16_t unknown_5; // FIXME: what is it?
-    uint16_t unknown_6; // FIXME: what is it?
+    uint16_t type;
 } LOCALSDK_H26X_FRAME_INFO;
 
 typedef struct {
