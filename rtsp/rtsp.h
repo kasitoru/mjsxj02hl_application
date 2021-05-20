@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#define RTSP_PAYLOAD_TYPE_H265  265
+#define RTSP_PAYLOAD_TYPE_H265 98
 
 bool rtsp_init();
 

@@ -16,8 +16,13 @@ bool rtsp_init() {
         logger("rtsp", "rtsp_init", LOGGER_LEVEL_INFO, "%s success.", "rtsp_create()");
         
         rtsp_media_attr_t rtsp_media_attr = { 0 };
-	    rtsp_media_attr.video_type[LOCALSDK_VIDEO_PRIMARY_CHANNEL] = RTSP_PAYLOAD_TYPE_H264;
-        rtsp_media_attr.video_type[LOCALSDK_VIDEO_SECONDARY_CHANNEL] = RTSP_PAYLOAD_TYPE_H264;
+        #if LOCALSDK_VIDEO_PAYLOAD_TYPE == LOCALSDK_VIDEO_PAYLOAD_H264
+	        rtsp_media_attr.video_type[LOCALSDK_VIDEO_PRIMARY_CHANNEL] = RTSP_PAYLOAD_TYPE_H264;
+            rtsp_media_attr.video_type[LOCALSDK_VIDEO_SECONDARY_CHANNEL] = RTSP_PAYLOAD_TYPE_H264;
+        #elif LOCALSDK_VIDEO_PAYLOAD_TYPE == LOCALSDK_VIDEO_PAYLOAD_H265
+	        rtsp_media_attr.video_type[LOCALSDK_VIDEO_PRIMARY_CHANNEL] = RTSP_PAYLOAD_TYPE_H265;
+            rtsp_media_attr.video_type[LOCALSDK_VIDEO_SECONDARY_CHANNEL] = RTSP_PAYLOAD_TYPE_H265;
+        #endif
         rtsp_media_attr.video_fps[LOCALSDK_VIDEO_PRIMARY_CHANNEL] = LOCALSDK_VIDEO_FPS;
         rtsp_media_attr.video_fps[LOCALSDK_VIDEO_SECONDARY_CHANNEL] = LOCALSDK_VIDEO_FPS;
         rtsp_media_attr.audio_type = RTSP_PAYLOAD_TYPE_G711_PCMA;
