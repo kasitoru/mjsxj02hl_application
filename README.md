@@ -43,6 +43,7 @@ level = 2              ; Log level (0 = disable, 1 = error, 2 = warning, 3 = inf
 file =                 ; Write log to file (empty for disable)
 
 [video]
+type = 1               ; Video compression standard (1 = h264, 2 = h265)
 flip = false           ; Flip image
 mirror = false         ; Mirror image
 
