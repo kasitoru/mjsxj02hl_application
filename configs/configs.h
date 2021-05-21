@@ -13,6 +13,7 @@ typedef struct {
 
     // [video]
     struct {
+        int type;
         bool flip;
         bool mirror;
     } video;

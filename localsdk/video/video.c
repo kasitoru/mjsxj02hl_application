@@ -42,7 +42,7 @@ bool video_init() {
             .unknown_5   = 0, // FIXME: what is it?
             .unknown_6   = 1, // FIXME: what is it?
             .unknown_7   = 1, // FIXME: what is it?
-            .payload     = LOCALSDK_VIDEO_PAYLOAD_TYPE,
+            .payload     = APP_CFG.video.type,
             .rcmode      = LOCALSDK_VIDEO_RCMODE_TYPE,
             .gop         = 1 * LOCALSDK_VIDEO_FPS,
             .screen_size = LOCALSDK_VIDEO_PRIMARY_WIDTH * LOCALSDK_VIDEO_PRIMARY_HEIGHT,

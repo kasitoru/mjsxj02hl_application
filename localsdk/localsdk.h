@@ -41,7 +41,6 @@ int localsdk_get_version();
 #define LOCALSDK_VIDEO_PAYLOAD_H265         2
 
 #define LOCALSDK_VIDEO_FPS                  20
-#define LOCALSDK_VIDEO_PAYLOAD_TYPE         LOCALSDK_VIDEO_PAYLOAD_H264
 #define LOCALSDK_VIDEO_RCMODE_TYPE          2
 
 #define LOCALSDK_VIDEO_PRIMARY_CHANNEL      0
