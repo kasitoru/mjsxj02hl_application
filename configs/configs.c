@@ -13,7 +13,7 @@ APPLICATION_CONFIGURATION APP_CFG = {
     .logger.file                = "",                          // Write log to file
     
     // [video]
-    .video.type                 = LOCALSDK_VIDEO_PAYLOAD_H264, // Video compression standard (1 = h264, 2 = h265)
+    .video.type                 = LOCALSDK_VIDEO_PAYLOAD_H265, // Video compression standard (1 = h264, 2 = h265)
     .video.flip                 = false,                       // Flip (true or false)
     .video.mirror               = false,                       // Mirror (true or false)
 

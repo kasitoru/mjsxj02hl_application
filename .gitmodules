@@ -9,4 +9,4 @@
 	url = https://github.com/benhoyt/inih
 [submodule "rtsp/librtsp"]
 	path = rtsp/librtsp
-	url = https://github.com/xiaochangzhen/librtsp
+	url = https://github.com/avdeevsv91/librtsp
