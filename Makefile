@@ -11,7 +11,7 @@ OUTPUT := ./bin
 all: mkdirs mjsxj02hl
 
 mjsxj02hl: ./mjsxj02hl.c logger.o init.o configs.o inih.o video.o audio.o speaker.o alarm.o night.o mqtt.o rtsp.o
-	$(TOOLCHAIN)$(CC) $(CCFLAGS) $(ARCH) ./mjsxj02hl.c $(OUTPUT)/objects/*.o ./rtsp/librtsp.a -o $(OUTPUT)/mjsxj02hl
+	$(TOOLCHAIN)$(CC) $(CCFLAGS) $(ARCH) ./mjsxj02hl.c $(OUTPUT)/objects/*.o $(OUTPUT)/objects/librtsp/librtsp.a -o $(OUTPUT)/mjsxj02hl
 
 logger.o: ./logger/logger.c
 	$(TOOLCHAIN)$(CC) $(CCFLAGS) $(ARCH) -c ./logger/logger.c -o $(OUTPUT)/objects/logger.o
@@ -51,7 +51,9 @@ rtsp.o: ./rtsp/rtsp.c librtsp.a
 
 mkdirs: clean
 	mkdir -p $(OUTPUT)/objects
+	make mkdirs -C ./rtsp
 
 clean:
 	make clean -C ./rtsp
 	rm -rf $(OUTPUT)/*
+

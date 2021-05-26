@@ -8,32 +8,28 @@
 #
 ############################################################################
 
-CROSS	= arm-himix100-linux-
-CC	= @echo " GCC	$@"; $(CROSS)gcc
-CPP	= @echo " G++	$@"; $(CROSS)g++
-LD	= @echo " LD	$@"; $(CROSS)ld
-AR	= @echo " AR	$@"; $(CROSS)ar
-STRIP	= @echo " STRIP $@"; $(CROSS)strip
+CROSS = arm-himix100-linux-
 
 CFLAGS = -std=gnu99
+CFLAGS += -Ilibrtsp/include
 
-CFLAGS += -Ilibrtsp/include 
+SRCDIR = librtsp/src
+OUTDIR = ../bin/objects/librtsp
+TARGET = $(OUTDIR)/librtsp.a
 
-TARGET = librtsp.a
+SOURCE = $(wildcard $(SRCDIR)/*.c)
+OBJS = $(patsubst $(SRCDIR)/%.c,$(OUTDIR)/%.o,$(SOURCE))
 
-SOURCE = $(wildcard librtsp/src/*.c)
-
-OBJS = $(patsubst librtsp/src/%.c,librtsp/src/%.o,$(SOURCE))
+all: mkdirs $(TARGET)
 
 $(TARGET): $(OBJS)
-	$(AR) -rv  $@ $^
+	$(CROSS)ar -rv $@ $^
 
-.c.o:
-	$(CC)  $(CFLAGS) -c -o $@ $<
-	@echo $@
-.cpp.o:
-	$(CPP) $(CFLAGS) -c -o $@ $<
+$(OBJS):
+	$(CROSS)gcc $(CFLAGS) -c $(patsubst $(OUTDIR)/%.o,$(SRCDIR)/%.c,$@) -o $@
 
+mkdirs: clean
+	mkdir -p $(OUTDIR)
 
 clean:
 	rm -f $(TARGET) $(OBJS)
