@@ -14,6 +14,7 @@ APPLICATION_CONFIGURATION APP_CFG = {
     
     // [video]
     .video.type                 = LOCALSDK_VIDEO_PAYLOAD_H265, // Video compression standard (1 = h264, 2 = h265)
+    .video.fps                  = 20,                          // Frames per second
     .video.flip                 = false,                       // Flip (true or false)
     .video.mirror               = false,                       // Mirror (true or false)
 
@@ -63,6 +64,8 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
     // [video]
     } else if(MATCH("video", "type")) {
         config->video.type = atoi(value);
+    } else if(MATCH("video", "fps")) {
+        config->video.fps = atoi(value);
     } else if(MATCH("video", "flip")) {
         config->video.flip = (atoi(value) != 0);
     } else if(MATCH("video", "mirror")) {

@@ -19,8 +19,8 @@ bool rtsp_init() {
         rtsp_media_attr_t rtsp_media_attr = { 0 };
 	    rtsp_media_attr.video_type[LOCALSDK_VIDEO_PRIMARY_CHANNEL] = (APP_CFG.video.type == LOCALSDK_VIDEO_PAYLOAD_H265 ? RTSP_PAYLOAD_TYPE_H265 : RTSP_PAYLOAD_TYPE_H264);
         rtsp_media_attr.video_type[LOCALSDK_VIDEO_SECONDARY_CHANNEL] = (APP_CFG.video.type == LOCALSDK_VIDEO_PAYLOAD_H265 ? RTSP_PAYLOAD_TYPE_H265 : RTSP_PAYLOAD_TYPE_H264);
-        rtsp_media_attr.video_fps[LOCALSDK_VIDEO_PRIMARY_CHANNEL] = LOCALSDK_VIDEO_FPS;
-        rtsp_media_attr.video_fps[LOCALSDK_VIDEO_SECONDARY_CHANNEL] = LOCALSDK_VIDEO_FPS;
+        rtsp_media_attr.video_fps[LOCALSDK_VIDEO_PRIMARY_CHANNEL] = APP_CFG.video.fps;
+        rtsp_media_attr.video_fps[LOCALSDK_VIDEO_SECONDARY_CHANNEL] = APP_CFG.video.fps;
         rtsp_media_attr.audio_type = RTSP_PAYLOAD_TYPE_G711_PCMA;
         rtsp_media_attr.audio_sample_rate = LOCALSDK_AUDIO_SAMPLE_RATE;
         rtsp_media_attr.audio_poinum = 160;

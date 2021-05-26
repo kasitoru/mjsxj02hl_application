@@ -14,6 +14,7 @@ typedef struct {
     // [video]
     struct {
         int type;
+        int fps;
         bool flip;
         bool mirror;
     } video;

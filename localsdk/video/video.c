@@ -30,12 +30,12 @@ int h26x_capture_secondary_channel(LOCALSDK_H26X_FRAME_INFO *frameInfo) {
 bool video_init() {
     logger("video", "video_init", LOGGER_LEVEL_DEBUG, "Function is called...");
 
-    if(local_sdk_video_init(LOCALSDK_VIDEO_FPS) == LOCALSDK_OK) {
+    if(local_sdk_video_init(APP_CFG.video.fps) == LOCALSDK_OK) {
         logger("video", "video_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_video_init()");
         // Init channel 0
         LOCALSDK_VIDEO_OPTIONS video_options = {
             .bitrate     = 8 * LOCALSDK_VIDEO_PRIMARY_BITRATE,
-            .fps         = LOCALSDK_VIDEO_FPS,
+            .fps         = APP_CFG.video.fps,
             .resolution  = LOCALSDK_VIDEO_PRIMARY_RESOLUTION,
             .flip        = APP_CFG.video.flip,
             .mirror      = APP_CFG.video.mirror,
@@ -44,7 +44,7 @@ bool video_init() {
             .unknown_7   = 1, // FIXME: what is it?
             .payload     = APP_CFG.video.type,
             .rcmode      = LOCALSDK_VIDEO_RCMODE_TYPE,
-            .gop         = 1 * LOCALSDK_VIDEO_FPS,
+            .gop         = 1 * APP_CFG.video.fps,
             .screen_size = LOCALSDK_VIDEO_PRIMARY_WIDTH * LOCALSDK_VIDEO_PRIMARY_HEIGHT,
             .unknown_12  = 327680, // FIXME: what is it?
             .unknown_13  = 0, // FIXME: what is it?
