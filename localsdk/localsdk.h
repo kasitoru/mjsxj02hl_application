@@ -18,6 +18,11 @@ extern "C"{
 
 #define LOCALSDK_CURRENT_VERSION  14
 
+typedef struct {
+    uint32_t width;
+    uint32_t height;
+} LOCALSDK_PICTURE_SIZE;
+
 // Set printf function for debug messages
 int localsdk_set_logprintf_func(int (*function)(const char*, ...));
 
@@ -33,6 +38,12 @@ int localsdk_destory();
 // Get SDK version
 int localsdk_get_version();
 
+// Get the changed resolution type
+int inner_change_resulu_type(int resolution, int *result);
+
+// Get picture size
+int SAMPLE_COMM_SYS_GetPicSize(int resolution, LOCALSDK_PICTURE_SIZE *size);
+
 /********************
         VIDEO
 ********************/
@@ -40,19 +51,16 @@ int localsdk_get_version();
 #define LOCALSDK_VIDEO_PAYLOAD_H264         1
 #define LOCALSDK_VIDEO_PAYLOAD_H265         2
 
-#define LOCALSDK_VIDEO_RCMODE_TYPE          2
+#define LOCALSDK_VIDEO_RESOLUTION_640x360   3
+#define LOCALSDK_VIDEO_RESOLUTION_1920x1080 6
 
 #define LOCALSDK_VIDEO_PRIMARY_CHANNEL      0
 #define LOCALSDK_VIDEO_PRIMARY_BITRATE      110
-#define LOCALSDK_VIDEO_PRIMARY_RESOLUTION   6
-#define LOCALSDK_VIDEO_PRIMARY_WIDTH        1920
-#define LOCALSDK_VIDEO_PRIMARY_HEIGHT       1080
 
 #define LOCALSDK_VIDEO_SECONDARY_CHANNEL    1
 #define LOCALSDK_VIDEO_SECONDARY_BITRATE    120
-#define LOCALSDK_VIDEO_SECONDARY_RESOLUTION 3
-#define LOCALSDK_VIDEO_SECONDARY_WIDTH      640
-#define LOCALSDK_VIDEO_SECONDARY_HEIGHT     360
+
+#define LOCALSDK_VIDEO_RCMODE_TYPE          2
 
 typedef struct {
     signed char *data;
@@ -81,18 +89,6 @@ typedef struct {
     uint32_t unknown_13; // FIXME: what is it?
     uint32_t unknown_14; // FIXME: what is it?
 } LOCALSDK_VIDEO_OPTIONS;
-
-typedef struct {
-    uint32_t unknown_0; // FIXME: what is it?
-    uint32_t unknown_1; // FIXME: what is it?
-    uint32_t unknown_2; // FIXME: what is it?
-    uint32_t unknown_3; // FIXME: what is it?
-    uint32_t unknown_4; // FIXME: what is it?
-    uint32_t unknown_5; // FIXME: what is it?
-    uint32_t unknown_6; // FIXME: what is it?
-    uint32_t unknown_7; // FIXME: what is it?
-    uint32_t unknown_8; // FIXME: what is it?
-} LOCALSDK_OSD_OPTIONS;
 
 // Init video
 int local_sdk_video_init(int fps);
@@ -133,6 +129,18 @@ int local_sdk_video_set_kbps(int param_1, int param_2);
 /********************
         OSD
 ********************/
+
+typedef struct {
+    uint32_t unknown_0; // FIXME: what is it?
+    uint32_t unknown_1; // FIXME: what is it?
+    uint32_t unknown_2; // FIXME: what is it?
+    uint32_t unknown_3; // FIXME: what is it?
+    uint32_t unknown_4; // FIXME: what is it?
+    uint32_t unknown_5; // FIXME: what is it?
+    uint32_t unknown_6; // FIXME: what is it?
+    uint32_t unknown_7; // FIXME: what is it?
+    uint32_t unknown_8; // FIXME: what is it?
+} LOCALSDK_OSD_OPTIONS;
 
 // Set osd parameters
 int local_sdk_video_osd_set_parameters(int chn, LOCALSDK_OSD_OPTIONS *options);

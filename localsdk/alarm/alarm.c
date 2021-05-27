@@ -196,24 +196,32 @@ bool alarm_switch(bool state) {
 // Init alarm
 bool alarm_init() {
     logger("alarm", "alarm_init", LOGGER_LEVEL_DEBUG, "Function is called...");
-    if(local_sdk_alarm_init(LOCALSDK_VIDEO_SECONDARY_WIDTH, LOCALSDK_VIDEO_SECONDARY_HEIGHT) == LOCALSDK_OK) {
-        logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_alarm_init()");
-        if(local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_MOTION, APP_CFG.alarm.motion_sens) == LOCALSDK_OK) {
-            logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_MOTION)");
-            if(local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_HUMANOID, APP_CFG.alarm.humanoid_sens) == LOCALSDK_OK) {
-                logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_HUMANOID)");
-                if(local_sdk_alarm_state_set_callback(alarm_state_callback) == LOCALSDK_OK) {
-                    logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_alarm_state_set_callback()");
-                    if(pthread_create(&timeout_thread, NULL, alarm_state_timeout, NULL) == 0) {
-                        logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "pthread_create(timeout_thread)");
+    int changed_resolution_type;
+    LOCALSDK_PICTURE_SIZE picture_size;
+    if(inner_change_resulu_type(LOCALSDK_VIDEO_RESOLUTION_640x360, &changed_resolution_type) == LOCALSDK_OK) {
+        logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "inner_change_resulu_type(LOCALSDK_VIDEO_RESOLUTION_640x360)");
+        if(SAMPLE_COMM_SYS_GetPicSize(changed_resolution_type, &picture_size) == LOCALSDK_OK) {
+            logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "SAMPLE_COMM_SYS_GetPicSize(LOCALSDK_VIDEO_RESOLUTION_640x360)");
+            if(local_sdk_alarm_init(picture_size.width, picture_size.height) == LOCALSDK_OK) {
+                logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_alarm_init()");
+                if(local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_MOTION, APP_CFG.alarm.motion_sens) == LOCALSDK_OK) {
+                    logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_MOTION)");
+                    if(local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_HUMANOID, APP_CFG.alarm.humanoid_sens) == LOCALSDK_OK) {
+                        logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_HUMANOID)");
+                        if(local_sdk_alarm_state_set_callback(alarm_state_callback) == LOCALSDK_OK) {
+                            logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_alarm_state_set_callback()");
+                            if(pthread_create(&timeout_thread, NULL, alarm_state_timeout, NULL) == 0) {
+                                logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "pthread_create(timeout_thread)");
 
-                        logger("alarm", "alarm_init", LOGGER_LEVEL_DEBUG, "Function completed.");
-                        return true;
-                    } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "pthread_create(timeout_thread)");
-                } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_alarm_state_set_callback()");
-            } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_HUMANOID)");
-        } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_MOTION)");
-    } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_alarm_init()");
+                                logger("alarm", "alarm_init", LOGGER_LEVEL_DEBUG, "Function completed.");
+                                return true;
+                            } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "pthread_create(timeout_thread)");
+                        } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_alarm_state_set_callback()");
+                    } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_HUMANOID)");
+                } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_MOTION)");
+            } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_alarm_init()");
+        } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "SAMPLE_COMM_SYS_GetPicSize(LOCALSDK_VIDEO_RESOLUTION_640x360)");
+    } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "inner_change_resulu_type(LOCALSDK_VIDEO_RESOLUTION_640x360)");
     if(alarm_free()) {
         logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "alarm_free()");
     } else logger("alarm", "alarm_init", LOGGER_LEVEL_WARNING, "%s error!", "alarm_free()");
