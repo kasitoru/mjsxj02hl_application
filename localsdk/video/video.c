@@ -11,7 +11,7 @@
 // Video capture callback
 int h26x_capture_callback(int chn, LOCALSDK_H26X_FRAME_INFO *frameInfo) {
     if(frameInfo && frameInfo->size) {
-        if(rtsp_media_frame(frameInfo->data, frameInfo->size, frameInfo->timestamp, chn)) {
+        if(rtsp_media_frame(frameInfo->data, frameInfo->size, frameInfo->index, chn)) {
             return LOCALSDK_OK;
         } else logger("video", "h26x_capture_callback", LOGGER_LEVEL_ERROR, "%s error!", "rtsp_media_frame()");
     }

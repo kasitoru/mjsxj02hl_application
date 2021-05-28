@@ -11,7 +11,7 @@
 // Audio capture callback
 int g711_capture_callback(LOCALSDK_AUDIO_G711_FRAME_INFO *frameInfo) {
     if(frameInfo && frameInfo->size) {
-        if(rtsp_media_frame(frameInfo->data, frameInfo->size, frameInfo->timestamp, 2)) {
+        if(rtsp_media_frame(frameInfo->data, frameInfo->size, frameInfo->index, 2)) {
             return LOCALSDK_OK;
         } else logger("audio", "g711_capture_callback", LOGGER_LEVEL_ERROR, "%s error!", "rtsp_media_frame()");
     }
