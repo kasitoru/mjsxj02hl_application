@@ -44,6 +44,7 @@ file =                 ; Write log to file (empty for disable)
 
 [video]
 type = 1               ; Video compression standard (1 = h264, 2 = h265)
+fps = 20               ; Frames per second
 flip = false           ; Flip image
 mirror = false         ; Mirror image
 
