@@ -14,6 +14,7 @@
 #include "./mqtt.h"
 #include "./paho.mqtt.c/src/MQTTClient.h"
 #include "./../logger/logger.h"
+#include "./../localsdk/init.h"
 #include "./../localsdk/localsdk.h"
 #include "./../localsdk/speaker/speaker.h"
 #include "./../configs/configs.h"
@@ -97,6 +98,9 @@ void* mqtt_periodical(void *arg) {
             // SDK version
             int sdk_version = (int) localsdk_get_version();
             yyjson_mut_obj_add_int(json_doc, json_root, "sdk_version", sdk_version);
+            // FW version
+            char *fw_version = firmware_version();
+            yyjson_mut_obj_add_str(json_doc, json_root, "fw_version", fw_version);
             // Build time
             int build_time = -1;
             struct tm compile_time;
@@ -193,6 +197,7 @@ void* mqtt_periodical(void *arg) {
             // Free resources
             yyjson_mut_doc_free(json_doc);
             free(ip_address);
+            free(fw_version);
             free(topic);
         } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_ERROR, "%s error!", "mqtt_fulltopic()");
 

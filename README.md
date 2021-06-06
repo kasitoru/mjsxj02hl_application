@@ -121,6 +121,7 @@ This is a topic where general device state is published.
 Field | Description
 ----- | -----------
 `sdk_version` | Version of localsdk library.
+`fw_version` | Version of the firmware.
 `build_time` | Application compile timestamp.
 `startup` | Application startup timestamp.
 `timestamp` | Current timestamp.
