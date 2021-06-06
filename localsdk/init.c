@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <stdlib.h>
 
 #include "./init.h"
 #include "./localsdk.h"
@@ -26,6 +27,22 @@ int logprintf(const char *format, ...) {
         va_end(params);
     }
     return result;
+}
+
+// Get firmware version
+char *firmware_version() {
+    char *firmware_version = "Unknown";
+    int counter = 0;
+    FILE *version_file;
+    if(version_file = fopen("/usr/app/share/.version", "r")) {
+        fseek(version_file, 0, SEEK_END);
+        long version_size = ftell(version_file) - 1;
+        fseek(version_file, 0, SEEK_SET);
+        firmware_version = malloc(version_size);
+        fread(firmware_version, 1, version_size, version_file);
+        fclose(version_file);
+    }
+    return firmware_version;
 }
 
 // Init all

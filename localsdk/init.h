@@ -3,6 +3,9 @@
 
 #include <stdbool.h>
 
+// Get firmware version
+char *firmware_version();
+
 // Init all
 bool all_init();
 
