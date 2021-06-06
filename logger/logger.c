@@ -12,7 +12,7 @@
 // Add message to log
 int logger(const char *module, const char *function, const int level, const char *format, ...) {
     int result = 0;
-    if(level <= APP_CFG.logger.level) {
+    if(level < 0 || level <= APP_CFG.logger.level) {
         char *template;
         if(asprintf(&template, "[%s][%s]: %s\n", module, function, format) > 0) {
             va_list params;

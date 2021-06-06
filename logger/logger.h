@@ -1,6 +1,7 @@
 #ifndef _LOGGER_H_
 #define _LOGGER_H_
 
+#define LOGGER_LEVEL_FORCED   -1
 #define LOGGER_LEVEL_DISABLED 0
 #define LOGGER_LEVEL_ERROR    1
 #define LOGGER_LEVEL_WARNING  2
