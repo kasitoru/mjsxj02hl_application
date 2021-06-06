@@ -1,3 +1,7 @@
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE 1
+#endif
+
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -72,8 +76,8 @@ int main(int argc, char **argv) {
     logger("mjsxj02hl_application", "main", LOGGER_LEVEL_DEBUG, "Function is called...");
 
     // Default path of config file
-    char * config_filename = "/usr/app/share/mjsxj02hl.conf";
-    
+    char *config_filename = "/usr/app/share/mjsxj02hl.conf";
+
     // Running with arguments
     if(argc > 1) {
         if(strcmp(argv[1], "--config") == 0) { // Set config path
@@ -126,6 +130,18 @@ int main(int argc, char **argv) {
             return EX_USAGE;
         }
     }
+    
+    // Firmware version
+    char *fw_version = firmware_version();
+    logger("mjsxj02hl_application", "main", LOGGER_LEVEL_FORCED, "Firmware version: %s", fw_version);
+    free(fw_version);
+    
+    // Build time
+    struct tm compile_time;
+    if(strptime(__DATE__ ", " __TIME__, "%b %d %Y, %H:%M:%S", &compile_time) != NULL) {
+        int build_time = (int) mktime(&compile_time);
+        logger("mjsxj02hl_application", "main", LOGGER_LEVEL_FORCED, "Build time: %d", build_time);
+    } else logger("mjsxj02hl_application", "main", LOGGER_LEVEL_WARNING, "%s error!", "strptime()");
     
     // Main thread
     if(configs_init(config_filename)) { // Init configs
