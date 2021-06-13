@@ -138,6 +138,7 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
 bool configs_init(char *filename) {
     bool result = true;
     logger("configs", "configs_init", LOGGER_LEVEL_DEBUG, "Function is called...");
+    logger("configs", "configs_init", LOGGER_LEVEL_DEBUG, "Filename: %s", filename);
 
     // Read values from config file
     if(ini_parse(filename, parser_handler, &APP_CFG) >= 0) {
