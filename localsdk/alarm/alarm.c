@@ -176,6 +176,7 @@ int alarm_state_callback(LOCALSDK_ALARM_EVENT_INFO *eventInfo) {
 bool alarm_switch(bool state) {
     bool result = false;
     logger("alarm", "alarm_switch", LOGGER_LEVEL_DEBUG, "Function is called...");
+    logger("alarm", "alarm_switch", LOGGER_LEVEL_DEBUG, "State: %s", (state ? "true" : "false"));
     
     // Switch alarm for motion
     if(local_sdk_set_alarm_switch(LOCALSDK_ALARM_MOTION, state) == LOCALSDK_OK) {
