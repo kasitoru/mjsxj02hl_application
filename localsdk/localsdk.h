@@ -226,6 +226,9 @@ int local_sdk_audio_destory();
 #define LOCALSDK_SPEAKER_BIT_DEPTH   16
 #define LOCALSDK_SPEAKER_TRACK_TYPE  1
 
+#define LOCALSDK_SPEAKER_PCM_TYPE    1
+#define LOCALSDK_SPEAKER_G711_TYPE   2
+
 typedef struct {
     uint32_t sample_rate;
     uint32_t bit_depth;
@@ -257,6 +260,9 @@ int local_sdk_speaker_start();
 
 // Feed PCM data
 int local_sdk_speaker_feed_pcm_data(void *data, int size);
+
+// Feed G711 data
+int local_sdk_speaker_feed_g711_data(void *data, int size);
 
 // Finish buffer
 int local_sdk_speaker_finish_buf_data();

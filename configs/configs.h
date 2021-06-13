@@ -27,6 +27,7 @@ typedef struct {
     // [speaker]
     struct {
         int volume;
+        int type;
     } speaker;
     
     // [alarm]

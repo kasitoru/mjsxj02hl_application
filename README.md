@@ -53,6 +53,7 @@ volume = 70            ; Audio volume level (0-100)
 
 [speaker]
 volume = 70            ; Speaker volume level (0-100)
+type = 1               ; Default file format (1 = PCM, 2 = G711)
 
 [alarm]
 motion_sens = 150      ; Motion sensitivity (1-255)
@@ -110,7 +111,8 @@ Command | Parameters | Description | Example payload
 ------- | ---------- | ----------- | ---------------
 `get_image` | `filename` (string) | Save the image to the specified file (JPEG, 640x360). | { "action": "get_image", "filename": "/mnt/mmc/image.jpg" }
 `set_volume` | `value` (integer) | Set volume level for speaker (0-100). | { "action": "set_volume", "value": 100 }
-`play_media` | `filename` (string) | Play the specified media file (WAV, 8000 hz, 16-bit, mono). | { "action": "play_media", "filename": "/mnt/mmc/media.wav" }
+`play_media` | `filename` (string), `type` (string, optional), `volume` (integer, optional) | Play the specified media file. Two types are supported: "pcm" (WAV, 8000 hz, 16-bit, mono) and "g711" (A-Law, 8000 hz, 16-bit, mono). | { "action": "play_media", "filename": "/mnt/mmc/media.wav", "type": "pcm", "volume": 75 }
+`stop_media` | | Stop current playback. | { "action": "stop_media" }
 
 ### Output topics
 
@@ -133,6 +135,7 @@ Field | Description
 `total_configs` | Total size of the configs partition.
 `free_configs` | The size of free space on the configs partition.
 `volume_level` | Current volume level of the speaker.
+`media_status` | Playback status (0 = stopped, 1 = playing, 2 = stopping).
 `image_url` | URL address of the JPEG image from the camera.
 
 **Topic: mjsxj02hl/alarm**

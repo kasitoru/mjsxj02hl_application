@@ -23,6 +23,7 @@ APPLICATION_CONFIGURATION APP_CFG = {
     
     // [speaker]
     .speaker.volume             = 70,                          // Volume (0-100)
+    .speaker.type               = LOCALSDK_SPEAKER_PCM_TYPE,   // Default file format (1 = PCM, 2 = G711)
     
     // [alarm]
     .alarm.motion_sens          = 150,                         // Motion sensitivity (1-255)
@@ -78,6 +79,8 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
     // [speaker]
     } else if(MATCH("speaker", "volume")) {
         config->speaker.volume = atoi(value);
+    } else if(MATCH("speaker", "type")) {
+        config->speaker.type = atoi(value);
 
     // [alarm]
     } else if(MATCH("alarm", "motion_sens")) {

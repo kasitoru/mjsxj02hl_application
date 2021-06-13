@@ -23,6 +23,7 @@
 MQTTClient MQTTclient;
 pthread_t periodical_thread;
 pthread_t reconnection_thread;
+pthread_t playmedia_thread;
 
 // Get full topic
 char* mqtt_fulltopic(char *topic) {
@@ -174,6 +175,9 @@ void* mqtt_periodical(void *arg) {
             // Volume level
             int volume_level = speaker_get_volume();
             yyjson_mut_obj_add_int(json_doc, json_root, "volume_level", volume_level);
+            // Media status
+            bool media_status = speaker_status_media();
+            yyjson_mut_obj_add_bool(json_doc, json_root, "media_status", media_status);
             // Image URL
             char *image_url = "";
             if(ip_address && ip_address[0]) {
@@ -210,6 +214,23 @@ void* mqtt_periodical(void *arg) {
     } while(endless_cycle);
     
     logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_DEBUG, "Function completed.");
+    return 0;
+}
+
+// Play media (for pthread)
+struct playmedia_args {
+    char *filename;
+    int type;
+} playmedia_args;
+void* mqtt_playmedia(void *args) {
+    logger("mqtt", "mqtt_playmedia", LOGGER_LEVEL_DEBUG, "Function is called...");
+    struct playmedia_args *arguments = (struct playmedia_args *) args;
+    
+    if(speaker_play_media(arguments->filename, arguments->type)) {
+        logger("mqtt", "mqtt_playmedia", LOGGER_LEVEL_INFO, "%s success.", "speaker_play_media()");
+    } else logger("mqtt", "mqtt_playmedia", LOGGER_LEVEL_ERROR, "%s error!", "speaker_play_media()");
+    
+    logger("mqtt", "mqtt_playmedia", LOGGER_LEVEL_DEBUG, "Function completed.");
     return 0;
 }
 
@@ -259,10 +280,38 @@ int mqtt_message_callback(void *context, char *topicName, int topicLen, MQTTClie
                 yyjson_val *json_filename = yyjson_obj_get(json_root, "filename");
                 if(yyjson_is_str(json_filename)) {
                     logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_INFO, "%s success.", "yyjson_is_str(json_filename)");
-                    if(speaker_play_media((char *) yyjson_get_str(json_filename))) {
-                        logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_INFO, "%s success.", "speaker_play_media()");
-                    } else logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_ERROR, "%s error!", "speaker_play_media()");
+                    playmedia_args.filename = (char *) yyjson_get_str(json_filename);
+                    // Set volume level
+                    yyjson_val *json_volume = yyjson_obj_get(json_root, "volume");
+                    if(yyjson_is_int(json_volume)) {
+                        logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_INFO, "%s success.", "yyjson_is_int(json_volume)");
+                        if(speaker_set_volume(yyjson_get_int(json_volume))) {
+                            logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_INFO, "%s success.", "speaker_set_volume()");
+                        } else logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_ERROR, "%s error!", "speaker_set_volume()");
+                    }
+                    // Get media type
+                    playmedia_args.type = APP_CFG.speaker.type;
+                    yyjson_val *json_type = yyjson_obj_get(json_root, "type");
+                    if(yyjson_is_str(json_type)) {
+                        logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_INFO, "%s success.", "yyjson_is_int(json_type)");
+                        if(strcmp(yyjson_get_str(json_type), "g711") == 0) {
+                            playmedia_args.type = LOCALSDK_SPEAKER_G711_TYPE;
+                        } else {
+                            playmedia_args.type = LOCALSDK_SPEAKER_PCM_TYPE;
+                        }
+                    }
+                    // Play
+                    if(pthread_create(&playmedia_thread, NULL, mqtt_playmedia, (void *) &playmedia_args) == 0) {
+                        logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_INFO, "%s success.", "pthread_create(playmedia_thread)");
+                    } else logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_WARNING, "%s error!", "pthread_create(playmedia_thread)");
                 } else logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_ERROR, "%s error!", "yyjson_is_str(json_filename)");
+            
+            // Stop playback
+            } else if(strcmp(yyjson_get_str(json_action), "stop_media") == 0) {
+                logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_INFO, "%s success.", "strcmp(\"stop_media\")");
+                if(speaker_stop_media()) {
+                    logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_INFO, "%s success.", "speaker_stop_media()");
+                } else logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_ERROR, "%s error!", "speaker_stop_media()");
             
             // Unknown action
             } else logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_ERROR, "%s error!", "Unknown action");
