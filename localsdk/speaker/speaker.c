@@ -57,6 +57,8 @@ bool speaker_free() {
 bool speaker_play_media(char *filename, int type) {
     bool result = true;
     logger("speaker", "speaker_play_media", LOGGER_LEVEL_DEBUG, "Function is called...");
+    logger("speaker", "speaker_play_media", LOGGER_LEVEL_DEBUG, "Filename: %s", filename);
+    logger("speaker", "speaker_play_media", LOGGER_LEVEL_DEBUG, "Type: %d", type);
     
     // Stop current playing
     if(speaker_status_media() != SPEAKER_MEDIA_STOPPED) {
@@ -142,6 +144,7 @@ bool speaker_stop_media() {
 bool speaker_set_volume(int value) {
     bool result = true;
     logger("speaker", "speaker_set_volume", LOGGER_LEVEL_DEBUG, "Function is called...");
+    logger("speaker", "speaker_set_volume", LOGGER_LEVEL_DEBUG, "Volume: %d", value);
     
     if(local_sdk_speaker_set_volume(value) == LOCALSDK_OK) {
         logger("speaker", "speaker_set_volume", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_speaker_set_volume()");
