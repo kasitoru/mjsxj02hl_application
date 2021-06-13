@@ -97,6 +97,8 @@ bool speaker_play_media(char *filename, int type) {
                 }
                 usleep(98000);
                 error_counter++;
+                if(speaker_status_media() == SPEAKER_MEDIA_STOPPED) playback_status = SPEAKER_MEDIA_STOPPING;
+                if(speaker_status_media() == SPEAKER_MEDIA_STOPPING) break;
             }
             free(buffer);
             if(speaker_status_media() == SPEAKER_MEDIA_STOPPED) playback_status = SPEAKER_MEDIA_STOPPING;
