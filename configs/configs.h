@@ -50,7 +50,7 @@ typedef struct {
         char* password; 
         char* topic;
         int qos;
-        int retain;
+        bool retain;
     } mqtt;
     
     // [night]

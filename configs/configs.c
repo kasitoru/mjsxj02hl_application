@@ -115,7 +115,7 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
     } else if(MATCH("mqtt", "qos")) {
         config->mqtt.qos = atoi(value);
     } else if(MATCH("mqtt", "retain")) {
-        config->mqtt.retain = (atoi(value) != 0);
+        config->mqtt.retain = atob(value);
 
     // [night]
     } else if(MATCH("night", "mode")) {
