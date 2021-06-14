@@ -127,7 +127,7 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
     } else result = false;
 
     if(result) {
-        logger("configs", "configs_init", LOGGER_LEVEL_INFO, "%s success. Section: %s, name: %s, value: %s", "parser_handler()", section, name, value);
+        logger("configs", "configs_init", LOGGER_LEVEL_FORCED, "%s success. Section: %s, name: %s, value: %s", "parser_handler()", section, name, value);
     } else {
         logger("configs", "configs_init", LOGGER_LEVEL_WARNING, "%s error! Section: %s, name: %s, value: %s", "parser_handler()", section, name, value);
     }
