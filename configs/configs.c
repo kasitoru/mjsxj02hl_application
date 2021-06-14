@@ -55,6 +55,7 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
 
     APPLICATION_CONFIGURATION* config = (APPLICATION_CONFIGURATION*) cfg;
     #define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0
+    #define atob(v) strcmp(value, "true") == 0 || strcmp(value, "yes") == 0 || strcmp(value, "on") == 0 || strcmp(value, "1") == 0
     
     // [logger]
     if(MATCH("logger", "level")) {
@@ -68,9 +69,9 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
     } else if(MATCH("video", "fps")) {
         config->video.fps = atoi(value);
     } else if(MATCH("video", "flip")) {
-        config->video.flip = (atoi(value) != 0);
+        config->video.flip = atob(value);
     } else if(MATCH("video", "mirror")) {
-        config->video.mirror = (atoi(value) != 0);
+        config->video.mirror = atob(value);
 
     // [audio]
     } else if(MATCH("audio", "volume")) {
