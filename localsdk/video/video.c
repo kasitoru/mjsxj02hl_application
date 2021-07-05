@@ -7,13 +7,14 @@
 #include "./../../logger/logger.h"
 #include "./../../configs/configs.h"
 #include "./../../rtsp/rtsp.h"
+#include "./../../rtsp/libRtspServer.h"
 
 // Video capture callback
 int h26x_capture_callback(int chn, LOCALSDK_H26X_FRAME_INFO *frameInfo) {
     if(frameInfo && frameInfo->size) {
-        if(rtsp_media_frame(frameInfo->data, frameInfo->size, frameInfo->index, chn)) {
+        if(rtsp_media_frame(chn, frameInfo->data, frameInfo->size, frameInfo->timestamp, frameInfo->type)) {
             return LOCALSDK_OK;
-        } else logger("video", "h26x_capture_callback", LOGGER_LEVEL_ERROR, "%s error!", "rtsp_media_frame()");
+        }
     }
     return LOCALSDK_ERROR;
 }

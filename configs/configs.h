@@ -42,6 +42,11 @@ typedef struct {
         char* humanoid_lost_exec;
     } alarm;
     
+    // [rtsp]
+    struct {
+        int port;
+    } rtsp;
+    
     // [mqtt]
     struct {
         char* server;

@@ -35,9 +35,12 @@ APPLICATION_CONFIGURATION APP_CFG = {
     .alarm.motion_lost_exec     = "",                          // Execute the command when motion is lost
     .alarm.humanoid_lost_exec   = "",                          // Execute the command when humanoid is lost
     
+    // [rtsp]
+    .rtsp.port                  = 554,                         // Port number
+    
     // [mqtt]
     .mqtt.server                = "",                          // Address (empty for disable)
-    .mqtt.port                  = 1883,                        // Port
+    .mqtt.port                  = 1883,                        // Port number
     .mqtt.username              = "",                          // Username (empty for anonimous)
     .mqtt.password              = "",                          // Password (empty for disable)
     .mqtt.topic                 = "mjsxj02hl",                 // Topic name
@@ -100,6 +103,10 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
         config->alarm.motion_lost_exec = strdup(value);
     } else if(MATCH("alarm", "humanoid_lost_exec")) {
         config->alarm.humanoid_lost_exec = strdup(value);
+
+    // [rtsp]
+    } else if(MATCH("rtsp", "port")) {
+        config->rtsp.port = atoi(value);
 
     // [mqtt]
     } else if(MATCH("mqtt", "server")) {

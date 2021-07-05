@@ -62,6 +62,9 @@ int SAMPLE_COMM_SYS_GetPicSize(int resolution, LOCALSDK_PICTURE_SIZE *size);
 
 #define LOCALSDK_VIDEO_RCMODE_TYPE          2
 
+#define LOCALSDK_VIDEO_H26X_FRAME_I    0
+#define LOCALSDK_VIDEO_H26X_FRAME_P    1
+
 typedef struct {
     signed char *data;
     uint32_t size;
@@ -161,6 +164,8 @@ int local_sdk_video_osd_update_timestamp(int param_1, int param_2, struct tm * t
 
 #define LOCALSDK_AUDIO_G711_BUFFER_SIZE 320
 #define LOCALSDK_AUDIO_PCM_BUFFER_SIZE  640
+
+#define LOCALSDK_AUDIO_G711_FRAME       2
 
 typedef struct {
     signed char *data;

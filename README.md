@@ -13,7 +13,7 @@ tar -zxf arm-himix100-linux.tgz
 sudo ./arm-himix100-linux.install
 ```
 
-2. Copy the libraries from directory `/usr/app/lib` of the original firmware to directory `/opt/hisi-linux/x86-arm/arm-himix100-linux/target/usr/app`.
+2. Copy the libraries from directory `/usr/app/lib` of the original firmware to directory `/opt/hisi-linux/x86-arm/arm-himix100-linux/target/usr/app/lib`.
 
 3. Clone the repository:
 
@@ -22,10 +22,10 @@ git clone https://github.com/avdeevsv91/mjsxj02hl_application
 cd mjsxj02hl_application
 ```
 
-4. Copy the additional dependencies to directory `/opt/hisi-linux/x86-arm/arm-himix100-linux/target/usr/app`:
+4. Changing the permissions for the folder `/opt/hisi-linux/x86-arm/arm-himix100-linux/target/usr/app/lib`:
 
 ```bash
-sudo cp -r dependencies/. /opt/hisi-linux/x86-arm/arm-himix100-linux/target/usr/app
+sudo chmod 755 /opt/hisi-linux/x86-arm/arm-himix100-linux/target/usr/app/lib
 ```
 
 5. Build application:
@@ -65,9 +65,12 @@ humanoid_detect_exec = ; Execute the command when humanoid is detected (empty fo
 motion_lost_exec =     ; Execute the command when motion is lost (empty for disable)
 humanoid_lost_exec =   ; Execute the command when humanoid is lost (empty for disable)
 
+[rtsp]
+port = 554             ; Port number
+
 [mqtt]
 server =               ; Address (empty for disable)
-port = 1883            ; Port
+port = 1883            ; Port number
 username =             ; Username (empty for anonimous)
 password =             ; Password (empty for disable)
 topic = mjsxj02hl      ; Topic name
@@ -163,4 +166,4 @@ Field | Description
 * yyjson: https://github.com/ibireme/yyjson
 * inih: https://github.com/benhoyt/inih
 * paho.mqtt.c: https://github.com/eclipse/paho.mqtt.c
-* librtsp: https://github.com/xiaochangzhen/librtsp
+* RtspServer: https://github.com/PHZ76/RtspServer
