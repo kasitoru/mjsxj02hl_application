@@ -45,6 +45,7 @@ typedef struct {
     // [rtsp]
     struct {
         int port;
+        bool multicast;
     } rtsp;
     
     // [mqtt]

@@ -10,7 +10,7 @@ static xop::MediaSessionId primary_session_id;
 static xop::MediaSessionId secondary_session_id;
 
 // Create RTSP server
-bool rtspserver_create(uint16_t port, uint8_t video_type, uint32_t framerate) {
+bool rtspserver_create(uint16_t port, bool multicast, uint8_t video_type, uint32_t framerate) {
     rtsp_server = xop::RtspServer::Create(event_loop.get());
 	if(rtsp_server->Start("0.0.0.0", port)) {
 	
@@ -22,7 +22,7 @@ bool rtspserver_create(uint16_t port, uint8_t video_type, uint32_t framerate) {
 	        primary_session->AddSource(xop::channel_0, xop::H265Source::CreateNew(framerate));
 	    }
 	    primary_session->AddSource(xop::channel_1, xop::G711ASource::CreateNew());
-	    primary_session->StartMulticast();
+	    if(multicast) { primary_session->StartMulticast(); }
         primary_session->AddNotifyConnectedCallback([] (xop::MediaSessionId session_id, std::string peer_ip, uint16_t peer_port) {
             printf("[libRtspServer]: Client connect to %s channel, ip=%s, port=%hu\n", "primary", peer_ip.c_str(), peer_port);
         });
@@ -39,7 +39,7 @@ bool rtspserver_create(uint16_t port, uint8_t video_type, uint32_t framerate) {
 	        secondary_session->AddSource(xop::channel_0, xop::H265Source::CreateNew(framerate));
 	    }
 	    secondary_session->AddSource(xop::channel_1, xop::G711ASource::CreateNew());
-	    secondary_session->StartMulticast();
+	    if(multicast) { secondary_session->StartMulticast(); }
         secondary_session->AddNotifyConnectedCallback([] (xop::MediaSessionId session_id, std::string peer_ip, uint16_t peer_port) {
             printf("[libRtspServer]: Client connect to %s channel, ip=%s, port=%hu\n", "secondary", peer_ip.c_str(), peer_port);
         });

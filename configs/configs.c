@@ -37,6 +37,7 @@ APPLICATION_CONFIGURATION APP_CFG = {
     
     // [rtsp]
     .rtsp.port                  = 554,                         // Port number
+    .rtsp.multicast             = false,                       // Use multicast
     
     // [mqtt]
     .mqtt.server                = "",                          // Address (empty for disable)
@@ -107,6 +108,8 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
     // [rtsp]
     } else if(MATCH("rtsp", "port")) {
         config->rtsp.port = atoi(value);
+    } else if(MATCH("rtsp", "multicast")) {
+        config->rtsp.multicast = atob(value);
 
     // [mqtt]
     } else if(MATCH("mqtt", "server")) {
