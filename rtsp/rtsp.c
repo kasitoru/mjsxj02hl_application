@@ -48,7 +48,7 @@ bool rtsp_media_frame(int chn, signed char *data, size_t size, uint32_t timestam
     }
     
     // Get current timestamp
-    if(type == XOP_AUDIO_FRAME) {
+    if(type == LOCALSDK_AUDIO_G711_FRAME) {
         timestamp = rtspserver_timestamp_g711a();
     } else {
         if(APP_CFG.video.type == LOCALSDK_VIDEO_PAYLOAD_H264) {
