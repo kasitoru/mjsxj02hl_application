@@ -18,14 +18,16 @@
 #include "./../configs/configs.h"
 
 // Log printf function
-int logprintf(const char *format, ...) {
+static int logprintf(const char *format, ...) {
     int result = 0;
-    if(LOGGER_LEVEL_INFO <= APP_CFG.logger.level) {
-        va_list params;
-        va_start(params, format);
-        result = vprintf(format, params);
-        va_end(params);
+    char *message;
+    va_list params;
+    va_start(params, format);
+    if(vasprintf(&message, format, params) > 0) {
+        result = logger("localsdk", "logprintf", LOGGER_LEVEL_INFO, message);
+        free(message);
     }
+    va_end(params);
     return result;
 }
 
