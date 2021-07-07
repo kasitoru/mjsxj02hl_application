@@ -37,7 +37,6 @@ bool rtsp_is_enabled() {
 bool rtsp_init() {
     bool result = false;
     logger("rtsp", "rtsp_init", LOGGER_LEVEL_DEBUG, "Function is called...");
-    
     if(rtsp_is_enabled()) { // If RTSP enabled
         if(rtspserver_logprintf(librtspserver_logger)) {
             logger("rtsp", "rtsp_init", LOGGER_LEVEL_INFO, "%s success.", "rtspserver_logprintf()");
@@ -58,7 +57,6 @@ bool rtsp_init() {
         logger("rtsp", "rtsp_init", LOGGER_LEVEL_WARNING, "RTSP server is disabled in the settings.");
         result = true;
     }
-    
     logger("rtsp", "rtsp_init", LOGGER_LEVEL_DEBUG, "Function completed.");
     return result;
 }
@@ -66,15 +64,12 @@ bool rtsp_init() {
 // Free RTSP
 bool rtsp_free() {
     bool result = false;
-    
     logger("rtsp", "rtsp_free", LOGGER_LEVEL_DEBUG, "Function is called...");
-    
     if(rtsp_is_enabled()) { // If RTSP enabled
         if(result = rtspserver_free(2, primary_session, secondary_session)) {
             logger("rtsp", "rtsp_free", LOGGER_LEVEL_INFO, "%s success.", "rtspserver_free()");
         } else logger("rtsp", "rtsp_free", LOGGER_LEVEL_ERROR, "%s error!", "rtspserver_free()");
     } else result = true;
-    
     logger("rtsp", "rtsp_free", LOGGER_LEVEL_DEBUG, "Function completed.");
     return result;
 }
