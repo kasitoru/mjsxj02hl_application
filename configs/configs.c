@@ -38,9 +38,12 @@ APPLICATION_CONFIGURATION APP_CFG = {
     // [rtsp]
     .rtsp.enable                = true,                        // Enable RTSP server
     .rtsp.port                  = 554,                         // Port number
-    .rtsp.multicast             = false,                       // Use multicast
     .rtsp.username              = "",                          // Username (empty for disable)
     .rtsp.password              = "",                          // Password
+    .rtsp.primary_name          = "primary",                   // Name of the primary channel
+    .rtsp.secondary_name        = "secondary",                 // Name of the secondary channel
+    .rtsp.primary_multicast     = false,                       // Use multicast for primary channel
+    .rtsp.secondary_multicast   = false,                       // Use multicast for secondary channel
     
     // [mqtt]
     .mqtt.server                = "",                          // Address (empty for disable)
@@ -113,12 +116,18 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
         config->rtsp.enable = atob(value);
     } else if(MATCH("rtsp", "port")) {
         config->rtsp.port = atoi(value);
-    } else if(MATCH("rtsp", "multicast")) {
-        config->rtsp.multicast = atob(value);
     } else if(MATCH("rtsp", "username")) {
         config->rtsp.username = strdup(value);
     } else if(MATCH("rtsp", "password")) {
         config->rtsp.password = strdup(value);
+    } else if(MATCH("rtsp", "primary_name")) {
+        config->rtsp.primary_name = strdup(value);
+    } else if(MATCH("rtsp", "secondary_name")) {
+        config->rtsp.secondary_name = strdup(value);
+    } else if(MATCH("rtsp", "primary_multicast")) {
+        config->rtsp.primary_multicast = atob(value);
+    } else if(MATCH("rtsp", "secondary_multicast")) {
+        config->rtsp.secondary_multicast = atob(value);
 
     // [mqtt]
     } else if(MATCH("mqtt", "server")) {

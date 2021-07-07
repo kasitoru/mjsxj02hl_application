@@ -39,51 +39,54 @@ Default config `/usr/app/share/mjsxj02hl.conf`:
 
 ```ini
 [logger]
-level = 2              ; Log level (0 = disable, 1 = error, 2 = warning, 3 = info, 4 = debug)
-file =                 ; Write log to file (empty for disable)
+level = 2                   ; Log level (0 = disable, 1 = error, 2 = warning, 3 = info, 4 = debug)
+file =                      ; Write log to file (empty for disable)
 
 [video]
-type = 1               ; Video compression standard (1 = h264, 2 = h265)
-fps = 20               ; Frames per second
-flip = false           ; Flip image
-mirror = false         ; Mirror image
+type = 1                    ; Video compression standard (1 = h264, 2 = h265)
+fps = 20                    ; Frames per second
+flip = false                ; Flip image
+mirror = false              ; Mirror image
 
 [audio]
-volume = 70            ; Audio volume level (0-100)
+volume = 70                 ; Audio volume level (0-100)
 
 [speaker]
-volume = 70            ; Speaker volume level (0-100)
-type = 1               ; Default file format (1 = PCM, 2 = G711)
+volume = 70                 ; Speaker volume level (0-100)
+type = 1                    ; Default file format (1 = PCM, 2 = G711)
 
 [alarm]
-motion_sens = 150      ; Motion sensitivity (1-255)
-humanoid_sens = 150    ; Humanoid sensitivity (1-255)
-motion_timeout = 60    ; Motion timeout (in seconds)
-humanoid_timeout = 60  ; Humanoid timeout (in seconds)
-motion_detect_exec =   ; Execute the command when motion is detected (empty for disable)
-humanoid_detect_exec = ; Execute the command when humanoid is detected (empty for disable)
-motion_lost_exec =     ; Execute the command when motion is lost (empty for disable)
-humanoid_lost_exec =   ; Execute the command when humanoid is lost (empty for disable)
+motion_sens = 150           ; Motion sensitivity (1-255)
+humanoid_sens = 150         ; Humanoid sensitivity (1-255)
+motion_timeout = 60         ; Motion timeout (in seconds)
+humanoid_timeout = 60       ; Humanoid timeout (in seconds)
+motion_detect_exec =        ; Execute the command when motion is detected (empty for disable)
+humanoid_detect_exec =      ; Execute the command when humanoid is detected (empty for disable)
+motion_lost_exec =          ; Execute the command when motion is lost (empty for disable)
+humanoid_lost_exec =        ; Execute the command when humanoid is lost (empty for disable)
 
 [rtsp]
-enable = true          ; Enable RTSP server
-port = 554             ; Port number
-multicast = false      ; Use multicast
-username =             ; Username (empty for disable)
-password =             ; Password
+enable = true               ; Enable RTSP server
+port = 554                  ; Port number
+username =                  ; Username (empty for disable)
+password =                  ; Password
+primary_name = primary      ; Name of the primary channel
+secondary_name = secondary  ; Name of the secondary channel
+primary_multicast = false   ; Use multicast for primary channel
+secondary_multicast = false ; Use multicast for secondary channel
 
 [mqtt]
-server =               ; Address (empty for disable)
-port = 1883            ; Port number
-username =             ; Username (empty for anonimous)
-password =             ; Password (empty for disable)
-topic = mjsxj02hl      ; Topic name
-qos = 1                ; Quality of Service (0, 1 or 2)
-retain = false         ; Retained messages
+server =                    ; Address (empty for disable)
+port = 1883                 ; Port number
+username =                  ; Username (empty for anonimous)
+password =                  ; Password (empty for disable)
+topic = mjsxj02hl           ; Topic name
+qos = 1                     ; Quality of Service (0, 1 or 2)
+retain = false              ; Retained messages
 
 [night]
-mode = 2               ; Night mode (0 = off, 1 = on, 2 = auto)
-gray = 2               ; Grayscale (0 = off, 1 = on, 2 = auto)
+mode = 2                    ; Night mode (0 = off, 1 = on, 2 = auto)
+gray = 2                    ; Grayscale (0 = off, 1 = on, 2 = auto)
 ```
 
 ## Usage

@@ -43,10 +43,10 @@ bool rtsp_init() {
             if(rtspserver_create(APP_CFG.rtsp.port, APP_CFG.rtsp.username, APP_CFG.rtsp.password)) {
                 logger("rtsp", "rtsp_init", LOGGER_LEVEL_INFO, "%s success.", "rtspserver_create()");
                 // Primary channel
-                if(primary_session = rtspserver_session("primary", APP_CFG.rtsp.multicast, APP_CFG.video.type, APP_CFG.video.fps, true)) {
+                if(primary_session = rtspserver_session(APP_CFG.rtsp.primary_name, APP_CFG.rtsp.primary_multicast, APP_CFG.video.type, APP_CFG.video.fps, true)) {
                     logger("rtsp", "rtsp_init", LOGGER_LEVEL_INFO, "%s success.", "rtspserver_session(primary)");
                     // Secondary channel
-                    if(secondary_session = rtspserver_session("secondary", APP_CFG.rtsp.multicast, APP_CFG.video.type, APP_CFG.video.fps, true)) {
+                    if(secondary_session = rtspserver_session(APP_CFG.rtsp.secondary_name, APP_CFG.rtsp.secondary_multicast, APP_CFG.video.type, APP_CFG.video.fps, true)) {
                         logger("rtsp", "rtsp_init", LOGGER_LEVEL_INFO, "%s success.", "rtspserver_session(secondary)");
                         result = true;
                     } else logger("rtsp", "rtsp_init", LOGGER_LEVEL_ERROR, "%s error!", "rtspserver_session(secondary)");

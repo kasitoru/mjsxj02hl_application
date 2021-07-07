@@ -46,9 +46,12 @@ typedef struct {
     struct {
         bool enable;
         int port;
-        bool multicast;
         char* username;
         char* password;
+        char* primary_name;
+        char* secondary_name;
+        bool primary_multicast;
+        bool secondary_multicast;
     } rtsp;
     
     // [mqtt]
