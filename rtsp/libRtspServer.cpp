@@ -81,11 +81,11 @@ uint32_t rtspserver_timestamp_g711a() {
 
 // Send media frame
 bool rtspserver_frame(uint32_t session_id, signed char *data, uint8_t type, uint32_t size, uint32_t timestamp) {
-    xop::Nal nal;
     xop::AVFrame frame = {0};
     frame.type = type;
     frame.timestamp = timestamp;
     
+    xop::Nal nal;
     uint32_t endpoint = ((uint32_t) data) + size;
     while(true) {
         
@@ -108,8 +108,16 @@ bool rtspserver_frame(uint32_t session_id, signed char *data, uint8_t type, uint
             } else break;
         } else break;
     }
-    
     return true;
+    
+    /*
+    uint32_t offset = 0;
+    if(frame.type != xop::AUDIO_FRAME) { offset = 4; } // Skip 00 00 00 01
+    frame.size = size - offset;
+    frame.buffer.reset(new uint8_t[frame.size]);
+    memcpy(frame.buffer.get(), data + offset, frame.size);
+    return rtsp_server->PushFrame(session_id, (frame.type != xop::AUDIO_FRAME ? xop::channel_0 : xop::channel_1), frame);
+    */
 }
 
 // Free RTSP server
