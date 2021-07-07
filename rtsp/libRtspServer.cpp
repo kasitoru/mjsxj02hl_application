@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stdarg.h>
 
 #include "libRtspServer.h"
 #include "xop/RtspServer.h"
@@ -7,81 +8,87 @@
 
 static std::shared_ptr<xop::EventLoop> event_loop(new xop::EventLoop());
 static std::shared_ptr<xop::RtspServer> rtsp_server;
-static xop::MediaSessionId primary_session_id;
-static xop::MediaSessionId secondary_session_id;
+
+// Default log printf function
+static int logprintf_default(const char *format, ...) {
+    int result = 0;
+    char *message;
+    va_list params;
+    va_start(params, format);
+    if(vasprintf(&message, format, params) > 0) {
+        result = printf("[rtspserver]: %s\n", message);
+        free(message);
+    }
+    va_end(params);
+    return result;
+}
+static int (*logprintf_function)(const char*, ...) = logprintf_default;
+
+// Set log printf function
+bool rtspserver_logprintf(int (*function)(const char*, ...)) {
+    logprintf_function = function;
+    return true;
+}
 
 // Create RTSP server
-bool rtspserver_create(uint16_t port, bool multicast, char *username, char *password, uint8_t video_type, uint32_t framerate) {
+bool rtspserver_create(uint16_t port, char *username, char *password) {
     rtsp_server = xop::RtspServer::Create(event_loop.get());
 	if(rtsp_server->Start("0.0.0.0", port)) {
-	    
-	    // Authorization
+	    logprintf_function("The RTSP server is running on port %d.", port);
+	    // Digest authentication
 	    if(username && username[0]) {
 	        rtsp_server->SetAuthConfig("RTSP", std::string(username), std::string(password));
+	        logprintf_function("Digest authentication is enabled.");
 	    }
-	    
-	    // Primary channel
-	    xop::MediaSession *primary_session = xop::MediaSession::CreateNew("primary");
-	    if(video_type == LOCALSDK_VIDEO_PAYLOAD_H264) {
-	        primary_session->AddSource(xop::channel_0, xop::H264Source::CreateNew(framerate));
-	    } else {
-	        primary_session->AddSource(xop::channel_0, xop::H265Source::CreateNew(framerate));
-	    }
-	    primary_session->AddSource(xop::channel_1, xop::G711ASource::CreateNew());
-	    if(multicast) { primary_session->StartMulticast(); }
-        primary_session->AddNotifyConnectedCallback([] (xop::MediaSessionId session_id, std::string peer_ip, uint16_t peer_port) {
-            printf("[libRtspServer]: Client connect to %s channel, ip=%s, port=%hu\n", "primary", peer_ip.c_str(), peer_port);
-        });
-        primary_session->AddNotifyDisconnectedCallback([](xop::MediaSessionId session_id, std::string peer_ip, uint16_t peer_port) {
-            printf("[libRtspServer]: Client disconnect from %s channel, ip=%s, port=%hu\n", "primary", peer_ip.c_str(), peer_port);
-        });
-	    primary_session_id = rtsp_server->AddSession(primary_session);
-        
-        // Secondary channel
-	    xop::MediaSession *secondary_session = xop::MediaSession::CreateNew("secondary");
-	    if(video_type == LOCALSDK_VIDEO_PAYLOAD_H264) {
-	        secondary_session->AddSource(xop::channel_0, xop::H264Source::CreateNew(framerate));
-	    } else {
-	        secondary_session->AddSource(xop::channel_0, xop::H265Source::CreateNew(framerate));
-	    }
-	    secondary_session->AddSource(xop::channel_1, xop::G711ASource::CreateNew());
-	    if(multicast) { secondary_session->StartMulticast(); }
-        secondary_session->AddNotifyConnectedCallback([] (xop::MediaSessionId session_id, std::string peer_ip, uint16_t peer_port) {
-            printf("[libRtspServer]: Client connect to %s channel, ip=%s, port=%hu\n", "secondary", peer_ip.c_str(), peer_port);
-        });
-        secondary_session->AddNotifyDisconnectedCallback([](xop::MediaSessionId session_id, std::string peer_ip, uint16_t peer_port) {
-            printf("[libRtspServer]: Client disconnect from %s channel, ip=%s, port=%hu\n", "secondary", peer_ip.c_str(), peer_port);
-        });
-	    secondary_session_id = rtsp_server->AddSession(secondary_session);
-
 		return true;
 	}
+	logprintf_function("RTSP server startup error! Port %d is busy?", port);
 	return false;
 }
 
-// Get primary session id
-uint32_t rtspserver_primary_id() {
-    return primary_session_id;
+// Create new session
+uint32_t rtspserver_session(char *name, bool multicast, uint8_t video_type, uint32_t framerate, bool audio) {
+    logprintf_function("A new multimedia session \"%s\" has been created.", name);
+    xop::MediaSession *session = xop::MediaSession::CreateNew(std::string(name));
+    // Video
+    if(video_type == LOCALSDK_VIDEO_PAYLOAD_H264) {
+        session->AddSource(xop::channel_0, xop::H264Source::CreateNew(framerate));
+        logprintf_function("%s source is enabled for session \"%s\" (channel = %d).", "H264", name, xop::channel_0);
+    } else {
+        session->AddSource(xop::channel_0, xop::H265Source::CreateNew(framerate));
+        logprintf_function("%s source is enabled for session \"%s\" (channel = %d).", "H265", name, xop::channel_0);
+    }
+    // Audio
+    if(audio) {
+        session->AddSource(xop::channel_1, xop::G711ASource::CreateNew());
+        logprintf_function("%s source is enabled for session \"%s\" (channel = %d).", "G711A", name, xop::channel_1);
+    }
+    // Multicast
+    if(multicast) {
+        session->StartMulticast();
+        logprintf_function("Multicast is enabled for session \"%s\".", name);
+    }
+    // Callbacks
+    session->AddNotifyConnectedCallback([] (xop::MediaSessionId session_id, std::string peer_ip, uint16_t peer_port) {
+        logprintf_function("Client connected to media session %d (IP = %s, port = %hu).", session_id, peer_ip.c_str(), peer_port);
+    });
+    session->AddNotifyDisconnectedCallback([](xop::MediaSessionId session_id, std::string peer_ip, uint16_t peer_port) {
+        logprintf_function("Client disconnected from media session %d (IP = %s, port = %hu).", session_id, peer_ip.c_str(), peer_port);
+    });
+    // Done
+    xop::MediaSessionId session_id = rtsp_server->AddSession(session);
+    logprintf_function("Media session \"%s\" was started with ID = %d.", name, session_id);
+    return session_id;
 }
 
-// Get secondary session id
-uint32_t rtspserver_secondary_id() {
-    return secondary_session_id;
-}
-
-// Timestamp for H264
-uint32_t rtspserver_timestamp_h264() {
-    return xop::H264Source::GetTimestamp();
-}
-
-// Timestamp for H265
-uint32_t rtspserver_timestamp_h265() {
-    return xop::H265Source::GetTimestamp();
-}
-
-// Timestamp for G711A
-uint32_t rtspserver_timestamp_g711a() {
-    return xop::G711ASource::GetTimestamp();
+// Get current timestamp
+uint32_t rtspserver_timestamp(uint8_t source) {
+    switch(source) {
+        case RTSP_SERVER_TIMESTAMP_H264: return xop::H264Source::GetTimestamp();
+        case RTSP_SERVER_TIMESTAMP_H265: return xop::H265Source::GetTimestamp();
+        case RTSP_SERVER_TIMESTAMP_G711: return xop::G711ASource::GetTimestamp();
+        default: return 0;
+    }
 }
 
 // Send media frame
@@ -126,11 +133,20 @@ bool rtspserver_frame(uint32_t session_id, signed char *data, uint8_t type, uint
 }
 
 // Free RTSP server
-bool rtspserver_free() {
-    rtsp_server->RemoveSession(primary_session_id);
-    rtsp_server->RemoveSession(secondary_session_id);
+bool rtspserver_free(uint32_t count, ...) {
+    // Remove sessions
+    va_list sessions;
+    va_start(sessions, count);
+    for(uint32_t i=0;i<count;i++) {
+        xop::MediaSessionId session_id = va_arg(sessions, xop::MediaSessionId);
+        logprintf_function("Stopping the media session %d...", session_id);
+        rtsp_server->RemoveSession(session_id);
+    }
+    va_end(sessions);
+    // Stop server
     rtsp_server->Stop();
     event_loop->Quit();
+    logprintf_function("The RTSP server is stopped.");
     return true;
 }
 

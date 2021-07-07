@@ -1,6 +1,10 @@
 #ifndef __LIBRTSPSERVER_H
 #define __LIBRTSPSERVER_H
 
+#define RTSP_SERVER_TIMESTAMP_H264 1
+#define RTSP_SERVER_TIMESTAMP_H265 2
+#define RTSP_SERVER_TIMESTAMP_G711 3
+
 #define XOP_VIDEO_FRAME_I 0x01
 #define XOP_VIDEO_FRAME_P 0x02
 #define XOP_VIDEO_FRAME_B 0x03
@@ -10,29 +14,23 @@
 extern "C"{
 #endif
 
+// Set log printf function
+bool rtspserver_logprintf(int (*function)(const char*, ...));
+
 // Create RTSP server
-bool rtspserver_create(uint16_t port, bool multicast, char *username, char *password, uint8_t video_type, uint32_t framerate);
+bool rtspserver_create(uint16_t port, char *username, char *password);
 
-// Get primary session id
-uint32_t rtspserver_primary_id();
+// Create new session
+uint32_t rtspserver_session(char *name, bool multicast, uint8_t video_type, uint32_t framerate, bool audio);
 
-// Get secondary session id
-uint32_t rtspserver_secondary_id();
-
-// Timestamp for H264
-uint32_t rtspserver_timestamp_h264();
-
-// Timestamp for H265
-uint32_t rtspserver_timestamp_h265();
-
-// Timestamp for G711A
-uint32_t rtspserver_timestamp_g711a();
+// Get current timestamp
+uint32_t rtspserver_timestamp(uint8_t source);
 
 // Send media frame
 bool rtspserver_frame(uint32_t session_id, signed char *data, uint8_t type, uint32_t size, uint32_t timestamp);
 
 // Free RTSP server
-bool rtspserver_free();
+bool rtspserver_free(uint32_t count, ...);
 
 #ifdef __cplusplus
 }

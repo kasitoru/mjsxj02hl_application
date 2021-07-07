@@ -1,5 +1,10 @@
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE 1
+#endif
+
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdarg.h>
 
 #include "./rtsp.h"
 #include "./libRtspServer.h"
@@ -7,15 +12,42 @@
 #include "./../logger/logger.h"
 #include "./../configs/configs.h"
 
+static uint32_t primary_session, secondary_session;
+
+// Logger function for libRtspServer
+int librtspserver_logger(const char *format, ...) {
+    int result = 0;
+    char *message;
+    va_list params;
+    va_start(params, format);
+    if(vasprintf(&message, format, params) > 0) {
+        result = logger("rtsp", "rtspserver", LOGGER_LEVEL_INFO, message);
+        free(message);
+    }
+    va_end(params);
+    return result;
+}
+
 // Init RTSP
 bool rtsp_init() {
     bool result = false;
     logger("rtsp", "rtsp_init", LOGGER_LEVEL_DEBUG, "Function is called...");
     
-    if(rtspserver_create(APP_CFG.rtsp.port, APP_CFG.rtsp.multicast, APP_CFG.rtsp.username, APP_CFG.rtsp.password, APP_CFG.video.type, APP_CFG.video.fps)) {
-        logger("rtsp", "rtsp_init", LOGGER_LEVEL_INFO, "%s success.", "rtspserver_create()");
-        result = true;
-    } else logger("rtsp", "rtsp_init", LOGGER_LEVEL_ERROR, "%s error!", "rtspserver_create()");
+    if(rtspserver_logprintf(librtspserver_logger)) {
+        logger("rtsp", "rtsp_init", LOGGER_LEVEL_INFO, "%s success.", "rtspserver_logprintf()");
+        if(rtspserver_create(APP_CFG.rtsp.port, APP_CFG.rtsp.username, APP_CFG.rtsp.password)) {
+            logger("rtsp", "rtsp_init", LOGGER_LEVEL_INFO, "%s success.", "rtspserver_create()");
+            // Primary channel
+            if(primary_session = rtspserver_session("primary", APP_CFG.rtsp.multicast, APP_CFG.video.type, APP_CFG.video.fps, true)) {
+                logger("rtsp", "rtsp_init", LOGGER_LEVEL_INFO, "%s success.", "rtspserver_session(primary)");
+                // Secondary channel
+                if(secondary_session = rtspserver_session("secondary", APP_CFG.rtsp.multicast, APP_CFG.video.type, APP_CFG.video.fps, true)) {
+                    logger("rtsp", "rtsp_init", LOGGER_LEVEL_INFO, "%s success.", "rtspserver_session(secondary)");
+                    result = true;
+                } else logger("rtsp", "rtsp_init", LOGGER_LEVEL_ERROR, "%s error!", "rtspserver_session(secondary)");
+            } else logger("rtsp", "rtsp_init", LOGGER_LEVEL_ERROR, "%s error!", "rtspserver_session(primary)");
+        } else logger("rtsp", "rtsp_init", LOGGER_LEVEL_ERROR, "%s error!", "rtspserver_create()");
+    } else logger("rtsp", "rtsp_init", LOGGER_LEVEL_ERROR, "%s error!", "rtspserver_logprintf()");
     
     logger("rtsp", "rtsp_init", LOGGER_LEVEL_DEBUG, "Function completed.");
     return result;
@@ -27,7 +59,7 @@ bool rtsp_free() {
     
     logger("rtsp", "rtsp_free", LOGGER_LEVEL_DEBUG, "Function is called...");
     
-    if(result = rtspserver_free()) {
+    if(result = rtspserver_free(2, primary_session, secondary_session)) {
         logger("rtsp", "rtsp_free", LOGGER_LEVEL_INFO, "%s success.", "rtspserver_free()");
     } else logger("rtsp", "rtsp_free", LOGGER_LEVEL_ERROR, "%s error!", "rtspserver_free()");
     
@@ -39,22 +71,14 @@ bool rtsp_free() {
 bool rtsp_media_frame(int chn, signed char *data, size_t size, uint32_t timestamp, uint8_t type) {
     bool result = false;
     
-    // Get session id
-    uint32_t session_id;
-    if(chn == LOCALSDK_VIDEO_SECONDARY_CHANNEL) {
-        session_id = rtspserver_secondary_id();
-    } else {
-        session_id = rtspserver_primary_id();
-    }
-    
     // Get current timestamp
     if(type == LOCALSDK_AUDIO_G711_FRAME) {
-        timestamp = rtspserver_timestamp_g711a();
+        timestamp = rtspserver_timestamp(RTSP_SERVER_TIMESTAMP_G711);
     } else {
         if(APP_CFG.video.type == LOCALSDK_VIDEO_PAYLOAD_H264) {
-            timestamp = rtspserver_timestamp_h264();
+            timestamp = rtspserver_timestamp(RTSP_SERVER_TIMESTAMP_H264);
         } else {
-            timestamp = rtspserver_timestamp_h265();
+            timestamp = rtspserver_timestamp(RTSP_SERVER_TIMESTAMP_H265);
         }
     }
     
@@ -74,7 +98,7 @@ bool rtsp_media_frame(int chn, signed char *data, size_t size, uint32_t timestam
     }
     
     // Send frame
-    if(rtspserver_frame(session_id, data, type, size, timestamp)) {
+    if(rtspserver_frame((chn == LOCALSDK_VIDEO_SECONDARY_CHANNEL ? secondary_session : primary_session), data, type, size, timestamp)) {
         result = true;
     }
     
