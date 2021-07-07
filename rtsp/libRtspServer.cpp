@@ -138,9 +138,10 @@ bool rtspserver_free(uint32_t count, ...) {
     va_list sessions;
     va_start(sessions, count);
     for(uint32_t i=0;i<count;i++) {
-        xop::MediaSessionId session_id = va_arg(sessions, xop::MediaSessionId);
-        logprintf_function("Stopping the media session #%d...", session_id);
-        rtsp_server->RemoveSession(session_id);
+        if(xop::MediaSessionId session_id = va_arg(sessions, xop::MediaSessionId)) {
+            logprintf_function("Stopping the media session #%d...", session_id);
+            rtsp_server->RemoveSession(session_id);
+        }
     }
     va_end(sessions);
     // Stop server
