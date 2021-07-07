@@ -46,7 +46,7 @@ bool video_init() {
                     .flip        = APP_CFG.video.flip,
                     .mirror      = APP_CFG.video.mirror,
                     .unknown_5   = 0, // FIXME: what is it?
-                    .unknown_6   = 1, // FIXME: what is it?
+                    .video       = true,
                     .unknown_7   = 1, // FIXME: what is it?
                     .payload     = APP_CFG.video.type,
                     .rcmode      = LOCALSDK_VIDEO_RCMODE_TYPE,
@@ -87,7 +87,6 @@ bool video_init() {
                                                 video_options.bitrate     = LOCALSDK_VIDEO_SECONDARY_BITRATE;
                                                 video_options.resolution  = LOCALSDK_VIDEO_RESOLUTION_640x360;
                                                 video_options.unknown_5   = 1; // FIXME: what is it?
-                                                video_options.unknown_6   = 0; // FIXME: what is it?
                                                 video_options.unknown_7   = 0; // FIXME: what is it?
                                                 video_options.screen_size = picture_size.width * picture_size.height;
                                                 video_options.unknown_12  = 50000; // FIXME: what is it?

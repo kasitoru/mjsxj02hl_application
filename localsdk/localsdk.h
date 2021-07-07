@@ -82,7 +82,7 @@ typedef struct {
     uint32_t flip;
     uint32_t mirror;
     uint32_t unknown_5; // FIXME: what is it?
-    uint32_t unknown_6; // FIXME: what is it?
+    uint32_t video;
     uint32_t unknown_7; // FIXME: what is it?
     uint32_t payload;
     uint32_t rcmode;
