@@ -89,7 +89,7 @@ typedef struct {
     uint32_t gop;
     uint32_t screen_size;
     uint32_t unknown_12; // FIXME: what is it?
-    uint32_t unknown_13; // FIXME: what is it?
+    uint32_t jpeg;
     uint32_t unknown_14; // FIXME: what is it?
 } LOCALSDK_VIDEO_OPTIONS;
 

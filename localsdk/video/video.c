@@ -53,7 +53,7 @@ bool video_init() {
                     .gop         = 1 * APP_CFG.video.fps,
                     .screen_size = picture_size.width * picture_size.height,
                     .unknown_12  = 327680, // FIXME: what is it?
-                    .unknown_13  = 0, // FIXME: what is it?
+                    .jpeg        = false,
                     .unknown_14  = 0, // FIXME: what is it?
                 };
                 if(local_sdk_video_create(LOCALSDK_VIDEO_PRIMARY_CHANNEL, &video_options) == LOCALSDK_OK) {
@@ -90,7 +90,7 @@ bool video_init() {
                                                 video_options.unknown_7   = 0; // FIXME: what is it?
                                                 video_options.screen_size = picture_size.width * picture_size.height;
                                                 video_options.unknown_12  = 50000; // FIXME: what is it?
-                                                video_options.unknown_13  = 1; // FIXME: what is it?
+                                                video_options.jpeg        = true;
                                                 video_options.unknown_14  = 1; // FIXME: what is it?
                                                 if(local_sdk_video_create(LOCALSDK_VIDEO_SECONDARY_CHANNEL, &video_options) == LOCALSDK_OK) {
                                                     logger("video", "video_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_video_create(LOCALSDK_VIDEO_SECONDARY_CHANNEL)");
