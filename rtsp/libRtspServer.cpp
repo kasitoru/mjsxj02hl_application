@@ -4,7 +4,6 @@
 #include "libRtspServer.h"
 #include "xop/RtspServer.h"
 #include "xop/H264Parser.h"
-#include "../localsdk/localsdk.h"
 
 static std::shared_ptr<xop::EventLoop> event_loop(new xop::EventLoop());
 static std::shared_ptr<xop::RtspServer> rtsp_server;
@@ -47,22 +46,41 @@ bool rtspserver_create(uint16_t port, char *username, char *password) {
 }
 
 // Create new session
-uint32_t rtspserver_session(char *name, bool multicast, uint8_t video_type, uint32_t framerate, bool audio) {
+uint32_t rtspserver_session(char *name, bool multicast, uint8_t video_type, uint32_t framerate, uint8_t audio_type, uint32_t samplerate, uint32_t channels, bool has_adts) {
     if(!rtsp_server) { return 0; }
     logprintf_function("A new multimedia session \"%s\" has been created.", name);
     xop::MediaSession *session = xop::MediaSession::CreateNew(std::string(name));
     // Video
-    if(video_type == LOCALSDK_VIDEO_PAYLOAD_H264) {
-        session->AddSource(xop::channel_0, xop::H264Source::CreateNew(framerate));
-        logprintf_function("%s source is enabled for session \"%s\" (channel = %d).", "H264", name, xop::channel_0);
-    } else {
-        session->AddSource(xop::channel_0, xop::H265Source::CreateNew(framerate));
-        logprintf_function("%s source is enabled for session \"%s\" (channel = %d).", "H265", name, xop::channel_0);
+    switch(video_type) {
+        case LIBRTSPSERVER_TYPE_H264:
+            session->AddSource(xop::channel_0, xop::H264Source::CreateNew(framerate));
+            logprintf_function("%s source is %s for session \"%s\" (channel = %d).", "H264", "enabled", name, xop::channel_0);
+            break;
+        case LIBRTSPSERVER_TYPE_H265:
+            session->AddSource(xop::channel_0, xop::H265Source::CreateNew(framerate));
+            logprintf_function("%s source is %s for session \"%s\" (channel = %d).", "H265", "enabled", name, xop::channel_0);
+            break;
+        case LIBRTSPSERVER_TYPE_NONE:
+            logprintf_function("%s source is %s for session \"%s\" (channel = %d).", "Video", "disabled", name, xop::channel_0);
+            break;
+        default:
+            logprintf_function("%s source is %s for session \"%s\" (channel = %d).", "Video", "unknown", name, xop::channel_0);
     }
     // Audio
-    if(audio) {
-        session->AddSource(xop::channel_1, xop::G711ASource::CreateNew());
-        logprintf_function("%s source is enabled for session \"%s\" (channel = %d).", "G711A", name, xop::channel_1);
+    switch(audio_type) {
+        case LIBRTSPSERVER_TYPE_AAC:
+            session->AddSource(xop::channel_1, xop::AACSource::CreateNew(samplerate, channels, has_adts));
+            logprintf_function("%s source is %s for session \"%s\" (channel = %d).", "AAC", "enabled", name, xop::channel_1);
+            break;
+        case LIBRTSPSERVER_TYPE_G711A:
+            session->AddSource(xop::channel_1, xop::G711ASource::CreateNew());
+            logprintf_function("%s source is %s for session \"%s\" (channel = %d).", "G711A", "enabled", name, xop::channel_1);
+            break;
+        case LIBRTSPSERVER_TYPE_NONE:
+            logprintf_function("%s source is %s for session \"%s\" (channel = %d).", "Audio", "disabled", name, xop::channel_1);
+            break;
+        default:
+            logprintf_function("%s source is %s for session \"%s\" (channel = %d).", "Audio", "unknown", name, xop::channel_1);
     }
     // Multicast
     if(multicast) {
@@ -83,11 +101,12 @@ uint32_t rtspserver_session(char *name, bool multicast, uint8_t video_type, uint
 }
 
 // Get current timestamp
-uint32_t rtspserver_timestamp(uint8_t source) {
+uint32_t rtspserver_timestamp(uint8_t source, uint32_t samplerate) {
     switch(source) {
-        case RTSP_SERVER_TIMESTAMP_H264: return xop::H264Source::GetTimestamp();
-        case RTSP_SERVER_TIMESTAMP_H265: return xop::H265Source::GetTimestamp();
-        case RTSP_SERVER_TIMESTAMP_G711: return xop::G711ASource::GetTimestamp();
+        case LIBRTSPSERVER_TYPE_H264:  return xop::H264Source::GetTimestamp();
+        case LIBRTSPSERVER_TYPE_H265:  return xop::H265Source::GetTimestamp();
+        case LIBRTSPSERVER_TYPE_AAC:   return xop::AACSource::GetTimestamp(samplerate);
+        case LIBRTSPSERVER_TYPE_G711A: return xop::G711ASource::GetTimestamp();
         default: return 0;
     }
 }
