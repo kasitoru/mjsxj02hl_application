@@ -48,6 +48,7 @@ bool rtspserver_create(uint16_t port, char *username, char *password) {
 
 // Create new session
 uint32_t rtspserver_session(char *name, bool multicast, uint8_t video_type, uint32_t framerate, bool audio) {
+    if(!rtsp_server) { return 0; }
     logprintf_function("A new multimedia session \"%s\" has been created.", name);
     xop::MediaSession *session = xop::MediaSession::CreateNew(std::string(name));
     // Video
@@ -93,21 +94,20 @@ uint32_t rtspserver_timestamp(uint8_t source) {
 
 // Send media frame
 bool rtspserver_frame(uint32_t session_id, signed char *data, uint8_t type, uint32_t size, uint32_t timestamp) {
+    if(!rtsp_server) { return false; }
     xop::AVFrame frame = {0};
     frame.type = type;
     frame.timestamp = timestamp;
-    
+    // Prepare and send
     xop::Nal nal;
     uint32_t endpoint = ((uint32_t) data) + size;
     while(true) {
-        
         // Divide the video package into separate frames
         if(frame.type != xop::AUDIO_FRAME) {
             nal = xop::H264Parser::findNal((const uint8_t*) data, size);
             data = (signed char *) nal.first;
             size = ((uint32_t) nal.second) - ((uint32_t) nal.first) + 1;
         }
-        
         // Send current frame
         if(data) {
             frame.size = size;
@@ -121,7 +121,6 @@ bool rtspserver_frame(uint32_t session_id, signed char *data, uint8_t type, uint
         } else break;
     }
     return true;
-    
     /*
     uint32_t offset = 0;
     if(frame.type != xop::AUDIO_FRAME) { offset = 4; } // Skip 00 00 00 01
@@ -134,20 +133,24 @@ bool rtspserver_frame(uint32_t session_id, signed char *data, uint8_t type, uint
 
 // Free RTSP server
 bool rtspserver_free(uint32_t count, ...) {
-    // Remove sessions
-    va_list sessions;
-    va_start(sessions, count);
-    for(uint32_t i=0;i<count;i++) {
-        if(xop::MediaSessionId session_id = va_arg(sessions, xop::MediaSessionId)) {
-            logprintf_function("Stopping the media session #%d...", session_id);
-            rtsp_server->RemoveSession(session_id);
+    bool result = false;
+    if(event_loop && rtsp_server) {
+        // Remove sessions
+        va_list sessions;
+        va_start(sessions, count);
+        for(uint32_t i=0;i<count;i++) {
+            if(xop::MediaSessionId session_id = va_arg(sessions, xop::MediaSessionId)) {
+                logprintf_function("Stopping the media session #%d...", session_id);
+                rtsp_server->RemoveSession(session_id);
+            }
         }
+        va_end(sessions);
+        // Stop server
+        rtsp_server->Stop();
+        event_loop->Quit();
+        logprintf_function("The RTSP server is stopped.");
+        result = true;
     }
-    va_end(sessions);
-    // Stop server
-    rtsp_server->Stop();
-    event_loop->Quit();
-    logprintf_function("The RTSP server is stopped.");
-    return true;
+    return result;
 }
 
