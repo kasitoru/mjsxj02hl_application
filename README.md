@@ -68,6 +68,8 @@ humanoid_lost_exec =   ; Execute the command when humanoid is lost (empty for di
 [rtsp]
 port = 554             ; Port number
 multicast = false      ; Use multicast
+username =             ; Username (empty for disable)
+password =             ; Password
 
 [mqtt]
 server =               ; Address (empty for disable)
