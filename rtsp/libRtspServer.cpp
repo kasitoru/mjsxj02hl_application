@@ -70,10 +70,10 @@ uint32_t rtspserver_session(char *name, bool multicast, uint8_t video_type, uint
     }
     // Callbacks
     session->AddNotifyConnectedCallback([] (xop::MediaSessionId session_id, std::string peer_ip, uint16_t peer_port) {
-        logprintf_function("Client connected to media session %d (IP = %s, port = %hu).", session_id, peer_ip.c_str(), peer_port);
+        logprintf_function("Client connected to media session #%d (IP = %s, port = %hu).", session_id, peer_ip.c_str(), peer_port);
     });
     session->AddNotifyDisconnectedCallback([](xop::MediaSessionId session_id, std::string peer_ip, uint16_t peer_port) {
-        logprintf_function("Client disconnected from media session %d (IP = %s, port = %hu).", session_id, peer_ip.c_str(), peer_port);
+        logprintf_function("Client disconnected from media session #%d (IP = %s, port = %hu).", session_id, peer_ip.c_str(), peer_port);
     });
     // Done
     xop::MediaSessionId session_id = rtsp_server->AddSession(session);
@@ -139,7 +139,7 @@ bool rtspserver_free(uint32_t count, ...) {
     va_start(sessions, count);
     for(uint32_t i=0;i<count;i++) {
         xop::MediaSessionId session_id = va_arg(sessions, xop::MediaSessionId);
-        logprintf_function("Stopping the media session %d...", session_id);
+        logprintf_function("Stopping the media session #%d...", session_id);
         rtsp_server->RemoveSession(session_id);
     }
     va_end(sessions);
