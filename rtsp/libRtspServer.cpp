@@ -11,9 +11,14 @@ static xop::MediaSessionId primary_session_id;
 static xop::MediaSessionId secondary_session_id;
 
 // Create RTSP server
-bool rtspserver_create(uint16_t port, bool multicast, uint8_t video_type, uint32_t framerate) {
+bool rtspserver_create(uint16_t port, bool multicast, char *username, char *password, uint8_t video_type, uint32_t framerate) {
     rtsp_server = xop::RtspServer::Create(event_loop.get());
 	if(rtsp_server->Start("0.0.0.0", port)) {
+	    
+	    // Authorization
+	    if(username && username[0]) {
+	        rtsp_server->SetAuthConfig("RTSP", std::string(username), std::string(password));
+	    }
 	    
 	    // Primary channel
 	    xop::MediaSession *primary_session = xop::MediaSession::CreateNew("primary");

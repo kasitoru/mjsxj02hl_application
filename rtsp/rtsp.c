@@ -12,7 +12,7 @@ bool rtsp_init() {
     bool result = false;
     logger("rtsp", "rtsp_init", LOGGER_LEVEL_DEBUG, "Function is called...");
     
-    if(rtspserver_create(APP_CFG.rtsp.port, APP_CFG.rtsp.multicast, APP_CFG.video.type, APP_CFG.video.fps)) {
+    if(rtspserver_create(APP_CFG.rtsp.port, APP_CFG.rtsp.multicast, APP_CFG.rtsp.username, APP_CFG.rtsp.password, APP_CFG.video.type, APP_CFG.video.fps)) {
         logger("rtsp", "rtsp_init", LOGGER_LEVEL_INFO, "%s success.", "rtspserver_create()");
         result = true;
     } else logger("rtsp", "rtsp_init", LOGGER_LEVEL_ERROR, "%s error!", "rtspserver_create()");

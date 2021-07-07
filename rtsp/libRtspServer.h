@@ -11,7 +11,7 @@ extern "C"{
 #endif
 
 // Create RTSP server
-bool rtspserver_create(uint16_t port, bool multicast, uint8_t video_type, uint32_t framerate);
+bool rtspserver_create(uint16_t port, bool multicast, char *username, char *password, uint8_t video_type, uint32_t framerate);
 
 // Get primary session id
 uint32_t rtspserver_primary_id();

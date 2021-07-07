@@ -38,6 +38,8 @@ APPLICATION_CONFIGURATION APP_CFG = {
     // [rtsp]
     .rtsp.port                  = 554,                         // Port number
     .rtsp.multicast             = false,                       // Use multicast
+    .rtsp.username              = "",                          // Username (empty for disable)
+    .rtsp.password              = "",                          // Password
     
     // [mqtt]
     .mqtt.server                = "",                          // Address (empty for disable)
@@ -110,6 +112,10 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
         config->rtsp.port = atoi(value);
     } else if(MATCH("rtsp", "multicast")) {
         config->rtsp.multicast = atob(value);
+    } else if(MATCH("rtsp", "username")) {
+        config->rtsp.username = strdup(value);
+    } else if(MATCH("rtsp", "password")) {
+        config->rtsp.password = strdup(value);
 
     // [mqtt]
     } else if(MATCH("mqtt", "server")) {

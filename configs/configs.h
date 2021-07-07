@@ -46,6 +46,8 @@ typedef struct {
     struct {
         int port;
         bool multicast;
+        char* username;
+        char* password;
     } rtsp;
     
     // [mqtt]
@@ -53,7 +55,7 @@ typedef struct {
         char* server;
         int port;
         char* username;
-        char* password; 
+        char* password;
         char* topic;
         int qos;
         bool retain;
