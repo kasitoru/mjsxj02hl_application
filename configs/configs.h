@@ -44,6 +44,7 @@ typedef struct {
     
     // [rtsp]
     struct {
+        bool enable;
         int port;
         bool multicast;
         char* username;

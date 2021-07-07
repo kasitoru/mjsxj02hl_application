@@ -66,6 +66,7 @@ motion_lost_exec =     ; Execute the command when motion is lost (empty for disa
 humanoid_lost_exec =   ; Execute the command when humanoid is lost (empty for disable)
 
 [rtsp]
+enable = true          ; Enable RTSP server
 port = 554             ; Port number
 multicast = false      ; Use multicast
 username =             ; Username (empty for disable)

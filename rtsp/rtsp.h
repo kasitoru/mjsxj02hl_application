@@ -7,6 +7,9 @@
 // Init RTSP
 bool rtsp_init();
 
+// Is enabled
+bool rtsp_is_enabled();
+
 // Free RTSP
 bool rtsp_free();
 

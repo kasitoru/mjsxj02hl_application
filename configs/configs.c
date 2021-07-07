@@ -36,6 +36,7 @@ APPLICATION_CONFIGURATION APP_CFG = {
     .alarm.humanoid_lost_exec   = "",                          // Execute the command when humanoid is lost
     
     // [rtsp]
+    .rtsp.enable                = true,                        // Enable RTSP server
     .rtsp.port                  = 554,                         // Port number
     .rtsp.multicast             = false,                       // Use multicast
     .rtsp.username              = "",                          // Username (empty for disable)
@@ -108,6 +109,8 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
         config->alarm.humanoid_lost_exec = strdup(value);
 
     // [rtsp]
+    } else if(MATCH("rtsp", "enable")) {
+        config->rtsp.enable = atob(value);
     } else if(MATCH("rtsp", "port")) {
         config->rtsp.port = atoi(value);
     } else if(MATCH("rtsp", "multicast")) {

@@ -10,14 +10,16 @@
 
 // Audio capture callback
 int g711_capture_callback(LOCALSDK_AUDIO_G711_FRAME_INFO *frameInfo) {
+    int result = LOCALSDK_OK;
     if(frameInfo && frameInfo->size) {
-        bool primary = rtsp_media_frame(LOCALSDK_VIDEO_PRIMARY_CHANNEL, frameInfo->data, frameInfo->size, frameInfo->timestamp, LOCALSDK_AUDIO_G711_FRAME);
-        bool secondary = rtsp_media_frame(LOCALSDK_VIDEO_SECONDARY_CHANNEL, frameInfo->data, frameInfo->size, frameInfo->timestamp, LOCALSDK_AUDIO_G711_FRAME);
-        if(primary && secondary) {
-            return LOCALSDK_OK;
+        // RTSP
+        if(rtsp_is_enabled()) {
+            bool primary = rtsp_media_frame(LOCALSDK_VIDEO_PRIMARY_CHANNEL, frameInfo->data, frameInfo->size, frameInfo->timestamp, LOCALSDK_AUDIO_G711_FRAME);
+            bool secondary = rtsp_media_frame(LOCALSDK_VIDEO_SECONDARY_CHANNEL, frameInfo->data, frameInfo->size, frameInfo->timestamp, LOCALSDK_AUDIO_G711_FRAME);
+            if(!primary || !secondary) { result = LOCALSDK_ERROR; }
         }
     }
-    return LOCALSDK_ERROR;
+    return result;
 }
 
 // Init audio
