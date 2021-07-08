@@ -115,7 +115,9 @@ Running without arguments starts the main thread of the application.
 
 ## RTSP
 
-Network URL: `rtsp://<ip-address>:554`
+Network URL: `rtsp://<ip-address>:<port>/<channel_name>`
+
+Example: `rtsp://192.168.1.18:554/primary`
 
 ## MQTT
 
