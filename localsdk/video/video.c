@@ -47,7 +47,7 @@ bool video_init() {
             if(SAMPLE_COMM_SYS_GetPicSize(primary_resolution_type, &primary_picture_size) == LOCALSDK_OK) {
                 logger("video", "video_init", LOGGER_LEVEL_INFO, "%s success.", "SAMPLE_COMM_SYS_GetPicSize(LOCALSDK_VIDEO_RESOLUTION_1920x1080)");
                 LOCALSDK_VIDEO_OPTIONS primary_options = {
-                    .bitrate     = 8 * LOCALSDK_VIDEO_PRIMARY_BITRATE,
+                    .bitrate     = APP_CFG.video.primary_bitrate,
                     .fps         = APP_CFG.video.primary_fps,
                     .resolution  = LOCALSDK_VIDEO_RESOLUTION_1920x1080,
                     .flip        = APP_CFG.video.primary_flip,
@@ -94,7 +94,7 @@ bool video_init() {
                                             if(SAMPLE_COMM_SYS_GetPicSize(secondary_resolution_type, &secondary_picture_size) == LOCALSDK_OK) {
                                                 logger("video", "video_init", LOGGER_LEVEL_INFO, "%s success.", "SAMPLE_COMM_SYS_GetPicSize(LOCALSDK_VIDEO_RESOLUTION_640x360)");
                                                 LOCALSDK_VIDEO_OPTIONS secondary_options = {
-                                                    .bitrate     = LOCALSDK_VIDEO_SECONDARY_BITRATE,
+                                                    .bitrate     = APP_CFG.video.secondary_bitrate,
                                                     .fps         = APP_CFG.video.secondary_fps,
                                                     .resolution  = LOCALSDK_VIDEO_RESOLUTION_640x360,
                                                     .flip        = APP_CFG.video.secondary_flip,

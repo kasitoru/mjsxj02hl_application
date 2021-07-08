@@ -25,6 +25,8 @@ typedef struct {
         int secondary_type;
         int primary_fps;
         int secondary_fps;
+        int primary_bitrate;
+        int secondary_bitrate;
         bool primary_flip;
         bool secondary_flip;
         bool primary_mirror;
