@@ -9,7 +9,7 @@
 #include "./../../rtsp/rtsp.h"
 
 // Video capture callback
-int h26x_capture_callback(int chn, LOCALSDK_H26X_FRAME_INFO *frameInfo) {
+static int h26x_capture_callback(int chn, LOCALSDK_H26X_FRAME_INFO *frameInfo) {
     int result = LOCALSDK_OK;
     if(frameInfo && frameInfo->size) {
         // RTSP
@@ -22,11 +22,11 @@ int h26x_capture_callback(int chn, LOCALSDK_H26X_FRAME_INFO *frameInfo) {
     return result;
 }
 
-int h26x_capture_primary_channel(LOCALSDK_H26X_FRAME_INFO *frameInfo) {
+static int h26x_capture_primary_channel(LOCALSDK_H26X_FRAME_INFO *frameInfo) {
     return h26x_capture_callback(LOCALSDK_VIDEO_PRIMARY_CHANNEL, frameInfo);
 }
 
-int h26x_capture_secondary_channel(LOCALSDK_H26X_FRAME_INFO *frameInfo) {
+static int h26x_capture_secondary_channel(LOCALSDK_H26X_FRAME_INFO *frameInfo) {
     return h26x_capture_callback(LOCALSDK_VIDEO_SECONDARY_CHANNEL, frameInfo);
 }
 
@@ -139,7 +139,6 @@ bool video_init() {
 bool video_free() {
     bool result = true;
     logger("video", "video_free", LOGGER_LEVEL_DEBUG, "Function is called...");
-    
     // Stop secondary video
     if(local_sdk_video_stop(LOCALSDK_VIDEO_SECONDARY_CHANNEL, true) == LOCALSDK_OK) {
         logger("video", "video_free", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_video_stop(LOCALSDK_VIDEO_SECONDARY_CHANNEL)");
@@ -147,7 +146,6 @@ bool video_free() {
         logger("video", "video_free", LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_video_stop(LOCALSDK_VIDEO_SECONDARY_CHANNEL)");
         result = false;
     }
-    
     // Stop primary video
     if(local_sdk_video_stop(LOCALSDK_VIDEO_PRIMARY_CHANNEL, true) == LOCALSDK_OK) {
         logger("video", "video_free", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_video_stop(LOCALSDK_VIDEO_PRIMARY_CHANNEL)");
@@ -155,7 +153,6 @@ bool video_free() {
         logger("video", "video_free", LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_video_stop(LOCALSDK_VIDEO_PRIMARY_CHANNEL)");
         result = false;
     }
-
     logger("video", "video_free", LOGGER_LEVEL_DEBUG, "Function completed.");
     return result;
 }
