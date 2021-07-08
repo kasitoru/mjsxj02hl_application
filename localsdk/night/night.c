@@ -138,14 +138,10 @@ bool night_init() {
             case 1: // on
                 if(local_sdk_open_ircut() == LOCALSDK_OK) {
                     logger("night", "night_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_open_ircut()");
-                    usleep(98000);
-                    if(local_sdk_open_ircut() == LOCALSDK_OK) { logger("night", "======", LOGGER_LEVEL_INFO, "CLOSED");
-                        logger("night", "night_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_open_ircut()");
-                        if(local_sdk_open_night_light() == LOCALSDK_OK) {
-                            logger("night", "night_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_open_night_light()");
-                            result = true;
-                        } else logger("night", "night_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_open_night_light()");
-                    } else logger("night", "night_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_open_ircut()");
+                    if(local_sdk_open_night_light() == LOCALSDK_OK) {
+                        logger("night", "night_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_open_night_light()");
+                        result = true;
+                    } else logger("night", "night_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_open_night_light()");
                 } else logger("night", "night_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_open_ircut()");
                 break;
             case 2: // auto
