@@ -9,23 +9,30 @@
 #include "./../../rtsp/rtsp.h"
 
 // Audio capture callback
-int g711_capture_callback(LOCALSDK_AUDIO_G711_FRAME_INFO *frameInfo) {
+static int g711_capture_callback(int chn, LOCALSDK_AUDIO_G711_FRAME_INFO *frameInfo) {
     int result = LOCALSDK_OK;
     if(frameInfo && frameInfo->size) {
         // RTSP
         if(rtsp_is_enabled()) {
-            bool primary = rtsp_media_frame(LOCALSDK_VIDEO_PRIMARY_CHANNEL, frameInfo->data, frameInfo->size, frameInfo->timestamp, LOCALSDK_AUDIO_G711_FRAME);
-            bool secondary = rtsp_media_frame(LOCALSDK_VIDEO_SECONDARY_CHANNEL, frameInfo->data, frameInfo->size, frameInfo->timestamp, LOCALSDK_AUDIO_G711_FRAME);
-            if(!primary || !secondary) { result = LOCALSDK_ERROR; }
+            if(!rtsp_media_frame(chn, frameInfo->data, frameInfo->size, frameInfo->timestamp, LOCALSDK_AUDIO_G711_FRAME)) {
+                result = LOCALSDK_ERROR;
+            }
         }
     }
     return result;
 }
 
+static int g711_capture_primary_channel(LOCALSDK_AUDIO_G711_FRAME_INFO *frameInfo) {
+    return g711_capture_callback(LOCALSDK_VIDEO_PRIMARY_CHANNEL, frameInfo);
+}
+
+static int g711_capture_secondary_channel(LOCALSDK_AUDIO_G711_FRAME_INFO *frameInfo) {
+    return g711_capture_callback(LOCALSDK_VIDEO_SECONDARY_CHANNEL, frameInfo);
+}
+
 // Init audio
 bool audio_init() {
     logger("audio", "audio_init", LOGGER_LEVEL_DEBUG, "Function is called...");
-    
     if(local_sdk_audio_init() == LOCALSDK_OK) {
         logger("audio", "audio_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_audio_init()");
         // Init channel 0
@@ -48,18 +55,21 @@ bool audio_init() {
             };
             if(local_sdk_audio_set_parameters(LOCALSDK_AUDIO_CHANNEL, &audio_options) == LOCALSDK_OK) {
                 logger("audio", "audio_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_audio_set_parameters()");
-                if(local_sdk_audio_set_encode_frame_callback(LOCALSDK_AUDIO_CHANNEL, g711_capture_callback) == LOCALSDK_OK) {
-                    logger("audio", "audio_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_audio_set_encode_frame_callback()");
-                    if(local_sdk_audio_start() == LOCALSDK_OK) {
-                        logger("audio", "audio_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_audio_start()");
-                        if(local_sdk_audio_run() == LOCALSDK_OK) {
-                            logger("audio", "audio_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_audio_run()");
-                            
-                            logger("audio", "audio_init", LOGGER_LEVEL_DEBUG, "Function completed.");
-                            return true;
-                        } else logger("audio", "audio_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_audio_run()");
-                    } else logger("audio", "audio_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_audio_start()");
-                } else logger("audio", "audio_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_audio_set_encode_frame_callback()");
+                if(local_sdk_audio_set_encode_frame_callback(LOCALSDK_AUDIO_CHANNEL, g711_capture_primary_channel) == LOCALSDK_OK) {
+                    logger("audio", "audio_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_audio_set_encode_frame_callback(LOCALSDK_VIDEO_PRIMARY_CHANNEL)");
+                    if(local_sdk_audio_set_encode_frame_callback(LOCALSDK_AUDIO_CHANNEL, g711_capture_secondary_channel) == LOCALSDK_OK) {
+                        logger("audio", "audio_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_audio_set_encode_frame_callback(LOCALSDK_VIDEO_SECONDARY_CHANNEL)");
+                        if(local_sdk_audio_start() == LOCALSDK_OK) {
+                            logger("audio", "audio_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_audio_start()");
+                            if(local_sdk_audio_run() == LOCALSDK_OK) {
+                                logger("audio", "audio_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_audio_run()");
+                                
+                                logger("audio", "audio_init", LOGGER_LEVEL_DEBUG, "Function completed.");
+                                return true;
+                            } else logger("audio", "audio_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_audio_run()");
+                        } else logger("audio", "audio_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_audio_start()");
+                    } else logger("audio", "audio_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_audio_set_encode_frame_callback(LOCALSDK_VIDEO_SECONDARY_CHANNEL)");
+                } else logger("audio", "audio_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_audio_set_encode_frame_callback(LOCALSDK_VIDEO_PRIMARY_CHANNEL)");
             } else logger("audio", "audio_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_audio_set_parameters()");
         } else logger("audio", "audio_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_audio_create()");
     } else logger("audio", "audio_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_audio_init()");
@@ -74,7 +84,6 @@ bool audio_init() {
 bool audio_free() {
     bool result = true;
     logger("audio", "audio_free", LOGGER_LEVEL_DEBUG, "Function is called...");
-    
     // Stop audio
     if(local_sdk_audio_stop() == LOCALSDK_OK) {
         logger("audio", "audio_free", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_audio_stop()");
@@ -82,7 +91,6 @@ bool audio_free() {
         logger("audio", "audio_free", LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_audio_stop()");
         result = false;
     }
-    
     // End audio
     if(local_sdk_audio_end() == LOCALSDK_OK) {
         logger("audio", "audio_free", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_audio_end()");
@@ -90,7 +98,6 @@ bool audio_free() {
         logger("audio", "audio_free", LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_audio_end()");
         result = false;
     }
-
     // Destory audio
     if(local_sdk_audio_destory() == LOCALSDK_OK) {
         logger("audio", "audio_free", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_audio_destory()");
@@ -98,7 +105,6 @@ bool audio_free() {
         logger("audio", "audio_free", LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_audio_destory()");
         result = false;
     }
-
     logger("audio", "audio_free", LOGGER_LEVEL_DEBUG, "Function completed.");
     return result;
 }
