@@ -13,17 +13,25 @@ APPLICATION_CONFIGURATION APP_CFG = {
     .logger.file                = "",                          // Write log to file
     
     // [video]
-    .video.type                 = LOCALSDK_VIDEO_PAYLOAD_H265, // Video compression standard (1 = h264, 2 = h265)
-    .video.fps                  = 20,                          // Frames per second
-    .video.flip                 = false,                       // Flip (true or false)
-    .video.mirror               = false,                       // Mirror (true or false)
+    .video.primary_enable       = true,                        // Enable video for primary channel
+    .video.secondary_enable     = true,                        // Enable video for secondary channel
+    .video.primary_type         = LOCALSDK_VIDEO_PAYLOAD_H265, // Video compression standard for primary channel
+    .video.secondary_type       = LOCALSDK_VIDEO_PAYLOAD_H264, // Video compression standard for secondary channel
+    .video.primary_fps          = 20,                          // Frames per second for primary channel
+    .video.secondary_fps        = 20,                          // Frames per second for secondary channel
+    .video.primary_flip         = false,                       // Flip image for primary channel
+    .video.secondary_flip       = false,                       // Flip image for secondary channel
+    .video.primary_mirror       = false,                       // Mirror image for primary channel
+    .video.secondary_mirror     = false,                       // Mirror image for secondary channel
 
     // [audio]
     .audio.volume               = 70,                          // Volume (0-100)
+    .audio.primary_enable       = true,                        // Enable audio for primary channel
+    .audio.secondary_enable     = true,                        // Enable audio for secondary channel
     
     // [speaker]
     .speaker.volume             = 70,                          // Volume (0-100)
-    .speaker.type               = LOCALSDK_SPEAKER_PCM_TYPE,   // Default file format (1 = PCM, 2 = G711)
+    .speaker.type               = LOCALSDK_SPEAKER_PCM_TYPE,   // Default file format
     
     // [alarm]
     .alarm.motion_sens          = 150,                         // Motion sensitivity (1-255)
@@ -35,9 +43,19 @@ APPLICATION_CONFIGURATION APP_CFG = {
     .alarm.motion_lost_exec     = "",                          // Execute the command when motion is lost
     .alarm.humanoid_lost_exec   = "",                          // Execute the command when humanoid is lost
     
+    // [rtsp]
+    .rtsp.enable                = true,                        // Enable RTSP server
+    .rtsp.port                  = 554,                         // Port number
+    .rtsp.username              = "",                          // Username (empty for disable)
+    .rtsp.password              = "",                          // Password
+    .rtsp.primary_name          = "primary",                   // Name of the primary channel
+    .rtsp.secondary_name        = "secondary",                 // Name of the secondary channel
+    .rtsp.primary_multicast     = false,                       // Use multicast for primary channel
+    .rtsp.secondary_multicast   = false,                       // Use multicast for secondary channel
+    
     // [mqtt]
     .mqtt.server                = "",                          // Address (empty for disable)
-    .mqtt.port                  = 1883,                        // Port
+    .mqtt.port                  = 1883,                        // Port number
     .mqtt.username              = "",                          // Username (empty for anonimous)
     .mqtt.password              = "",                          // Password (empty for disable)
     .mqtt.topic                 = "mjsxj02hl",                 // Topic name
@@ -64,18 +82,34 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
         config->logger.file = strdup(value);
     
     // [video]
-    } else if(MATCH("video", "type")) {
-        config->video.type = atoi(value);
-    } else if(MATCH("video", "fps")) {
-        config->video.fps = atoi(value);
-    } else if(MATCH("video", "flip")) {
-        config->video.flip = atob(value);
-    } else if(MATCH("video", "mirror")) {
-        config->video.mirror = atob(value);
+    } else if(MATCH("video", "primary_enable")) {
+        config->video.primary_enable = atob(value);
+    } else if(MATCH("video", "secondary_enable")) {
+        config->video.secondary_enable = atob(value);
+    } else if(MATCH("video", "primary_type")) {
+        config->video.primary_type = atoi(value);
+    } else if(MATCH("video", "secondary_type")) {
+        config->video.secondary_type = atoi(value);
+    } else if(MATCH("video", "primary_fps")) {
+        config->video.primary_fps = atoi(value);
+    } else if(MATCH("video", "secondary_fps")) {
+        config->video.secondary_fps = atoi(value);
+    } else if(MATCH("video", "primary_flip")) {
+        config->video.primary_flip = atob(value);
+    } else if(MATCH("video", "secondary_flip")) {
+        config->video.secondary_flip = atob(value);
+    } else if(MATCH("video", "primary_mirror")) {
+        config->video.primary_mirror = atob(value);
+    } else if(MATCH("video", "secondary_mirror")) {
+        config->video.secondary_mirror = atob(value);
 
     // [audio]
     } else if(MATCH("audio", "volume")) {
         config->audio.volume = atoi(value);
+    } else if(MATCH("audio", "primary_enable")) {
+        config->audio.primary_enable = atob(value);
+    } else if(MATCH("audio", "secondary_enable")) {
+        config->audio.secondary_enable = atob(value);
 
     // [speaker]
     } else if(MATCH("speaker", "volume")) {
@@ -100,6 +134,24 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
         config->alarm.motion_lost_exec = strdup(value);
     } else if(MATCH("alarm", "humanoid_lost_exec")) {
         config->alarm.humanoid_lost_exec = strdup(value);
+
+    // [rtsp]
+    } else if(MATCH("rtsp", "enable")) {
+        config->rtsp.enable = atob(value);
+    } else if(MATCH("rtsp", "port")) {
+        config->rtsp.port = atoi(value);
+    } else if(MATCH("rtsp", "username")) {
+        config->rtsp.username = strdup(value);
+    } else if(MATCH("rtsp", "password")) {
+        config->rtsp.password = strdup(value);
+    } else if(MATCH("rtsp", "primary_name")) {
+        config->rtsp.primary_name = strdup(value);
+    } else if(MATCH("rtsp", "secondary_name")) {
+        config->rtsp.secondary_name = strdup(value);
+    } else if(MATCH("rtsp", "primary_multicast")) {
+        config->rtsp.primary_multicast = atob(value);
+    } else if(MATCH("rtsp", "secondary_multicast")) {
+        config->rtsp.secondary_multicast = atob(value);
 
     // [mqtt]
     } else if(MATCH("mqtt", "server")) {

@@ -62,6 +62,9 @@ int SAMPLE_COMM_SYS_GetPicSize(int resolution, LOCALSDK_PICTURE_SIZE *size);
 
 #define LOCALSDK_VIDEO_RCMODE_TYPE          2
 
+#define LOCALSDK_VIDEO_H26X_FRAME_I    0
+#define LOCALSDK_VIDEO_H26X_FRAME_P    1
+
 typedef struct {
     signed char *data;
     uint32_t size;
@@ -79,14 +82,14 @@ typedef struct {
     uint32_t flip;
     uint32_t mirror;
     uint32_t unknown_5; // FIXME: what is it?
-    uint32_t unknown_6; // FIXME: what is it?
+    uint32_t video;
     uint32_t unknown_7; // FIXME: what is it?
     uint32_t payload;
     uint32_t rcmode;
     uint32_t gop;
     uint32_t screen_size;
     uint32_t unknown_12; // FIXME: what is it?
-    uint32_t unknown_13; // FIXME: what is it?
+    uint32_t jpeg;
     uint32_t unknown_14; // FIXME: what is it?
 } LOCALSDK_VIDEO_OPTIONS;
 
@@ -161,6 +164,8 @@ int local_sdk_video_osd_update_timestamp(int param_1, int param_2, struct tm * t
 
 #define LOCALSDK_AUDIO_G711_BUFFER_SIZE 320
 #define LOCALSDK_AUDIO_PCM_BUFFER_SIZE  640
+
+#define LOCALSDK_AUDIO_G711_FRAME       2
 
 typedef struct {
     signed char *data;

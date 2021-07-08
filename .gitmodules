@@ -7,6 +7,6 @@
 [submodule "configs/inih"]
 	path = configs/inih
 	url = https://github.com/benhoyt/inih
-[submodule "rtsp/librtsp"]
-	path = rtsp/librtsp
-	url = https://github.com/avdeevsv91/librtsp
+[submodule "rtsp/RtspServer"]
+	path = rtsp/RtspServer
+	url = https://github.com/PHZ76/RtspServer

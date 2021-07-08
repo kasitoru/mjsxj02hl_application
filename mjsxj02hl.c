@@ -37,19 +37,19 @@ void signal_callback(int signal) {
         signal = EX_SOFTWARE;
     }
 
-    // All free
-    if(all_free()) {
-        logger("mjsxj02hl_application", "signal_callback", LOGGER_LEVEL_INFO, "%s success.", "all_free()");
-    } else {
-        logger("mjsxj02hl_application", "signal_callback", LOGGER_LEVEL_WARNING, "%s error!", "all_free()");
-        signal = EX_SOFTWARE;
-    }
-
     // RTSP free
     if(rtsp_free()) {
         logger("mjsxj02hl_application", "signal_callback", LOGGER_LEVEL_INFO, "%s success.", "rtsp_free()");
     } else {
         logger("mjsxj02hl_application", "signal_callback", LOGGER_LEVEL_WARNING, "%s error!", "rtsp_free()");
+        signal = EX_SOFTWARE;
+    }
+
+    // All free
+    if(all_free()) {
+        logger("mjsxj02hl_application", "signal_callback", LOGGER_LEVEL_INFO, "%s success.", "all_free()");
+    } else {
+        logger("mjsxj02hl_application", "signal_callback", LOGGER_LEVEL_WARNING, "%s error!", "all_free()");
         signal = EX_SOFTWARE;
     }
 
@@ -91,6 +91,7 @@ int main(int argc, char **argv) {
             printf("Reset to factory settings...\n");
             system("rm -rf /configs/*");
             system("touch /configs/mjsxj02hl.conf");
+            system("chmod 644 /configs/mjsxj02hl.conf");
             system("reboot");
             return EX_OK;
         } else if(strcmp(argv[1], "--get-image") == 0) { // Get image
@@ -146,47 +147,47 @@ int main(int argc, char **argv) {
     // Main thread
     if(configs_init(config_filename)) { // Init configs
         logger("mjsxj02hl_application", "main", LOGGER_LEVEL_INFO, "%s success.", "configs_init()");
-        if(rtsp_init()) { // Init RTSP
-            logger("mjsxj02hl_application", "main", LOGGER_LEVEL_INFO, "%s success.", "rtsp_init()");
-            if(all_init()) { // Init all systems
-                logger("mjsxj02hl_application", "main", LOGGER_LEVEL_INFO, "%s success.", "all_init()");
+        if(all_init()) { // Init all systems
+            logger("mjsxj02hl_application", "main", LOGGER_LEVEL_INFO, "%s success.", "all_init()");
 
-                // Register signals
-                if(signal(SIGINT, signal_callback) != SIG_ERR) {
-                    logger("mjsxj02hl_application", "main", LOGGER_LEVEL_INFO, "%s success.", "signal(SIGINT)");
-                } else logger("mjsxj02hl_application", "main", LOGGER_LEVEL_WARNING, "%s error!", "signal(SIGINT)");
-                if(signal(SIGABRT, signal_callback) != SIG_ERR) {
-                    logger("mjsxj02hl_application", "main", LOGGER_LEVEL_INFO, "%s success.", "signal(SIGABRT)");
-                } else logger("mjsxj02hl_application", "main", LOGGER_LEVEL_WARNING, "%s error!", "signal(SIGABRT)");
-                if(signal(SIGTERM, signal_callback) != SIG_ERR) {
-                    logger("mjsxj02hl_application", "main", LOGGER_LEVEL_INFO, "%s success.", "signal(SIGTERM)");
-                } else logger("mjsxj02hl_application", "main", LOGGER_LEVEL_WARNING, "%s error!", "signal(SIGTERM)");
-                
-                // Enable blue pin
-                if(local_sdk_indicator_led_option(false, true) == LOCALSDK_OK) {
-                    logger("mjsxj02hl_application", "main", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_indicator_led_option()");
-                } else logger("mjsxj02hl_application", "main", LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_indicator_led_option()");
-                
-                // Factory reset
-                if(local_sdk_setup_keydown_set_callback(3000, factory_reset_callback) == LOCALSDK_OK) {
-                    logger("mjsxj02hl_application", "main", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_setup_keydown_set_callback()");
-                } else logger("mjsxj02hl_application", "main", LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_setup_keydown_set_callback()");
-                
-                // MQTT
-                if(mqtt_init()) {
-                    logger("mjsxj02hl_application", "main", LOGGER_LEVEL_INFO, "%s success.", "mqtt_init()");
-                } else logger("mjsxj02hl_application", "main", LOGGER_LEVEL_WARNING, "%s error!", "mqtt_init()");
-                
-                // Endless waiting
-                while(true) {
-                    sleep(1);
-                }
-            } else {
-                logger("mjsxj02hl_application", "main", LOGGER_LEVEL_ERROR, "%s error!", "all_init()");
-                return EX_SOFTWARE;
+            // Register signals
+            if(signal(SIGINT, signal_callback) != SIG_ERR) {
+                logger("mjsxj02hl_application", "main", LOGGER_LEVEL_INFO, "%s success.", "signal(SIGINT)");
+            } else logger("mjsxj02hl_application", "main", LOGGER_LEVEL_WARNING, "%s error!", "signal(SIGINT)");
+            if(signal(SIGABRT, signal_callback) != SIG_ERR) {
+                logger("mjsxj02hl_application", "main", LOGGER_LEVEL_INFO, "%s success.", "signal(SIGABRT)");
+            } else logger("mjsxj02hl_application", "main", LOGGER_LEVEL_WARNING, "%s error!", "signal(SIGABRT)");
+            if(signal(SIGTERM, signal_callback) != SIG_ERR) {
+                logger("mjsxj02hl_application", "main", LOGGER_LEVEL_INFO, "%s success.", "signal(SIGTERM)");
+            } else logger("mjsxj02hl_application", "main", LOGGER_LEVEL_WARNING, "%s error!", "signal(SIGTERM)");
+            
+            // Enable blue pin
+            if(local_sdk_indicator_led_option(false, true) == LOCALSDK_OK) {
+                logger("mjsxj02hl_application", "main", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_indicator_led_option()");
+            } else logger("mjsxj02hl_application", "main", LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_indicator_led_option()");
+            
+            // Factory reset
+            if(local_sdk_setup_keydown_set_callback(3000, factory_reset_callback) == LOCALSDK_OK) {
+                logger("mjsxj02hl_application", "main", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_setup_keydown_set_callback()");
+            } else logger("mjsxj02hl_application", "main", LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_setup_keydown_set_callback()");
+            
+            // RTSP
+            if(rtsp_init()) {
+                logger("mjsxj02hl_application", "main", LOGGER_LEVEL_INFO, "%s success.", "rtsp_init()");
+            } else logger("mjsxj02hl_application", "main", LOGGER_LEVEL_WARNING, "%s error!", "rtsp_init()");
+            
+            // MQTT
+            if(mqtt_init()) {
+                logger("mjsxj02hl_application", "main", LOGGER_LEVEL_INFO, "%s success.", "mqtt_init()");
+            } else logger("mjsxj02hl_application", "main", LOGGER_LEVEL_WARNING, "%s error!", "mqtt_init()");
+            
+            // Endless waiting
+            while(true) {
+                sleep(1);
             }
+            
         } else {
-            logger("mjsxj02hl_application", "main", LOGGER_LEVEL_ERROR, "%s error!", "rtsp_init()");
+            logger("mjsxj02hl_application", "main", LOGGER_LEVEL_ERROR, "%s error!", "all_init()");
             return EX_SOFTWARE;
         }
     } else {

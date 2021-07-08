@@ -4,10 +4,16 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+// Init RTSP
 bool rtsp_init();
 
+// Is enabled
+bool rtsp_is_enabled();
+
+// Free RTSP
 bool rtsp_free();
 
-bool rtsp_media_frame(signed char *data, size_t size, uint32_t timestamp, int type);
+// Send data frame
+bool rtsp_media_frame(int chn, signed char *data, size_t size, uint32_t timestamp, uint8_t type);
 
 #endif

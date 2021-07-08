@@ -20,10 +20,10 @@
 #include "./../configs/configs.h"
 #include "./../yyjson/src/yyjson.h"
 
-MQTTClient MQTTclient;
-pthread_t periodical_thread;
-pthread_t reconnection_thread;
-pthread_t playmedia_thread;
+static MQTTClient MQTTclient;
+static pthread_t periodical_thread;
+static pthread_t reconnection_thread;
+static pthread_t playmedia_thread;
 
 // Get full topic
 char* mqtt_fulltopic(char *topic) {
@@ -40,19 +40,21 @@ char* mqtt_fulltopic(char *topic) {
 bool mqtt_send(char *topic, char *payload) {
     bool result = false;
     logger("mqtt", "mqtt_send", LOGGER_LEVEL_DEBUG, "Function is called...");
-    logger("mqtt", "mqtt_send", LOGGER_LEVEL_DEBUG, "Topic: %s", topic);
-    logger("mqtt", "mqtt_send", LOGGER_LEVEL_DEBUG, "Payload: %s", payload);
-    MQTTClient_message message = MQTTClient_message_initializer;
-    message.payload = payload;
-    message.payloadlen = (int) strlen(payload);
-    message.qos = APP_CFG.mqtt.qos;
-    message.retained = APP_CFG.mqtt.retain;
-    MQTTClient_deliveryToken token;
-    if(MQTTClient_publishMessage(MQTTclient, topic, &message, &token) == MQTTCLIENT_SUCCESS) {
-        logger("mqtt", "mqtt_send", LOGGER_LEVEL_DEBUG, "Token: %d", token);
-        logger("mqtt", "mqtt_send", LOGGER_LEVEL_INFO, "%s success.", "MQTTClient_publishMessage()");
-        result = true;
-    } else logger("mqtt", "mqtt_send", LOGGER_LEVEL_ERROR, "%s error!", "MQTTClient_publishMessage()");
+    if(mqtt_is_enabled()) {
+        logger("mqtt", "mqtt_send", LOGGER_LEVEL_DEBUG, "Topic: %s", topic);
+        logger("mqtt", "mqtt_send", LOGGER_LEVEL_DEBUG, "Payload: %s", payload);
+        MQTTClient_message message = MQTTClient_message_initializer;
+        message.payload = payload;
+        message.payloadlen = (int) strlen(payload);
+        message.qos = APP_CFG.mqtt.qos;
+        message.retained = APP_CFG.mqtt.retain;
+        MQTTClient_deliveryToken token;
+        if(MQTTClient_publishMessage(MQTTclient, topic, &message, &token) == MQTTCLIENT_SUCCESS) {
+            logger("mqtt", "mqtt_send", LOGGER_LEVEL_DEBUG, "Token: %d", token);
+            logger("mqtt", "mqtt_send", LOGGER_LEVEL_INFO, "%s success.", "MQTTClient_publishMessage()");
+            result = true;
+        } else logger("mqtt", "mqtt_send", LOGGER_LEVEL_ERROR, "%s error!", "MQTTClient_publishMessage()");
+    }
     logger("mqtt", "mqtt_send", LOGGER_LEVEL_DEBUG, "Function completed.");
     return result;
 }
@@ -61,37 +63,35 @@ bool mqtt_send(char *topic, char *payload) {
 bool mqtt_sendf(char *topic, const char *format, ...) {
     bool result = false;
     logger("mqtt", "mqtt_sendf", LOGGER_LEVEL_DEBUG, "Function is called...");
-    va_list params;
-    va_start(params, format);
-    char *payload;
-    if(vasprintf(&payload, format, params) > 0) {
-        logger("mqtt", "mqtt_sendf", LOGGER_LEVEL_INFO, "%s success.", "vasprintf()");
-        result = mqtt_send(topic, payload);
-        free(payload);
-    } else logger("mqtt", "mqtt_sendf", LOGGER_LEVEL_ERROR, "%s error!", "vasprintf()");
-    va_end(params);
+    if(mqtt_is_enabled()) {
+        va_list params;
+        va_start(params, format);
+        char *payload;
+        if(vasprintf(&payload, format, params) > 0) {
+            logger("mqtt", "mqtt_sendf", LOGGER_LEVEL_INFO, "%s success.", "vasprintf()");
+            result = mqtt_send(topic, payload);
+            free(payload);
+        } else logger("mqtt", "mqtt_sendf", LOGGER_LEVEL_ERROR, "%s error!", "vasprintf()");
+        va_end(params);
+    }
     logger("mqtt", "mqtt_sendf", LOGGER_LEVEL_DEBUG, "Function completed.");
     return result;
 }
 
 // Periodic data sending
-void* mqtt_periodical(void *arg) {
+static void* mqtt_periodical(void *arg) {
     bool endless_cycle = (bool) arg;
     logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_DEBUG, "Function is called...");
-
     bool first = endless_cycle;
     do {
-        
         // First iteration
         if(first) {
             first = false;
         }
-        
         // Send system info
         char *topic = mqtt_fulltopic(MQTT_INFO_TOPIC);
         if(topic && topic[0]) {
             logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_INFO, "%s success.", "mqtt_fulltopic()");
-
             // JSON Data
             yyjson_mut_doc *json_doc = yyjson_mut_doc_new(NULL);
             yyjson_mut_val *json_root = yyjson_mut_obj(json_doc);
@@ -187,7 +187,6 @@ void* mqtt_periodical(void *arg) {
             } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_WARNING, "%s error!", "ip_address is null so image_url");
             yyjson_mut_obj_add_str(json_doc, json_root, "image_url", image_url);
             free(image_url);
-
             // Send it
             const char *json = yyjson_mut_write(json_doc, 0, NULL);
             if(json) {
@@ -197,14 +196,12 @@ void* mqtt_periodical(void *arg) {
                 } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_ERROR, "%s error!", "mqtt_send()");
                 free((void *)json);
             } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_ERROR, "%s error!", "yyjson_mut_write()");
-            
             // Free resources
             yyjson_mut_doc_free(json_doc);
             free(ip_address);
             free(fw_version);
             free(topic);
         } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_ERROR, "%s error!", "mqtt_fulltopic()");
-
         // Sleep
         if(endless_cycle) {
             logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_INFO, "Wait %d seconds until the next sending...", MQTT_PERIODICAL_INTERVAL);
@@ -212,46 +209,38 @@ void* mqtt_periodical(void *arg) {
             pthread_testcancel();
         }
     } while(endless_cycle);
-    
     logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_DEBUG, "Function completed.");
     return 0;
 }
 
 // Play media (for pthread)
-struct playmedia_args {
+static struct playmedia_args {
     char *filename;
     int type;
 } playmedia_args;
-void* mqtt_playmedia(void *args) {
+static void* mqtt_playmedia(void *args) {
     logger("mqtt", "mqtt_playmedia", LOGGER_LEVEL_DEBUG, "Function is called...");
     struct playmedia_args *arguments = (struct playmedia_args *) args;
-    
     if(speaker_play_media(arguments->filename, arguments->type)) {
         logger("mqtt", "mqtt_playmedia", LOGGER_LEVEL_INFO, "%s success.", "speaker_play_media()");
     } else logger("mqtt", "mqtt_playmedia", LOGGER_LEVEL_ERROR, "%s error!", "speaker_play_media()");
-    
     logger("mqtt", "mqtt_playmedia", LOGGER_LEVEL_DEBUG, "Function completed.");
     return 0;
 }
 
 // Message received
-int mqtt_message_callback(void *context, char *topicName, int topicLen, MQTTClient_message *message) {
+static int mqtt_message_callback(void *context, char *topicName, int topicLen, MQTTClient_message *message) {
     logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_DEBUG, "Function is called...");
-    
     logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_DEBUG, "Topic: %s", topicName);
     logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_DEBUG, "Payload: %.*s", message->payloadlen, (char *) message->payload);
-    
     // Parse JSON
     yyjson_doc *json_doc = yyjson_read((char *) message->payload, message->payloadlen, 0);
     yyjson_val *json_root = yyjson_doc_get_root(json_doc);
     yyjson_val *json_action = yyjson_obj_get(json_root, "action");
-    
     if(json_action) {
         logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_INFO, "%s success.", "yyjson_obj_get(\"action\")");
-        
         if(yyjson_is_str(json_action)) {
             logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_INFO, "%s success.", "yyjson_is_str(json_action)");
-            
             // Get image
             if(strcmp(yyjson_get_str(json_action), "get_image") == 0) {
                 logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_INFO, "%s success.", "strcmp(\"get_image\")");
@@ -262,7 +251,6 @@ int mqtt_message_callback(void *context, char *topicName, int topicLen, MQTTClie
                         logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_video_get_jpeg()");
                     } else logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_video_get_jpeg()");
                 } else logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_ERROR, "%s error!", "yyjson_is_str(json_filename)");
-            
             // Set volume
             } else if(strcmp(yyjson_get_str(json_action), "set_volume") == 0) {
                 logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_INFO, "%s success.", "strcmp(\"set_volume\")");
@@ -273,7 +261,6 @@ int mqtt_message_callback(void *context, char *topicName, int topicLen, MQTTClie
                         logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_INFO, "%s success.", "speaker_set_volume()");
                     } else logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_ERROR, "%s error!", "speaker_set_volume()");
                 } else logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_ERROR, "%s error!", "yyjson_is_int(json_value)");
-            
             // Play media
             } else if(strcmp(yyjson_get_str(json_action), "play_media") == 0) {
                 logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_INFO, "%s success.", "strcmp(\"play_media\")");
@@ -305,14 +292,12 @@ int mqtt_message_callback(void *context, char *topicName, int topicLen, MQTTClie
                         logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_INFO, "%s success.", "pthread_create(playmedia_thread)");
                     } else logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_WARNING, "%s error!", "pthread_create(playmedia_thread)");
                 } else logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_ERROR, "%s error!", "yyjson_is_str(json_filename)");
-            
             // Stop playback
             } else if(strcmp(yyjson_get_str(json_action), "stop_media") == 0) {
                 logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_INFO, "%s success.", "strcmp(\"stop_media\")");
                 if(speaker_stop_media()) {
                     logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_INFO, "%s success.", "speaker_stop_media()");
                 } else logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_ERROR, "%s error!", "speaker_stop_media()");
-            
             // Unknown action
             } else logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_ERROR, "%s error!", "Unknown action");
             mqtt_periodical((void *) false); // Send new data
@@ -326,15 +311,15 @@ int mqtt_message_callback(void *context, char *topicName, int topicLen, MQTTClie
 }
 
 // Delivery confirmed
-void mqtt_delivery_callback(void *context, MQTTClient_deliveryToken dt) {
+static void mqtt_delivery_callback(void *context, MQTTClient_deliveryToken dt) {
     logger("mqtt", "mqtt_delivery_callback", LOGGER_LEVEL_DEBUG, "Function is called...");
     logger("mqtt", "mqtt_delivery_callback", LOGGER_LEVEL_DEBUG, "Message with token value %d delivery confirmed.", dt);
     logger("mqtt", "mqtt_delivery_callback", LOGGER_LEVEL_DEBUG, "Function completed.");
 }
 
 // Lost connection
-bool mqtt_initialization(bool first_init);
-void mqtt_disconnect_callback(void *context, char *cause) {
+static bool mqtt_initialization(bool first_init);
+static void mqtt_disconnect_callback(void *context, char *cause) {
     logger("mqtt", "mqtt_disconnect_callback", LOGGER_LEVEL_DEBUG, "Function is called...");
     do {
         logger("mqtt", "mqtt_disconnect_callback", LOGGER_LEVEL_WARNING, "The connection to the MQTT server was lost! Wait %d seconds...", MQTT_RECONNECT_INTERVAL);
@@ -346,7 +331,7 @@ void mqtt_disconnect_callback(void *context, char *cause) {
 }
 
 // Reconnect (for pthread)
-void* mqtt_reconnection(void *args) {
+static void* mqtt_reconnection(void *args) {
     logger("mqtt", "mqtt_reconnection", LOGGER_LEVEL_DEBUG, "Function is called...");
     mqtt_disconnect_callback(NULL, NULL);
     logger("mqtt", "mqtt_reconnection", LOGGER_LEVEL_DEBUG, "Function completed.");
@@ -355,32 +340,23 @@ void* mqtt_reconnection(void *args) {
 
 // Is enabled
 bool mqtt_is_enabled() {
-    logger("mqtt", "mqtt_is_enabled", LOGGER_LEVEL_DEBUG, "Function is called...");
-    bool result = (APP_CFG.mqtt.server && APP_CFG.mqtt.server[0]);
-    logger("mqtt", "mqtt_is_enabled", LOGGER_LEVEL_DEBUG, "Function completed.");
-    return result;
+    return (APP_CFG.mqtt.server && APP_CFG.mqtt.server[0]);
 }
 
 // Init mqtt (local)
-bool mqtt_initialization(bool first_init) {
-
+static bool mqtt_initialization(bool first_init) {
+    bool result = false;
     logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_DEBUG, "Function is called...");
-    
     if(mqtt_is_enabled()) { // If MQTT enabled
-    
         // Get server address
         char *server_address;
         if(asprintf(&server_address, "tcp://%s:%d", APP_CFG.mqtt.server, APP_CFG.mqtt.port) > 0) {
-
             // Create MQTT client
             if(MQTTClient_create(&MQTTclient, server_address, MQTT_CLIENT_ID, MQTTCLIENT_PERSISTENCE_NONE, NULL) == MQTTCLIENT_SUCCESS) {
                 logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_INFO, "%s success.", "MQTTClient_create()");
-                free(server_address);
-                    
                 // Set callbacks
                 if(MQTTClient_setCallbacks(MQTTclient, NULL, mqtt_disconnect_callback, mqtt_message_callback, mqtt_delivery_callback) == MQTTCLIENT_SUCCESS) {
                     logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_INFO, "%s success.", "MQTTClient_setCallbacks()");
-                    
                     // Get authorization data
                     MQTTClient_connectOptions connect_options = MQTTClient_connectOptions_initializer;
                     if(APP_CFG.mqtt.username && APP_CFG.mqtt.username[0]) {
@@ -391,25 +367,19 @@ bool mqtt_initialization(bool first_init) {
                             logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_DEBUG, "Password: %s", "<hidden>");
                         } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_DEBUG, "Password: %s", "<not_set> (shared connection)");
                     } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_DEBUG, "Username: %s", "<not_set> (anonymous connection)");
-                        
                     // Connection to server
                     if(MQTTClient_connect(MQTTclient, &connect_options) == MQTTCLIENT_SUCCESS) {
                         logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_INFO, "%s success.", "MQTTClient_connect()");
-                            
                         // Subscribe to topic
                         char *command_topic;
                         if(asprintf(&command_topic, "%s/%s", APP_CFG.mqtt.topic, MQTT_COMMAND_TOPIC) > 0) {
                             logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_DEBUG, "Command topic: %s", command_topic);
                             if(MQTTClient_subscribe(MQTTclient, command_topic, true) == MQTTCLIENT_SUCCESS) {
                                 logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_INFO, "%s success.", "MQTTClient_subscribe()");
-                                free(command_topic);
-                                
                                 // Periodic data sending
                                 if(pthread_create(&periodical_thread, NULL, mqtt_periodical, (void *) true) == 0) {
                                     logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_INFO, "%s success.", "pthread_create(periodical_thread)");
-
-                                    logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_DEBUG, "Function completed.");
-                                    return true;
+                                    result = true;
                                 } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_ERROR, "%s error!", "pthread_create(periodical_thread)");
                             } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_ERROR, "%s error!", "MQTTClient_subscribe()");
                             free(command_topic);
@@ -419,17 +389,18 @@ bool mqtt_initialization(bool first_init) {
             } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_ERROR, "%s error!", "MQTTClient_create()");
             free(server_address);
         } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_ERROR, "%s error!", "asprintf()");
-
         // Reconnect (only for first init)
-        if(first_init == true) {
+        if((result == false) && (first_init == true)) {
             if(pthread_create(&reconnection_thread, NULL, mqtt_reconnection, NULL) == 0) {
                 logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_INFO, "%s success.", "pthread_create(reconnection_thread)");
             } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_WARNING, "%s error!", "pthread_create(reconnection_thread)");
         }
-
-    } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_WARNING, "MQTT is disabled because server address not set.");
+    } else {
+        logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_WARNING, "MQTT is disabled because server address not set.");
+        result = true;
+    }
     logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_DEBUG, "Function completed.");
-    return false;
+    return result;
 }
 
 // Init mqtt (global)
@@ -443,63 +414,61 @@ bool mqtt_init() {
 
 // Check connection
 bool mqtt_is_connected() {
-    logger("mqtt", "mqtt_is_connected", LOGGER_LEVEL_DEBUG, "Function is called...");
-    bool result = !!MQTTClient_isConnected(MQTTclient);
-    logger("mqtt", "mqtt_is_connected", LOGGER_LEVEL_DEBUG, "Function completed.");
-    return result;
+    return !!MQTTClient_isConnected(MQTTclient);
+}
+
+// Check ready
+bool mqtt_is_ready() {
+    return (mqtt_is_enabled() && mqtt_is_connected());
 }
 
 // Free mqtt
 bool mqtt_free() {
     bool result = true;
     logger("mqtt", "mqtt_free", LOGGER_LEVEL_DEBUG, "Function is called...");
-
-    // Stop reconnection
-    if(reconnection_thread) {
-        if(pthread_cancel(reconnection_thread) == 0) {
-            logger("mqtt", "mqtt_free", LOGGER_LEVEL_INFO, "%s success.", "pthread_cancel(reconnection_thread)");
+    if(mqtt_is_enabled()) { // If MQTT enabled
+        // Stop reconnection
+        if(reconnection_thread) {
+            if(pthread_cancel(reconnection_thread) == 0) {
+                logger("mqtt", "mqtt_free", LOGGER_LEVEL_INFO, "%s success.", "pthread_cancel(reconnection_thread)");
+            } else {
+                logger("mqtt", "mqtt_free", LOGGER_LEVEL_WARNING, "%s error!", "pthread_cancel(reconnection_thread)");
+                result = false;
+            }
+        }
+        // Stop periodic data sending
+        if(periodical_thread) {
+            if(pthread_cancel(periodical_thread) == 0) {
+                logger("mqtt", "mqtt_free", LOGGER_LEVEL_INFO, "%s success.", "pthread_cancel(periodical_thread)");
+            } else {
+                logger("mqtt", "mqtt_free", LOGGER_LEVEL_WARNING, "%s error!", "pthread_cancel(periodical_thread)");
+                result = false;
+            }
+        }
+        // Unsubscribe
+        char *command_topic;
+        if(asprintf(&command_topic, "%s/%s", APP_CFG.mqtt.topic, MQTT_COMMAND_TOPIC) > 0) {
+            if(MQTTClient_unsubscribe(MQTTclient, command_topic) == MQTTCLIENT_SUCCESS) {
+                logger("mqtt", "mqtt_free", LOGGER_LEVEL_INFO, "%s success.", "MQTTClient_unsubscribe()");
+            } else {
+                logger("mqtt", "mqtt_free", LOGGER_LEVEL_WARNING, "%s error!", "MQTTClient_unsubscribe()");
+                result = false;
+            }
+            free(command_topic);
         } else {
-            logger("mqtt", "mqtt_free", LOGGER_LEVEL_WARNING, "%s error!", "pthread_cancel(reconnection_thread)");
+            logger("mqtt", "mqtt_free", LOGGER_LEVEL_WARNING, "%s error!", "asprintf()");
             result = false;
         }
-    }
-    
-    // Stop periodic data sending
-    if(periodical_thread) {
-        if(pthread_cancel(periodical_thread) == 0) {
-            logger("mqtt", "mqtt_free", LOGGER_LEVEL_INFO, "%s success.", "pthread_cancel(periodical_thread)");
+        // Disconnect
+        if(MQTTClient_disconnect(MQTTclient, MQTT_DISCONNECT_TIMEOUT) == MQTTCLIENT_SUCCESS) {
+            logger("mqtt", "mqtt_free", LOGGER_LEVEL_INFO, "%s success.", "MQTTClient_disconnect()");
         } else {
-            logger("mqtt", "mqtt_free", LOGGER_LEVEL_WARNING, "%s error!", "pthread_cancel(periodical_thread)");
+            logger("mqtt", "mqtt_free", LOGGER_LEVEL_WARNING, "%s error!", "MQTTClient_disconnect()");
             result = false;
         }
+        // Destroy
+        MQTTClient_destroy(&MQTTclient);
     }
-    
-    // Unsubscribe
-    char *command_topic;
-    if(asprintf(&command_topic, "%s/%s", APP_CFG.mqtt.topic, MQTT_COMMAND_TOPIC) > 0) {
-        if(MQTTClient_unsubscribe(MQTTclient, command_topic) == MQTTCLIENT_SUCCESS) {
-            logger("mqtt", "mqtt_free", LOGGER_LEVEL_INFO, "%s success.", "MQTTClient_unsubscribe()");
-        } else {
-            logger("mqtt", "mqtt_free", LOGGER_LEVEL_WARNING, "%s error!", "MQTTClient_unsubscribe()");
-            result = false;
-        }
-        free(command_topic);
-    } else {
-        logger("mqtt", "mqtt_free", LOGGER_LEVEL_WARNING, "%s error!", "asprintf()");
-        result = false;
-    }
-    
-    // Disconnect
-    if(MQTTClient_disconnect(MQTTclient, MQTT_DISCONNECT_TIMEOUT) == MQTTCLIENT_SUCCESS) {
-        logger("mqtt", "mqtt_free", LOGGER_LEVEL_INFO, "%s success.", "MQTTClient_disconnect()");
-    } else {
-        logger("mqtt", "mqtt_free", LOGGER_LEVEL_WARNING, "%s error!", "MQTTClient_disconnect()");
-        result = false;
-    }
-    
-    // Destroy
-    MQTTClient_destroy(&MQTTclient);
-    
     logger("mqtt", "mqtt_free", LOGGER_LEVEL_DEBUG, "Function completed.");
     return result;
 }

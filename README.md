@@ -13,7 +13,7 @@ tar -zxf arm-himix100-linux.tgz
 sudo ./arm-himix100-linux.install
 ```
 
-2. Copy the libraries from directory `/usr/app/lib` of the original firmware to directory `/opt/hisi-linux/x86-arm/arm-himix100-linux/target/usr/app`.
+2. Copy the libraries from directory `/usr/app/lib` of the original firmware to directory `/opt/hisi-linux/x86-arm/arm-himix100-linux/target/usr/app/lib`.
 
 3. Clone the repository:
 
@@ -22,10 +22,10 @@ git clone https://github.com/avdeevsv91/mjsxj02hl_application
 cd mjsxj02hl_application
 ```
 
-4. Copy the additional dependencies to directory `/opt/hisi-linux/x86-arm/arm-himix100-linux/target/usr/app`:
+4. Changing the permissions for the folder `/opt/hisi-linux/x86-arm/arm-himix100-linux/target/usr/app/lib`:
 
 ```bash
-sudo cp -r dependencies/. /opt/hisi-linux/x86-arm/arm-himix100-linux/target/usr/app
+sudo chmod 755 /opt/hisi-linux/x86-arm/arm-himix100-linux/target/usr/app/lib
 ```
 
 5. Build application:
@@ -39,44 +39,62 @@ Default config `/usr/app/share/mjsxj02hl.conf`:
 
 ```ini
 [logger]
-level = 2              ; Log level (0 = disable, 1 = error, 2 = warning, 3 = info, 4 = debug)
-file =                 ; Write log to file (empty for disable)
+level = 2                   ; Log level (0 = disable, 1 = error, 2 = warning, 3 = info, 4 = debug)
+file =                      ; Write log to file (empty for disable)
 
 [video]
-type = 1               ; Video compression standard (1 = h264, 2 = h265)
-fps = 20               ; Frames per second
-flip = false           ; Flip image
-mirror = false         ; Mirror image
+primary_enable = true       ; Enable video for primary channel
+secondary_enable = true     ; Enable video for secondary channel
+primary_type = 1            ; Video compression standard for primary channel (1 = h264, 2 = h265)
+secondary_type = 1          ; Video compression standard for secondary channel (1 = h264, 2 = h265)
+primary_fps = 20            ; Frames per second for primary channel
+secondary_fps = 20          ; Frames per second for secondary channel
+primary_flip = false        ; Flip image for primary channel
+secondary_flip = false      ; Flip image for secondary channel
+primary_mirror = false      ; Mirror image for primary channel
+secondary_mirror = false    ; Mirror image for secondary channel
 
 [audio]
-volume = 70            ; Audio volume level (0-100)
+volume = 70                 ; Audio volume level (0-100)
+primary_enable = true       ; Enable audio for primary channel
+secondary_enable = true     ; Enable audio for secondary channel
 
 [speaker]
-volume = 70            ; Speaker volume level (0-100)
-type = 1               ; Default file format (1 = PCM, 2 = G711)
+volume = 70                 ; Speaker volume level (0-100)
+type = 1                    ; Default file format (1 = PCM, 2 = G711)
 
 [alarm]
-motion_sens = 150      ; Motion sensitivity (1-255)
-humanoid_sens = 150    ; Humanoid sensitivity (1-255)
-motion_timeout = 60    ; Motion timeout (in seconds)
-humanoid_timeout = 60  ; Humanoid timeout (in seconds)
-motion_detect_exec =   ; Execute the command when motion is detected (empty for disable)
-humanoid_detect_exec = ; Execute the command when humanoid is detected (empty for disable)
-motion_lost_exec =     ; Execute the command when motion is lost (empty for disable)
-humanoid_lost_exec =   ; Execute the command when humanoid is lost (empty for disable)
+motion_sens = 150           ; Motion sensitivity (1-255)
+humanoid_sens = 150         ; Humanoid sensitivity (1-255)
+motion_timeout = 60         ; Motion timeout (in seconds)
+humanoid_timeout = 60       ; Humanoid timeout (in seconds)
+motion_detect_exec =        ; Execute the command when motion is detected (empty for disable)
+humanoid_detect_exec =      ; Execute the command when humanoid is detected (empty for disable)
+motion_lost_exec =          ; Execute the command when motion is lost (empty for disable)
+humanoid_lost_exec =        ; Execute the command when humanoid is lost (empty for disable)
+
+[rtsp]
+enable = true               ; Enable RTSP server
+port = 554                  ; Port number
+username =                  ; Username (empty for disable)
+password =                  ; Password
+primary_name = primary      ; Name of the primary channel
+secondary_name = secondary  ; Name of the secondary channel
+primary_multicast = false   ; Use multicast for primary channel
+secondary_multicast = false ; Use multicast for secondary channel
 
 [mqtt]
-server =               ; Address (empty for disable)
-port = 1883            ; Port
-username =             ; Username (empty for anonimous)
-password =             ; Password (empty for disable)
-topic = mjsxj02hl      ; Topic name
-qos = 1                ; Quality of Service (0, 1 or 2)
-retain = false         ; Retained messages
+server =                    ; Address (empty for disable)
+port = 1883                 ; Port number
+username =                  ; Username (empty for anonimous)
+password =                  ; Password (empty for disable)
+topic = mjsxj02hl           ; Topic name
+qos = 1                     ; Quality of Service (0, 1 or 2)
+retain = false              ; Retained messages
 
 [night]
-mode = 2               ; Night mode (0 = off, 1 = on, 2 = auto)
-gray = 2               ; Grayscale (0 = off, 1 = on, 2 = auto)
+mode = 2                    ; Night mode (0 = off, 1 = on, 2 = auto)
+gray = 2                    ; Grayscale (0 = off, 1 = on, 2 = auto)
 ```
 
 ## Usage
@@ -163,4 +181,4 @@ Field | Description
 * yyjson: https://github.com/ibireme/yyjson
 * inih: https://github.com/benhoyt/inih
 * paho.mqtt.c: https://github.com/eclipse/paho.mqtt.c
-* librtsp: https://github.com/xiaochangzhen/librtsp
+* RtspServer: https://github.com/PHZ76/RtspServer

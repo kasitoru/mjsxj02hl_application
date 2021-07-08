@@ -53,5 +53,5 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
-# Dependencies
-!/dependencies/*
+# Binary libraries
+!/lib/*

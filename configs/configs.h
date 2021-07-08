@@ -13,15 +13,23 @@ typedef struct {
 
     // [video]
     struct {
-        int type;
-        int fps;
-        bool flip;
-        bool mirror;
+        bool primary_enable;
+        bool secondary_enable;
+        int primary_type;
+        int secondary_type;
+        int primary_fps;
+        int secondary_fps;
+        bool primary_flip;
+        bool secondary_flip;
+        bool primary_mirror;
+        bool secondary_mirror;
     } video;
 
     // [audio]
     struct {
         int volume;
+        bool primary_enable;
+        bool secondary_enable;
     } audio;
     
     // [speaker]
@@ -42,12 +50,24 @@ typedef struct {
         char* humanoid_lost_exec;
     } alarm;
     
+    // [rtsp]
+    struct {
+        bool enable;
+        int port;
+        char* username;
+        char* password;
+        char* primary_name;
+        char* secondary_name;
+        bool primary_multicast;
+        bool secondary_multicast;
+    } rtsp;
+    
     // [mqtt]
     struct {
         char* server;
         int port;
         char* username;
-        char* password; 
+        char* password;
         char* topic;
         int qos;
         bool retain;

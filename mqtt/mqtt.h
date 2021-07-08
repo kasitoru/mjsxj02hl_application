@@ -22,6 +22,9 @@ bool mqtt_is_enabled();
 // Check connection
 bool mqtt_is_connected();
 
+// Check ready
+bool mqtt_is_ready();
+
 // Free mqtt
 bool mqtt_free();
 

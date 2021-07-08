@@ -10,21 +10,17 @@
 #include "./../../mqtt/mqtt.h"
 
 // MQTT send info
-bool night_state_mqtt(bool night, bool gray) {
+static bool night_state_mqtt(bool night, bool gray) {
     bool result = false;
-    
     logger("night", "night_state_mqtt", LOGGER_LEVEL_DEBUG, "Function is called...");
-    
     // Send night mode info
     char *topic = mqtt_fulltopic(MQTT_NIGHT_TOPIC);
     if(topic && topic[0]) {
         logger("night", "night_state_mqtt", LOGGER_LEVEL_INFO, "%s success.", "mqtt_fulltopic()");
-    
         // JSON Data
         yyjson_mut_doc *json_doc = yyjson_mut_doc_new(NULL);
         yyjson_mut_val *json_root = yyjson_mut_obj(json_doc);
         yyjson_mut_doc_set_root(json_doc, json_root);
-        
         // Motion state
         yyjson_mut_obj_add_bool(json_doc, json_root, "state", night);
         // Humanoid state
@@ -32,7 +28,6 @@ bool night_state_mqtt(bool night, bool gray) {
         // Current timestamp
         int timestamp = (int) time(NULL);
         yyjson_mut_obj_add_int(json_doc, json_root, "timestamp", timestamp);
-        
         // Send it
         const char *json = yyjson_mut_write(json_doc, 0, NULL);
         if(json) {
@@ -43,23 +38,18 @@ bool night_state_mqtt(bool night, bool gray) {
             } else logger("night", "night_state_mqtt", LOGGER_LEVEL_ERROR, "%s error!", "mqtt_send()");
             free((void *)json);
         } else logger("night", "night_state_mqtt", LOGGER_LEVEL_ERROR, "%s error!", "yyjson_mut_write()");
-        
         // Free resources
         yyjson_mut_doc_free(json_doc);
         free(topic);
-
     } else logger("night", "night_state_mqtt", LOGGER_LEVEL_ERROR, "%s error!", "mqtt_fulltopic()");
-    
     logger("night", "night_state_mqtt", LOGGER_LEVEL_DEBUG, "Function completed.");
-    
     return result;
 }
 
 // Callback for change state of night mode
-int night_mode_change_callback(int state) {
+static int night_mode_change_callback(int state) {
     int result = LOCALSDK_OK;
     logger("night", "night_mode_change_callback", LOGGER_LEVEL_DEBUG, "Function is called...");
-
     logger("night", "night_mode_change_callback", LOGGER_LEVEL_DEBUG, "state = %d", state);
     switch(state) {
         case NIGHT_MODE_STATE_NIGHTTIME: // night
@@ -76,7 +66,7 @@ int night_mode_change_callback(int state) {
                 } else logger("night", "night_mode_change_callback", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_video_set_night_mode()");
             }
             // MQTT
-            if(mqtt_is_enabled() && mqtt_is_connected()) {
+            if(mqtt_is_ready()) {
                 if(night_state_mqtt(true, (APP_CFG.night.gray == 2 ? true : (APP_CFG.night.gray == 1)))) {
                     logger("night", "night_mode_change_callback", LOGGER_LEVEL_INFO, "%s success.", "night_state_mqtt()");
                 } else logger("night", "night_mode_change_callback", LOGGER_LEVEL_ERROR, "%s error!", "night_state_mqtt()");
@@ -96,7 +86,7 @@ int night_mode_change_callback(int state) {
                 } else logger("night", "night_mode_change_callback", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_video_set_daytime_mode()");
             }
             // MQTT
-            if(mqtt_is_enabled() && mqtt_is_connected()) {
+            if(mqtt_is_ready()) {
                 if(night_state_mqtt(false, (APP_CFG.night.gray == 2 ? false : (APP_CFG.night.gray == 1)))) {
                     logger("night", "night_mode_change_callback", LOGGER_LEVEL_INFO, "%s success.", "night_state_mqtt()");
                 } else logger("night", "night_mode_change_callback", LOGGER_LEVEL_ERROR, "%s error!", "night_state_mqtt()");
@@ -123,7 +113,6 @@ int night_mode_change_callback(int state) {
             result = LOCALSDK_ERROR;
             break;
     }
-
     logger("night", "night_mode_change_callback", LOGGER_LEVEL_DEBUG, "Function completed.");
     return result;
 }
@@ -132,7 +121,6 @@ int night_mode_change_callback(int state) {
 bool night_init() {
     bool result = false;
     logger("night", "night_init", LOGGER_LEVEL_DEBUG, "Function is called...");
-
     if(local_sdk_night_state_set_callback(night_mode_change_callback) == LOCALSDK_OK) {
         logger("night", "night_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_night_state_set_callback()");
         // Set night mode
@@ -202,7 +190,6 @@ bool night_init() {
             }
         }
     } else logger("night", "night_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_night_state_set_callback()");
-    
     logger("night", "night_init", LOGGER_LEVEL_DEBUG, "Function completed.");
     return result;
 }
@@ -211,7 +198,6 @@ bool night_init() {
 bool night_free() {
     bool result = false;
     logger("night", "night_free", LOGGER_LEVEL_DEBUG, "Function is called...");
-    
     // Disable night mode
     if(local_sdk_close_ircut() == LOCALSDK_OK) { logger("night", "======", LOGGER_LEVEL_INFO, "OPENED");
         logger("night", "night_free", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_close_ircut()");
@@ -223,7 +209,6 @@ bool night_free() {
             } else logger("night", "night_free", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_video_set_daytime_mode()");
         } else logger("night", "night_free", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_close_night_light()");
     } else logger("night", "night_free", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_close_ircut()");
-    
     logger("night", "night_free", LOGGER_LEVEL_DEBUG, "Function completed.");
     return result;
 }
