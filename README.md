@@ -50,8 +50,8 @@ primary_enable = true       ; Enable video for primary channel
 secondary_enable = true     ; Enable video for secondary channel
 primary_type = 1            ; Video compression standard for primary channel (1 = h264, 2 = h265)
 secondary_type = 1          ; Video compression standard for secondary channel (1 = h264, 2 = h265)
-primary_fps = 20            ; Frames per second for primary channel
-secondary_fps = 20          ; Frames per second for secondary channel
+primary_fps = 30            ; Frames per second for primary channel
+secondary_fps = 30          ; Frames per second for secondary channel
 primary_bitrate = 8000      ; Bitrate for primary channel
 secondary_bitrate = 1200    ; Bitrate for secondary channel
 primary_flip = false        ; Flip image for primary channel
