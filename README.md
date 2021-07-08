@@ -38,6 +38,9 @@ make
 Default config `/usr/app/share/mjsxj02hl.conf`:
 
 ```ini
+[general]
+led = true                  ; Enable onboard LED indicator
+
 [logger]
 level = 2                   ; Log level (0 = disable, 1 = error, 2 = warning, 3 = info, 4 = debug)
 file =                      ; Write log to file (empty for disable)

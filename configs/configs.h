@@ -5,6 +5,12 @@
 
 // All configurations
 typedef struct {
+
+    // [general]
+    struct {
+        bool led;
+    } general;
+
     // [logger]
     struct {
         int level;

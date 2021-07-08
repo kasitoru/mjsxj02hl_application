@@ -21,12 +21,14 @@
 void signal_callback(int signal) {
     logger("mjsxj02hl_application", "signal_callback", LOGGER_LEVEL_DEBUG, "Function is called...");
 
-    // Enable orange pin
-    if(local_sdk_indicator_led_option(true, false) == LOCALSDK_OK) {
-        logger("mjsxj02hl_application", "signal_callback", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_indicator_led_option()");
-    } else {
-        logger("mjsxj02hl_application", "signal_callback", LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_indicator_led_option()");
-        signal = EX_SOFTWARE;
+    // Enable orange LED
+    if(APP_CFG.general.led) {
+        if(local_sdk_indicator_led_option(true, false) == LOCALSDK_OK) {
+            logger("mjsxj02hl_application", "signal_callback", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_indicator_led_option(true, false)");
+        } else {
+            logger("mjsxj02hl_application", "signal_callback", LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_indicator_led_option(true, false)");
+            signal = EX_SOFTWARE;
+        }
     }
 
     // MQTT free
@@ -161,10 +163,16 @@ int main(int argc, char **argv) {
                 logger("mjsxj02hl_application", "main", LOGGER_LEVEL_INFO, "%s success.", "signal(SIGTERM)");
             } else logger("mjsxj02hl_application", "main", LOGGER_LEVEL_WARNING, "%s error!", "signal(SIGTERM)");
             
-            // Enable blue pin
-            if(local_sdk_indicator_led_option(false, true) == LOCALSDK_OK) {
-                logger("mjsxj02hl_application", "main", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_indicator_led_option()");
-            } else logger("mjsxj02hl_application", "main", LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_indicator_led_option()");
+            // Onboard LED indicator
+            if(APP_CFG.general.led) { // Enable blue LED
+                if(local_sdk_indicator_led_option(false, true) == LOCALSDK_OK) {
+                    logger("mjsxj02hl_application", "main", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_indicator_led_option(false, true)");
+                } else logger("mjsxj02hl_application", "main", LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_indicator_led_option(false, true)");
+            } else { // Disable LEDs
+                if(local_sdk_indicator_led_option(false, false) == LOCALSDK_OK) {
+                    logger("mjsxj02hl_application", "main", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_indicator_led_option(false, false)");
+                } else logger("mjsxj02hl_application", "main", LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_indicator_led_option(false, false)");
+            }
             
             // Factory reset
             if(local_sdk_setup_keydown_set_callback(3000, factory_reset_callback) == LOCALSDK_OK) {

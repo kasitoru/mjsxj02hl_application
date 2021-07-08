@@ -8,6 +8,9 @@
 
 // Default values
 APPLICATION_CONFIGURATION APP_CFG = {
+    // [general]
+    .general.led                = true,                        // Enable onboard LED indicator
+
     // [logger]
     .logger.level               = LOGGER_LEVEL_WARNING,        // Log level
     .logger.file                = "",                          // Write log to file
@@ -75,8 +78,12 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
     #define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0
     #define atob(v) strcmp(value, "true") == 0 || strcmp(value, "yes") == 0 || strcmp(value, "on") == 0 || strcmp(value, "1") == 0
     
+    // [general]
+    if(MATCH("general", "led")) {
+        config->general.led = atob(value);
+    
     // [logger]
-    if(MATCH("logger", "level")) {
+    } else if(MATCH("logger", "level")) {
         config->logger.level = atoi(value);
     } else if(MATCH("logger", "file")) {
         config->logger.file = strdup(value);
