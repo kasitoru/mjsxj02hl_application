@@ -66,7 +66,7 @@ bool rtsp_init() {
                 bool primary_multicast = APP_CFG.rtsp.primary_multicast;
                 uint8_t primary_video_type = librtspserver_video_type(APP_CFG.video.type);
                 uint32_t primary_framerate = APP_CFG.video.fps;
-                uint8_t primary_audio_type = LIBRTSPSERVER_TYPE_G711A;
+                uint8_t primary_audio_type = (APP_CFG.audio.primary_enable ? LIBRTSPSERVER_TYPE_G711A : LIBRTSPSERVER_TYPE_NONE);
                 if(primary_session = rtspserver_session(primary_name, primary_multicast, primary_video_type, primary_framerate, primary_audio_type, 0, 0, false)) {
                     logger("rtsp", "rtsp_init", LOGGER_LEVEL_INFO, "%s success.", "rtspserver_session(primary)");
                     // Secondary channel
@@ -74,7 +74,7 @@ bool rtsp_init() {
                     bool secondary_multicast = APP_CFG.rtsp.secondary_multicast;
                     uint8_t secondary_video_type = librtspserver_video_type(APP_CFG.video.type);
                     uint32_t secondary_framerate = APP_CFG.video.fps;
-                    uint8_t secondary_audio_type = LIBRTSPSERVER_TYPE_G711A;
+                    uint8_t secondary_audio_type = (APP_CFG.audio.secondary_enable ? LIBRTSPSERVER_TYPE_G711A : LIBRTSPSERVER_TYPE_NONE);
                     if(secondary_session = rtspserver_session(secondary_name, secondary_multicast, secondary_video_type, secondary_framerate, secondary_audio_type, 0, 0, false)) {
                         logger("rtsp", "rtsp_init", LOGGER_LEVEL_INFO, "%s success.", "rtspserver_session(secondary)");
                         result = true;

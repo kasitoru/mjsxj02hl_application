@@ -20,6 +20,8 @@ APPLICATION_CONFIGURATION APP_CFG = {
 
     // [audio]
     .audio.volume               = 70,                          // Volume (0-100)
+    .audio.primary_enable       = true,                        // Enable audio for primary channel
+    .audio.secondary_enable     = true,                        // Enable audio for secondary channel
     
     // [speaker]
     .speaker.volume             = 70,                          // Volume (0-100)
@@ -86,6 +88,10 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
     // [audio]
     } else if(MATCH("audio", "volume")) {
         config->audio.volume = atoi(value);
+    } else if(MATCH("audio", "primary_enable")) {
+        config->audio.primary_enable = atob(value);
+    } else if(MATCH("audio", "secondary_enable")) {
+        config->audio.secondary_enable = atob(value);
 
     // [speaker]
     } else if(MATCH("speaker", "volume")) {

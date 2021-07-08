@@ -22,6 +22,8 @@ typedef struct {
     // [audio]
     struct {
         int volume;
+        bool primary_enable;
+        bool secondary_enable;
     } audio;
     
     // [speaker]

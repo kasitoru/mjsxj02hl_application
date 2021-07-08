@@ -50,6 +50,8 @@ mirror = false              ; Mirror image
 
 [audio]
 volume = 70                 ; Audio volume level (0-100)
+primary_enable = true       ; Enable audio for primary channel
+secondary_enable = true     ; Enable audio for secondary channel
 
 [speaker]
 volume = 70                 ; Speaker volume level (0-100)
