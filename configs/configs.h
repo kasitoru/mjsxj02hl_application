@@ -13,10 +13,16 @@ typedef struct {
 
     // [video]
     struct {
-        int type;
-        int fps;
-        bool flip;
-        bool mirror;
+        bool primary_enable;
+        bool secondary_enable;
+        int primary_type;
+        int secondary_type;
+        int primary_fps;
+        int secondary_fps;
+        bool primary_flip;
+        bool secondary_flip;
+        bool primary_mirror;
+        bool secondary_mirror;
     } video;
 
     // [audio]

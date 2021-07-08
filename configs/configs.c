@@ -13,10 +13,16 @@ APPLICATION_CONFIGURATION APP_CFG = {
     .logger.file                = "",                          // Write log to file
     
     // [video]
-    .video.type                 = LOCALSDK_VIDEO_PAYLOAD_H265, // Video compression standard (1 = h264, 2 = h265)
-    .video.fps                  = 20,                          // Frames per second
-    .video.flip                 = false,                       // Flip (true or false)
-    .video.mirror               = false,                       // Mirror (true or false)
+    .video.primary_enable       = true,                        // Enable video for primary channel
+    .video.secondary_enable     = true,                        // Enable video for secondary channel
+    .video.primary_type         = LOCALSDK_VIDEO_PAYLOAD_H265, // Video compression standard for primary channel
+    .video.secondary_type       = LOCALSDK_VIDEO_PAYLOAD_H264, // Video compression standard for secondary channel
+    .video.primary_fps          = 20,                          // Frames per second for primary channel
+    .video.secondary_fps        = 20,                          // Frames per second for secondary channel
+    .video.primary_flip         = false,                       // Flip image for primary channel
+    .video.secondary_flip       = false,                       // Flip image for secondary channel
+    .video.primary_mirror       = false,                       // Mirror image for primary channel
+    .video.secondary_mirror     = false,                       // Mirror image for secondary channel
 
     // [audio]
     .audio.volume               = 70,                          // Volume (0-100)
@@ -25,7 +31,7 @@ APPLICATION_CONFIGURATION APP_CFG = {
     
     // [speaker]
     .speaker.volume             = 70,                          // Volume (0-100)
-    .speaker.type               = LOCALSDK_SPEAKER_PCM_TYPE,   // Default file format (1 = PCM, 2 = G711)
+    .speaker.type               = LOCALSDK_SPEAKER_PCM_TYPE,   // Default file format
     
     // [alarm]
     .alarm.motion_sens          = 150,                         // Motion sensitivity (1-255)
@@ -76,14 +82,26 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
         config->logger.file = strdup(value);
     
     // [video]
-    } else if(MATCH("video", "type")) {
-        config->video.type = atoi(value);
-    } else if(MATCH("video", "fps")) {
-        config->video.fps = atoi(value);
-    } else if(MATCH("video", "flip")) {
-        config->video.flip = atob(value);
-    } else if(MATCH("video", "mirror")) {
-        config->video.mirror = atob(value);
+    } else if(MATCH("video", "primary_enable")) {
+        config->video.primary_enable = atob(value);
+    } else if(MATCH("video", "secondary_enable")) {
+        config->video.secondary_enable = atob(value);
+    } else if(MATCH("video", "primary_type")) {
+        config->video.primary_type = atoi(value);
+    } else if(MATCH("video", "secondary_type")) {
+        config->video.secondary_type = atoi(value);
+    } else if(MATCH("video", "primary_fps")) {
+        config->video.primary_fps = atoi(value);
+    } else if(MATCH("video", "secondary_fps")) {
+        config->video.secondary_fps = atoi(value);
+    } else if(MATCH("video", "primary_flip")) {
+        config->video.primary_flip = atob(value);
+    } else if(MATCH("video", "secondary_flip")) {
+        config->video.secondary_flip = atob(value);
+    } else if(MATCH("video", "primary_mirror")) {
+        config->video.primary_mirror = atob(value);
+    } else if(MATCH("video", "secondary_mirror")) {
+        config->video.secondary_mirror = atob(value);
 
     // [audio]
     } else if(MATCH("audio", "volume")) {

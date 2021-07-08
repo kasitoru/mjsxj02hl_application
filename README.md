@@ -43,10 +43,16 @@ level = 2                   ; Log level (0 = disable, 1 = error, 2 = warning, 3 
 file =                      ; Write log to file (empty for disable)
 
 [video]
-type = 1                    ; Video compression standard (1 = h264, 2 = h265)
-fps = 20                    ; Frames per second
-flip = false                ; Flip image
-mirror = false              ; Mirror image
+primary_enable = true       ; Enable video for primary channel
+secondary_enable = true     ; Enable video for secondary channel
+primary_type = 1            ; Video compression standard for primary channel (1 = h264, 2 = h265)
+secondary_type = 1          ; Video compression standard for secondary channel (1 = h264, 2 = h265)
+primary_fps = 20            ; Frames per second for primary channel
+secondary_fps = 20          ; Frames per second for secondary channel
+primary_flip = false        ; Flip image for primary channel
+secondary_flip = false      ; Flip image for secondary channel
+primary_mirror = false      ; Mirror image for primary channel
+secondary_mirror = false    ; Mirror image for secondary channel
 
 [audio]
 volume = 70                 ; Audio volume level (0-100)
