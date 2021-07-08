@@ -37,7 +37,7 @@ static int h26x_capture_secondary_channel(LOCALSDK_H26X_FRAME_INFO *frameInfo) {
 // Init video
 bool video_init() {
     logger("video", "video_init", LOGGER_LEVEL_DEBUG, "Function is called...");
-    if(local_sdk_video_init((APP_CFG.video.primary_fps > APP_CFG.video.secondary_fps) ? APP_CFG.video.primary_fps : APP_CFG.video.secondary_fps) == LOCALSDK_OK) {
+    if(local_sdk_video_init(LOCALSDK_VIDEO_FRAMERATE) == LOCALSDK_OK) {
         logger("video", "video_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_video_init()");
         // Init channel 0
         int primary_resolution_type;
@@ -48,7 +48,7 @@ bool video_init() {
                 logger("video", "video_init", LOGGER_LEVEL_INFO, "%s success.", "SAMPLE_COMM_SYS_GetPicSize(LOCALSDK_VIDEO_RESOLUTION_1920x1080)");
                 LOCALSDK_VIDEO_OPTIONS primary_options = {
                     .bitrate     = APP_CFG.video.primary_bitrate,
-                    .fps         = APP_CFG.video.primary_fps,
+                    .fps         = LOCALSDK_VIDEO_FRAMERATE,
                     .resolution  = LOCALSDK_VIDEO_RESOLUTION_1920x1080,
                     .flip        = APP_CFG.video.primary_flip,
                     .mirror      = APP_CFG.video.primary_mirror,
@@ -57,7 +57,7 @@ bool video_init() {
                     .unknown_7   = 1, // FIXME: what is it?
                     .payload     = APP_CFG.video.primary_type,
                     .rcmode      = LOCALSDK_VIDEO_RCMODE_TYPE,
-                    .gop         = 1 * APP_CFG.video.primary_fps,
+                    .gop         = 1 * LOCALSDK_VIDEO_FRAMERATE,
                     .screen_size = primary_picture_size.width * primary_picture_size.height,
                     .unknown_12  = 327680, // FIXME: what is it?
                     .jpeg        = false,
@@ -95,7 +95,7 @@ bool video_init() {
                                                 logger("video", "video_init", LOGGER_LEVEL_INFO, "%s success.", "SAMPLE_COMM_SYS_GetPicSize(LOCALSDK_VIDEO_RESOLUTION_640x360)");
                                                 LOCALSDK_VIDEO_OPTIONS secondary_options = {
                                                     .bitrate     = APP_CFG.video.secondary_bitrate,
-                                                    .fps         = APP_CFG.video.secondary_fps,
+                                                    .fps         = LOCALSDK_VIDEO_FRAMERATE,
                                                     .resolution  = LOCALSDK_VIDEO_RESOLUTION_640x360,
                                                     .flip        = APP_CFG.video.secondary_flip,
                                                     .mirror      = APP_CFG.video.secondary_mirror,
@@ -104,7 +104,7 @@ bool video_init() {
                                                     .unknown_7   = 0, // FIXME: what is it?
                                                     .payload     = APP_CFG.video.secondary_type,
                                                     .rcmode      = LOCALSDK_VIDEO_RCMODE_TYPE,
-                                                    .gop         = 1 * APP_CFG.video.secondary_fps,
+                                                    .gop         = 1 * LOCALSDK_VIDEO_FRAMERATE,
                                                     .screen_size = secondary_picture_size.width * secondary_picture_size.height,
                                                     .unknown_12  = 50000, // FIXME: what is it?
                                                     .jpeg        = true,

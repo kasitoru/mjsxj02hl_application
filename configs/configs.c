@@ -20,8 +20,6 @@ APPLICATION_CONFIGURATION APP_CFG = {
     .video.secondary_enable     = true,                        // Enable video for secondary channel
     .video.primary_type         = LOCALSDK_VIDEO_PAYLOAD_H265, // Video compression standard for primary channel
     .video.secondary_type       = LOCALSDK_VIDEO_PAYLOAD_H264, // Video compression standard for secondary channel
-    .video.primary_fps          = 30,                          // Frames per second for primary channel
-    .video.secondary_fps        = 30,                          // Frames per second for secondary channel
     .video.primary_bitrate      = 8000,                        // Bitrate for primary channel
     .video.secondary_bitrate    = 1200,                        // Bitrate for secondary channel
     .video.primary_flip         = false,                       // Flip image for primary channel
@@ -99,10 +97,6 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
         config->video.primary_type = atoi(value);
     } else if(MATCH("video", "secondary_type")) {
         config->video.secondary_type = atoi(value);
-    } else if(MATCH("video", "primary_fps")) {
-        config->video.primary_fps = atoi(value);
-    } else if(MATCH("video", "secondary_fps")) {
-        config->video.secondary_fps = atoi(value);
     } else if(MATCH("video", "primary_bitrate")) {
         config->video.primary_bitrate = atoi(value);
     } else if(MATCH("video", "secondary_bitrate")) {
