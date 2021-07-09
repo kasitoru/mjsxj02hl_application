@@ -127,22 +127,30 @@ bool night_init() {
         logger("night", "night_init", LOGGER_LEVEL_DEBUG, "night.mode = %d", APP_CFG.night.mode);
         switch(APP_CFG.night.mode) {
             case 0: // off
-                if(local_sdk_close_ircut() == LOCALSDK_OK) {
-                    logger("night", "night_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_close_ircut()");
-                    if(local_sdk_close_night_light() == LOCALSDK_OK) {
-                        logger("night", "night_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_close_night_light()");
-                        result = true;
-                    } else logger("night", "night_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_close_night_light()");
-                } else logger("night", "night_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_close_ircut()");
-                break;
-            case 1: // on
                 if(local_sdk_open_ircut() == LOCALSDK_OK) {
                     logger("night", "night_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_open_ircut()");
-                    if(local_sdk_open_night_light() == LOCALSDK_OK) {
-                        logger("night", "night_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_open_night_light()");
-                        result = true;
-                    } else logger("night", "night_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_open_night_light()");
+                    usleep(98000);
+                    if(local_sdk_close_ircut() == LOCALSDK_OK) {
+                        logger("night", "night_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_close_ircut()");
+                        if(local_sdk_close_night_light() == LOCALSDK_OK) {
+                            logger("night", "night_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_close_night_light()");
+                            result = true;
+                        } else logger("night", "night_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_close_night_light()");
+                    } else logger("night", "night_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_close_ircut()");
                 } else logger("night", "night_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_open_ircut()");
+                break;
+            case 1: // on
+                if(local_sdk_close_ircut() == LOCALSDK_OK) {
+                    logger("night", "night_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_open_ircut()");
+                    usleep(98000);
+                    if(local_sdk_open_ircut() == LOCALSDK_OK) {
+                        logger("night", "night_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_open_ircut()");
+                        if(local_sdk_open_night_light() == LOCALSDK_OK) {
+                            logger("night", "night_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_open_night_light()");
+                            result = true;
+                        } else logger("night", "night_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_open_night_light()");
+                    } else logger("night", "night_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_open_ircut()");
+                } else logger("night", "night_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_close_ircut()");
                 break;
             case 2: // auto
                 if(local_sdk_open_ircut() == LOCALSDK_OK) {
