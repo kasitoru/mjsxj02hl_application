@@ -128,34 +128,6 @@ int local_sdk_video_set_fps(int param_1, int param_2, int param_3, int param_4);
 int local_sdk_video_set_kbps(int param_1, int param_2);
 
 /********************
-        OSD
-********************/
-
-typedef struct {
-    uint32_t unknown_0; // FIXME: what is it?
-    uint32_t unknown_1; // FIXME: what is it?
-    uint32_t unknown_2; // FIXME: what is it?
-    uint32_t unknown_3; // FIXME: what is it?
-    uint32_t unknown_4; // FIXME: what is it?
-    uint32_t unknown_5; // FIXME: what is it?
-    uint32_t unknown_6; // FIXME: what is it?
-    uint32_t unknown_7; // FIXME: what is it?
-    uint32_t unknown_8; // FIXME: what is it?
-} LOCALSDK_OSD_OPTIONS;
-
-// Set osd parameters
-int local_sdk_video_osd_set_parameters(int chn, LOCALSDK_OSD_OPTIONS *options);
-
-// Displaying the brand logo (MI)
-int local_sdk_video_osd_update_logo(int chn, bool state);
-
-// Displaying date and time
-int local_sdk_video_osd_update_timestamp(int chn, bool state, struct tm *timestamp);
-
-// TODO:
-int local_sdk_video_osd_update_rect_multi(int chn, bool state, int *param_3);
-
-/********************
         AUDIO
 ********************/
 
@@ -285,14 +257,18 @@ int local_sdk_speaker_clean_buf_data();
 #define LOCALSDK_ALARM_HUMANOID 7
 
 typedef struct {
+    uint32_t x;
+    uint32_t width;
+    uint32_t y;
+    uint32_t height;
+} LOCALSDK_ALARM_OBJECT_INFO;
+
+typedef struct {
     uint32_t unknown_1; // FIXME: what is it?
     uint32_t type; // type (motion/humanoid)
     uint32_t unknown_3; // FIXME: what is it?
     uint32_t state; // state (start/stop)
-    uint32_t unknown_5; // FIXME: what is it?
-    uint32_t unknown_6; // FIXME: what is it?
-    uint32_t unknown_7; // FIXME: what is it?
-    uint32_t unknown_8; // FIXME: what is it?
+    LOCALSDK_ALARM_OBJECT_INFO object; // coordinates
     uint32_t unknown_9; // FIXME: what is it?
     uint32_t unknown_10; // FIXME: what is it?
 } LOCALSDK_ALARM_EVENT_INFO;
@@ -328,6 +304,39 @@ int local_sdk_set_alarm_network_state();
 // Set alarm switch
 // Type: LOCALSDK_ALARM_MOTION or LOCALSDK_ALARM_HUMANOID
 int local_sdk_set_alarm_switch(int type, bool state);
+
+/********************
+        OSD
+********************/
+
+typedef struct {
+    uint32_t unknown_0; // FIXME: what is it?
+    uint32_t unknown_1; // FIXME: what is it?
+    uint32_t unknown_2; // FIXME: what is it?
+    uint32_t unknown_3; // FIXME: what is it?
+    uint32_t unknown_4; // FIXME: what is it?
+    uint32_t unknown_5; // FIXME: what is it?
+    uint32_t unknown_6; // FIXME: what is it?
+    uint32_t unknown_7; // FIXME: what is it?
+    uint32_t unknown_8; // FIXME: what is it?
+} LOCALSDK_OSD_OPTIONS;
+
+typedef struct {
+    uint32_t count;
+    LOCALSDK_ALARM_OBJECT_INFO objects[8];
+} LOCALSDK_OSD_RECTANGLES;
+
+// Set osd parameters
+int local_sdk_video_osd_set_parameters(int chn, LOCALSDK_OSD_OPTIONS *options);
+
+// Display brand logo (MI)
+int local_sdk_video_osd_update_logo(int chn, bool state);
+
+// Display date and time
+int local_sdk_video_osd_update_timestamp(int chn, bool state, struct tm *timestamp);
+
+// Display rectangles 
+int local_sdk_video_osd_update_rect_multi(int chn, bool state, LOCALSDK_OSD_RECTANGLES *rectangles);
 
 /********************
         LEDS
