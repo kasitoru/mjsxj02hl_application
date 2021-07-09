@@ -1,5 +1,5 @@
-#ifndef _AUDIO_H_
-#define _AUDIO_H_
+#ifndef _LOCALSDK_AUDIO_H_
+#define _LOCALSDK_AUDIO_H_
 
 #include <stdbool.h>
 

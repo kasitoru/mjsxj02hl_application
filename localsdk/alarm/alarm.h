@@ -1,5 +1,5 @@
-#ifndef _ALARM_H_
-#define _ALARM_H_
+#ifndef _LOCALSDK_ALARM_H_
+#define _LOCALSDK_ALARM_H_
 
 #include <stdbool.h>
 

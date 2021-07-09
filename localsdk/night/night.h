@@ -1,5 +1,5 @@
-#ifndef _NIGHT_H_
-#define _NIGHT_H_
+#ifndef _LOCALSDK_NIGHT_H_
+#define _LOCALSDK_NIGHT_H_
 
 #include <stdbool.h>
 

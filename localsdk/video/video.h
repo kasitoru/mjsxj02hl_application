@@ -1,5 +1,5 @@
-#ifndef _VIDEO_H_
-#define _VIDEO_H_
+#ifndef _LOCALSDK_VIDEO_H_
+#define _LOCALSDK_VIDEO_H_
 
 #include <stdbool.h>
 

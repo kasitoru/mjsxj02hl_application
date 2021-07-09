@@ -1,5 +1,5 @@
-#ifndef _OSD_H_
-#define _OSD_H_
+#ifndef _LOCALSDK_OSD_H_
+#define _LOCALSDK_OSD_H_
 
 #include <stdbool.h>
 
