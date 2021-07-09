@@ -15,6 +15,9 @@ APPLICATION_CONFIGURATION APP_CFG = {
     .logger.level               = LOGGER_LEVEL_WARNING,        // Log level
     .logger.file                = "",                          // Write log to file
     
+    // [osd]
+    .osd.enable                 = false,                       // Enable On-Screen Display (OSD)
+    
     // [video]
     .video.primary_enable       = true,                        // Enable video for primary channel
     .video.secondary_enable     = true,                        // Enable video for secondary channel
@@ -87,6 +90,10 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
         config->logger.level = atoi(value);
     } else if(MATCH("logger", "file")) {
         config->logger.file = strdup(value);
+    
+    // [osd]
+    } else if(MATCH("osd", "enable")) {
+        config->osd.enable = atob(value);
     
     // [video]
     } else if(MATCH("video", "primary_enable")) {

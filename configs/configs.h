@@ -17,6 +17,11 @@ typedef struct {
         char* file;
     } logger;
 
+    // [osd]
+    struct {
+        bool enable;
+    } osd;
+
     // [video]
     struct {
         bool primary_enable;

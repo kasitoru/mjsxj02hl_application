@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "./video.h"
+#include "./../osd/osd.h"
 #include "./../localsdk.h"
 #include "./../../logger/logger.h"
 #include "./../../configs/configs.h"
@@ -54,7 +55,7 @@ bool video_init() {
                     .mirror      = APP_CFG.video.primary_mirror,
                     .unknown_5   = 0, // FIXME: what is it?
                     .video       = APP_CFG.video.primary_enable,
-                    .unknown_7   = 1, // FIXME: what is it?
+                    .osd         = APP_CFG.osd.enable,
                     .payload     = APP_CFG.video.primary_type,
                     .rcmode      = LOCALSDK_VIDEO_RCMODE_TYPE,
                     .gop         = 1 * LOCALSDK_VIDEO_FRAMERATE,
@@ -67,78 +68,63 @@ bool video_init() {
                     logger("video", "video_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_video_create(LOCALSDK_VIDEO_PRIMARY_CHANNEL)");
                     if(local_sdk_video_set_parameters(LOCALSDK_VIDEO_PRIMARY_CHANNEL, &primary_options) == LOCALSDK_OK) {
                         logger("video", "video_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_video_set_parameters(LOCALSDK_VIDEO_PRIMARY_CHANNEL)");
-                        LOCALSDK_OSD_OPTIONS osd_options = {
-                            .unknown_0 = 67, // FIXME: what is it?
-                            .unknown_1 = 48, // FIXME: what is it?
-                            .unknown_2 = 0, // FIXME: what is it?
-                            .unknown_3 = 1, // FIXME: what is it?
-                            .unknown_4 = 1, // FIXME: what is it?
-                            .unknown_5 = 2, // FIXME: what is it?
-                            .unknown_6 = 0, // FIXME: what is it?
-                            .unknown_7 = 1, // FIXME: what is it?
-                            .unknown_8 = 1, // FIXME: what is it?
-                        };
-                        if(local_sdk_video_osd_set_parameters(LOCALSDK_VIDEO_PRIMARY_CHANNEL, &osd_options) == LOCALSDK_OK) {
-                            logger("video", "video_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_video_osd_set_parameters(LOCALSDK_VIDEO_PRIMARY_CHANNEL)");
-                            if(local_sdk_video_set_encode_frame_callback(LOCALSDK_VIDEO_PRIMARY_CHANNEL, h26x_capture_primary_channel) == LOCALSDK_OK) {
-                                logger("video", "video_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_video_set_encode_frame_callback(LOCALSDK_VIDEO_PRIMARY_CHANNEL)");
-                                if(local_sdk_video_start(LOCALSDK_VIDEO_PRIMARY_CHANNEL) == LOCALSDK_OK) {
-                                    logger("video", "video_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_video_start(LOCALSDK_VIDEO_PRIMARY_CHANNEL)");
-                                    if(local_sdk_video_run(LOCALSDK_VIDEO_PRIMARY_CHANNEL) == LOCALSDK_OK) {
-                                        logger("video", "video_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_video_run(LOCALSDK_VIDEO_PRIMARY_CHANNEL)");
-                                        // Init channel 1
-                                        int secondary_resolution_type;
-                                        LOCALSDK_PICTURE_SIZE secondary_picture_size;
-                                        if(inner_change_resulu_type(LOCALSDK_VIDEO_RESOLUTION_640x360, &secondary_resolution_type) == LOCALSDK_OK) {
-                                            logger("video", "video_init", LOGGER_LEVEL_INFO, "%s success.", "inner_change_resulu_type(LOCALSDK_VIDEO_RESOLUTION_640x360)");
-                                            if(SAMPLE_COMM_SYS_GetPicSize(secondary_resolution_type, &secondary_picture_size) == LOCALSDK_OK) {
-                                                logger("video", "video_init", LOGGER_LEVEL_INFO, "%s success.", "SAMPLE_COMM_SYS_GetPicSize(LOCALSDK_VIDEO_RESOLUTION_640x360)");
-                                                LOCALSDK_VIDEO_OPTIONS secondary_options = {
-                                                    .bitrate     = APP_CFG.video.secondary_bitrate,
-                                                    .fps         = LOCALSDK_VIDEO_FRAMERATE,
-                                                    .resolution  = LOCALSDK_VIDEO_RESOLUTION_640x360,
-                                                    .flip        = APP_CFG.video.secondary_flip,
-                                                    .mirror      = APP_CFG.video.secondary_mirror,
-                                                    .unknown_5   = 1, // FIXME: what is it?
-                                                    .video       = APP_CFG.video.secondary_enable,
-                                                    .unknown_7   = 0, // FIXME: what is it?
-                                                    .payload     = APP_CFG.video.secondary_type,
-                                                    .rcmode      = LOCALSDK_VIDEO_RCMODE_TYPE,
-                                                    .gop         = 1 * LOCALSDK_VIDEO_FRAMERATE,
-                                                    .screen_size = secondary_picture_size.width * secondary_picture_size.height,
-                                                    .unknown_12  = 50000, // FIXME: what is it?
-                                                    .jpeg        = true,
-                                                    .unknown_14  = 1, // FIXME: what is it?
-                                                };
-                                                if(local_sdk_video_create(LOCALSDK_VIDEO_SECONDARY_CHANNEL, &secondary_options) == LOCALSDK_OK) {
-                                                    logger("video", "video_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_video_create(LOCALSDK_VIDEO_SECONDARY_CHANNEL)");
-                                                    if(local_sdk_video_set_parameters(LOCALSDK_VIDEO_SECONDARY_CHANNEL, &secondary_options) == LOCALSDK_OK) {
-                                                        logger("video", "video_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_video_set_parameters(LOCALSDK_VIDEO_SECONDARY_CHANNEL)");
-                                                        if(local_sdk_video_set_encode_frame_callback(LOCALSDK_VIDEO_SECONDARY_CHANNEL, h26x_capture_secondary_channel) == LOCALSDK_OK) {
-                                                            logger("video", "video_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_video_set_encode_frame_callback(LOCALSDK_VIDEO_SECONDARY_CHANNEL)");
-                                                            if(local_sdk_video_set_algo_module_register_callback(local_sdk_alarm_algo_module_register_callback) == LOCALSDK_OK) {
-                                                                logger("video", "video_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_video_set_algo_module_register_callback()");
-                                                                if(local_sdk_video_start(LOCALSDK_VIDEO_SECONDARY_CHANNEL) == LOCALSDK_OK) {
-                                                                    logger("video", "video_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_video_start(LOCALSDK_VIDEO_SECONDARY_CHANNEL)");
-                                                                    if(local_sdk_video_run(LOCALSDK_VIDEO_SECONDARY_CHANNEL) == LOCALSDK_OK) {
-                                                                        logger("video", "video_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_video_run(LOCALSDK_VIDEO_SECONDARY_CHANNEL)");
-                                                                        
-                                                                        logger("video", "video_init", LOGGER_LEVEL_DEBUG, "Function completed.");
-                                                                        return true;
-                                                                    } else logger("video", "video_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_video_run(LOCALSDK_VIDEO_SECONDARY_CHANNEL)");
-                                                                } else logger("video", "video_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_video_start(LOCALSDK_VIDEO_SECONDARY_CHANNEL)");
-                                                            } else logger("video", "video_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_video_set_algo_module_register_callback()");
-                                                        } else logger("video", "video_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_video_set_encode_frame_callback(LOCALSDK_VIDEO_SECONDARY_CHANNEL)");
-                                                    } else logger("video", "video_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_video_set_parameters(LOCALSDK_VIDEO_SECONDARY_CHANNEL)");
-                                                } else logger("video", "video_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_video_create(LOCALSDK_VIDEO_SECONDARY_CHANNEL)");
-                                            } else logger("video", "video_init", LOGGER_LEVEL_ERROR, "%s error!", "SAMPLE_COMM_SYS_GetPicSize(LOCALSDK_VIDEO_RESOLUTION_640x360)");
-                                        } else logger("video", "video_init", LOGGER_LEVEL_ERROR, "%s error!", "inner_change_resulu_type(LOCALSDK_VIDEO_RESOLUTION_640x360)");
-                                    } else logger("video", "video_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_video_run(LOCALSDK_VIDEO_PRIMARY_CHANNEL)");
-                                } else logger("video", "video_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_video_start(LOCALSDK_VIDEO_PRIMARY_CHANNEL)");
-                            } else logger("video", "video_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_video_set_encode_frame_callback(LOCALSDK_VIDEO_PRIMARY_CHANNEL)");
-                        } else logger("video", "video_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_video_osd_set_parameters(LOCALSDK_VIDEO_PRIMARY_CHANNEL)");
+                        if(local_sdk_video_set_encode_frame_callback(LOCALSDK_VIDEO_PRIMARY_CHANNEL, h26x_capture_primary_channel) == LOCALSDK_OK) {
+                            logger("video", "video_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_video_set_encode_frame_callback(LOCALSDK_VIDEO_PRIMARY_CHANNEL)");
+                            if(local_sdk_video_start(LOCALSDK_VIDEO_PRIMARY_CHANNEL) == LOCALSDK_OK) {
+                                logger("video", "video_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_video_start(LOCALSDK_VIDEO_PRIMARY_CHANNEL)");
+                                if(local_sdk_video_run(LOCALSDK_VIDEO_PRIMARY_CHANNEL) == LOCALSDK_OK) {
+                                    logger("video", "video_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_video_run(LOCALSDK_VIDEO_PRIMARY_CHANNEL)");
+                                    // Init channel 1
+                                    int secondary_resolution_type;
+                                    LOCALSDK_PICTURE_SIZE secondary_picture_size;
+                                    if(inner_change_resulu_type(LOCALSDK_VIDEO_RESOLUTION_640x360, &secondary_resolution_type) == LOCALSDK_OK) {
+                                        logger("video", "video_init", LOGGER_LEVEL_INFO, "%s success.", "inner_change_resulu_type(LOCALSDK_VIDEO_RESOLUTION_640x360)");
+                                        if(SAMPLE_COMM_SYS_GetPicSize(secondary_resolution_type, &secondary_picture_size) == LOCALSDK_OK) {
+                                            logger("video", "video_init", LOGGER_LEVEL_INFO, "%s success.", "SAMPLE_COMM_SYS_GetPicSize(LOCALSDK_VIDEO_RESOLUTION_640x360)");
+                                            LOCALSDK_VIDEO_OPTIONS secondary_options = {
+                                                .bitrate     = APP_CFG.video.secondary_bitrate,
+                                                .fps         = LOCALSDK_VIDEO_FRAMERATE,
+                                                .resolution  = LOCALSDK_VIDEO_RESOLUTION_640x360,
+                                                .flip        = APP_CFG.video.secondary_flip,
+                                                .mirror      = APP_CFG.video.secondary_mirror,
+                                                .unknown_5   = 1, // FIXME: what is it?
+                                                .video       = APP_CFG.video.secondary_enable,
+                                                .osd         = false, // Not work for secondary channel
+                                                .payload     = APP_CFG.video.secondary_type,
+                                                .rcmode      = LOCALSDK_VIDEO_RCMODE_TYPE,
+                                                .gop         = 1 * LOCALSDK_VIDEO_FRAMERATE,
+                                                .screen_size = secondary_picture_size.width * secondary_picture_size.height,
+                                                .unknown_12  = 50000, // FIXME: what is it? oldExp=1928067
+                                                .jpeg        = true,
+                                                .unknown_14  = 1, // FIXME: what is it?
+                                            };
+                                            if(local_sdk_video_create(LOCALSDK_VIDEO_SECONDARY_CHANNEL, &secondary_options) == LOCALSDK_OK) {
+                                                logger("video", "video_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_video_create(LOCALSDK_VIDEO_SECONDARY_CHANNEL)");
+                                                if(local_sdk_video_set_parameters(LOCALSDK_VIDEO_SECONDARY_CHANNEL, &secondary_options) == LOCALSDK_OK) {
+                                                    logger("video", "video_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_video_set_parameters(LOCALSDK_VIDEO_SECONDARY_CHANNEL)");
+                                                    if(local_sdk_video_set_encode_frame_callback(LOCALSDK_VIDEO_SECONDARY_CHANNEL, h26x_capture_secondary_channel) == LOCALSDK_OK) {
+                                                        logger("video", "video_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_video_set_encode_frame_callback(LOCALSDK_VIDEO_SECONDARY_CHANNEL)");
+                                                        if(local_sdk_video_set_algo_module_register_callback(local_sdk_alarm_algo_module_register_callback) == LOCALSDK_OK) {
+                                                            logger("video", "video_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_video_set_algo_module_register_callback()");
+                                                            if(local_sdk_video_start(LOCALSDK_VIDEO_SECONDARY_CHANNEL) == LOCALSDK_OK) {
+                                                                logger("video", "video_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_video_start(LOCALSDK_VIDEO_SECONDARY_CHANNEL)");
+                                                                if(local_sdk_video_run(LOCALSDK_VIDEO_SECONDARY_CHANNEL) == LOCALSDK_OK) {
+                                                                    logger("video", "video_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_video_run(LOCALSDK_VIDEO_SECONDARY_CHANNEL)");
+                                                                    
+                                                                    logger("video", "video_init", LOGGER_LEVEL_DEBUG, "Function completed.");
+                                                                    return true;
+                                                                } else logger("video", "video_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_video_run(LOCALSDK_VIDEO_SECONDARY_CHANNEL)");
+                                                            } else logger("video", "video_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_video_start(LOCALSDK_VIDEO_SECONDARY_CHANNEL)");
+                                                        } else logger("video", "video_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_video_set_algo_module_register_callback()");
+                                                    } else logger("video", "video_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_video_set_encode_frame_callback(LOCALSDK_VIDEO_SECONDARY_CHANNEL)");
+                                                } else logger("video", "video_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_video_set_parameters(LOCALSDK_VIDEO_SECONDARY_CHANNEL)");
+                                            } else logger("video", "video_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_video_create(LOCALSDK_VIDEO_SECONDARY_CHANNEL)");
+                                        } else logger("video", "video_init", LOGGER_LEVEL_ERROR, "%s error!", "SAMPLE_COMM_SYS_GetPicSize(LOCALSDK_VIDEO_RESOLUTION_640x360)");
+                                    } else logger("video", "video_init", LOGGER_LEVEL_ERROR, "%s error!", "inner_change_resulu_type(LOCALSDK_VIDEO_RESOLUTION_640x360)");
+                                } else logger("video", "video_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_video_run(LOCALSDK_VIDEO_PRIMARY_CHANNEL)");
+                            } else logger("video", "video_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_video_start(LOCALSDK_VIDEO_PRIMARY_CHANNEL)");
+                        } else logger("video", "video_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_video_set_encode_frame_callback(LOCALSDK_VIDEO_PRIMARY_CHANNEL)");
                     } else logger("video", "video_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_video_set_parameters(LOCALSDK_VIDEO_PRIMARY_CHANNEL)");
-
                 } else logger("video", "video_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_video_create(LOCALSDK_VIDEO_PRIMARY_CHANNEL)");
             } else logger("video", "video_init", LOGGER_LEVEL_ERROR, "%s error!", "SAMPLE_COMM_SYS_GetPicSize(LOCALSDK_VIDEO_RESOLUTION_1920x1080)");
         } else logger("video", "video_init", LOGGER_LEVEL_ERROR, "%s error!", "inner_change_resulu_type(LOCALSDK_VIDEO_RESOLUTION_1920x1080)");

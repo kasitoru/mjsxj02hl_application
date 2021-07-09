@@ -13,7 +13,7 @@ all: mkdirs mjsxj02hl
 mjsxj02hl: ./mjsxj02hl.c objects install-lib
 	$(CC) $(CCFLAGS) -L$(LDPATH) ./mjsxj02hl.c $(OUTPUT)/objects/*.o $(LDFLAGS) -o $(OUTPUT)/mjsxj02hl
 
-objects: logger.o init.o configs.o inih.o video.o audio.o speaker.o alarm.o night.o mqtt.o rtsp.o
+objects: logger.o init.o configs.o inih.o osd.o video.o audio.o speaker.o alarm.o night.o mqtt.o rtsp.o
 
 logger.o: ./logger/logger.c
 	$(CC) $(CCFLAGS) -c ./logger/logger.c -o $(OUTPUT)/objects/logger.o
@@ -26,6 +26,9 @@ inih.o: ./configs/inih/ini.c
 
 init.o: ./localsdk/init.c
 	$(CC) $(CCFLAGS) -c ./localsdk/init.c -o $(OUTPUT)/objects/init.o
+
+osd.o: ./localsdk/osd/osd.c
+	$(CC) $(CCFLAGS) -c ./localsdk/osd/osd.c -o $(OUTPUT)/objects/osd.o
 
 video.o: ./localsdk/video/video.c
 	$(CC) $(CCFLAGS) -c ./localsdk/video/video.c -o $(OUTPUT)/objects/video.o

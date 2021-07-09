@@ -81,7 +81,7 @@ typedef struct {
     uint32_t mirror;
     uint32_t unknown_5; // FIXME: what is it?
     uint32_t video;
-    uint32_t unknown_7; // FIXME: what is it?
+    uint32_t osd;
     uint32_t payload;
     uint32_t rcmode;
     uint32_t gop;
@@ -146,10 +146,14 @@ typedef struct {
 // Set osd parameters
 int local_sdk_video_osd_set_parameters(int chn, LOCALSDK_OSD_OPTIONS *options);
 
+// Displaying the brand logo (MI)
+int local_sdk_video_osd_update_logo(int chn, bool state);
+
+// Displaying date and time
+int local_sdk_video_osd_update_timestamp(int chn, bool state, struct tm *timestamp);
+
 // TODO:
-int local_sdk_video_osd_update_logo(int param_1, unsigned int param_2);
-int local_sdk_video_osd_update_rect_multi(int param_1, int param_2, int *param_3);
-int local_sdk_video_osd_update_timestamp(int param_1, int param_2, struct tm * timeptr);
+int local_sdk_video_osd_update_rect_multi(int chn, bool state, int *param_3);
 
 /********************
         AUDIO

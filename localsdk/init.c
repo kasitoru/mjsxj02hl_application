@@ -9,6 +9,7 @@
 
 #include "./init.h"
 #include "./localsdk.h"
+#include "./osd/osd.h"
 #include "./video/video.h"
 #include "./audio/audio.h"
 #include "./speaker/speaker.h"
@@ -57,25 +58,28 @@ bool all_init() {
             if(localsdk_init() == LOCALSDK_OK) {
                 logger("localsdk-init", "all_init", LOGGER_LEVEL_INFO, "%s success.", "localsdk_init()");
                 if(localsdk_get_version() == LOCALSDK_CURRENT_VERSION) {
-                    logger("localsdk-init", "all_init", LOGGER_LEVEL_INFO, "%s success.", "localsdk_get_version()");
-                    if(video_init()) {
-                        logger("localsdk-init", "all_init", LOGGER_LEVEL_INFO, "%s success.", "video_init()");
-                        if(audio_init()) {
-                            logger("localsdk-init", "all_init", LOGGER_LEVEL_INFO, "%s success.", "audio_init()");
-                            if(speaker_init()) {
-                                logger("localsdk-init", "all_init", LOGGER_LEVEL_INFO, "%s success.", "speaker_init()");
-                                if(alarm_init()) {
-                                    logger("localsdk-init", "all_init", LOGGER_LEVEL_INFO, "%s success.", "alarm_init()");
-                                    if(night_init()) {
-                                        logger("localsdk-init", "all_init", LOGGER_LEVEL_INFO, "%s success.", "night_init()");
-                                        
-                                        logger("localsdk-init", "all_init", LOGGER_LEVEL_DEBUG, "Function completed.");
-                                        return true;
-                                    } else logger("localsdk-init", "all_init", LOGGER_LEVEL_ERROR, "%s error!", "night_init()");
-                                } else logger("localsdk-init", "all_init", LOGGER_LEVEL_ERROR, "%s error!", "alarm_init()");
-                            } else logger("localsdk-init", "all_init", LOGGER_LEVEL_ERROR, "%s error!", "speaker_init()");
-                        } else logger("localsdk-init", "all_init", LOGGER_LEVEL_ERROR, "%s error!", "audio_init()");
-                    } else logger("localsdk-init", "all_init", LOGGER_LEVEL_ERROR, "%s error!", "video_init()");
+                    logger("localsdk-init", "all_init", LOGGER_LEVEL_INFO, "%s success.", "video_init()");
+                    if(osd_init()) {
+                        logger("localsdk-init", "all_init", LOGGER_LEVEL_INFO, "%s success.", "localsdk_get_version()");
+                        if(video_init()) {
+                            logger("localsdk-init", "all_init", LOGGER_LEVEL_INFO, "%s success.", "osd_init()");
+                            if(audio_init()) {
+                                logger("localsdk-init", "all_init", LOGGER_LEVEL_INFO, "%s success.", "audio_init()");
+                                if(speaker_init()) {
+                                    logger("localsdk-init", "all_init", LOGGER_LEVEL_INFO, "%s success.", "speaker_init()");
+                                    if(alarm_init()) {
+                                        logger("localsdk-init", "all_init", LOGGER_LEVEL_INFO, "%s success.", "alarm_init()");
+                                        if(night_init()) {
+                                            logger("localsdk-init", "all_init", LOGGER_LEVEL_INFO, "%s success.", "night_init()");
+                                            
+                                            logger("localsdk-init", "all_init", LOGGER_LEVEL_DEBUG, "Function completed.");
+                                            return true;
+                                        } else logger("localsdk-init", "all_init", LOGGER_LEVEL_ERROR, "%s error!", "night_init()");
+                                    } else logger("localsdk-init", "all_init", LOGGER_LEVEL_ERROR, "%s error!", "alarm_init()");
+                                } else logger("localsdk-init", "all_init", LOGGER_LEVEL_ERROR, "%s error!", "speaker_init()");
+                            } else logger("localsdk-init", "all_init", LOGGER_LEVEL_ERROR, "%s error!", "audio_init()");
+                        } else logger("localsdk-init", "all_init", LOGGER_LEVEL_ERROR, "%s error!", "video_init()");
+                    } else logger("localsdk-init", "all_init", LOGGER_LEVEL_ERROR, "%s error!", "osd_init()");
                 } else logger("localsdk-init", "all_init", LOGGER_LEVEL_ERROR, "%s error!", "localsdk_get_version()");
             } else logger("localsdk-init", "all_init", LOGGER_LEVEL_ERROR, "%s error!", "localsdk_init()");
         //} else logger("localsdk-init", "all_init", LOGGER_LEVEL_ERROR, "%s error!", "localsdk_set_shellcall_func()");
@@ -121,6 +125,14 @@ bool all_free() {
         logger("localsdk-init", "all_free", LOGGER_LEVEL_INFO, "%s success.", "audio_free()");
     } else {
         logger("localsdk-init", "all_free", LOGGER_LEVEL_WARNING, "%s error!", "audio_free()");
+        result = false;
+    }
+    
+    // Free OSD
+    if(osd_free()) {
+        logger("localsdk-init", "all_free", LOGGER_LEVEL_INFO, "%s success.", "osd_free()");
+    } else {
+        logger("localsdk-init", "all_free", LOGGER_LEVEL_WARNING, "%s error!", "osd_free()");
         result = false;
     }
     
