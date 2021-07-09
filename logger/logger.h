@@ -11,4 +11,7 @@
 // Add message to log
 int logger(const char *module, const char *function, const int level, const char *format, ...);
 
+// Hexdump of memory
+int logger_memory(const char *description, const int level, const void *address, const int length, int width);
+
 #endif
