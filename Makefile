@@ -3,6 +3,7 @@ CCFLAGS = -march=armv7-a -mfpu=neon-vfpv4 -funsafe-math-optimizations
 LDPATH = /opt/hisi-linux/x86-arm/arm-himix100-linux/target/usr/app/lib
 
 CC  = $(CROSS_COMPILE)gcc
+CXX = $(CROSS_COMPILE)g++
 
 LDFLAGS = -pthread -llocalsdk -l_hiae -livp -live -lmpi -lmd -l_hiawb -lisp -lsecurec -lsceneauto -lVoiceEngine -lupvqe -l_hidehaze -l_hidrc -l_hildci -ldnvqe -lsns_f22 -lpaho-mqtt3c -lyyjson -lrtspserver -lstdc++
 
@@ -10,10 +11,23 @@ OUTPUT = ./bin
 
 all: mkdirs mjsxj02hl
 
-mjsxj02hl: ./mjsxj02hl.c objects install-lib
+mjsxj02hl: ./mjsxj02hl.c lib install-lib objects
 	$(CC) $(CCFLAGS) -L$(LDPATH) ./mjsxj02hl.c $(OUTPUT)/objects/*.o $(LDFLAGS) -o $(OUTPUT)/mjsxj02hl
 
 objects: logger.o init.o configs.o inih.o osd.o video.o audio.o speaker.o alarm.o night.o mqtt.o rtsp.o
+
+lib: libyyjson.so librtspserver.so
+
+install-lib:
+	-cp -arf lib/. $(LDPATH)
+
+libyyjson.so:
+	cmake -S./yyjson -B$(OUTPUT)/objects/yyjson -DCMAKE_C_COMPILER=$(CC) -DCMAKE_C_FLAGS="$(CCFLAGS)" -DCMAKE_CXX_COMPILER=$(CXX) -DCMAKE_CXX_FLAGS="$(CCFLAGS)" -DBUILD_SHARED_LIBS=ON
+	make -C $(OUTPUT)/objects/yyjson
+	cp -f $(OUTPUT)/objects/yyjson/libyyjson.so lib/
+
+librtspserver.so:
+	make -C ./rtsp
 
 logger.o: ./logger/logger.c
 	$(CC) $(CCFLAGS) -c ./logger/logger.c -o $(OUTPUT)/objects/logger.o
@@ -48,20 +62,16 @@ night.o: ./localsdk/night/night.c
 mqtt.o: ./mqtt/mqtt.c
 	$(CC) $(CCFLAGS) -c ./mqtt/mqtt.c -o $(OUTPUT)/objects/mqtt.o
 
-librtspserver.so:
-	make -C ./rtsp
-
-rtsp.o: ./rtsp/rtsp.c librtspserver.so
+rtsp.o: ./rtsp/rtsp.c
 	$(CC) $(CCFLAGS) -c ./rtsp/rtsp.c -o $(OUTPUT)/objects/rtsp.o
-
-install-lib:
-	-cp -arf lib/. $(LDPATH)
 
 mkdirs: clean
 	mkdir -p $(OUTPUT)/objects
+	mkdir -p $(OUTPUT)/objects/yyjson
 	make BUILD_DIR -C ./rtsp
 
 clean:
+	-make clean -C $(OUTPUT)/objects/yyjson
 	make clean -C ./rtsp
 	rm -rf $(OUTPUT)/*
 
