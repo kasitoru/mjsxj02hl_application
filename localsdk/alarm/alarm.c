@@ -12,6 +12,13 @@
 
 static pthread_t timeout_thread;
 static int alarm_time_motion, alarm_time_humanoid;
+static struct {
+    char *type;
+    int x;
+    int y;
+    uint32_t width;
+    uint32_t height;
+} alarm_objects[LOCALSDK_ALARM_MAXIMUM_OBJECTS];
 
 // MQTT send info
 static bool alarm_state_mqtt(bool motion, bool humanoid) {
@@ -32,6 +39,8 @@ static bool alarm_state_mqtt(bool motion, bool humanoid) {
         // Current timestamp
         int timestamp = (int) time(NULL);
         yyjson_mut_obj_add_int(json_doc, json_root, "timestamp", timestamp);
+        // Objects info
+        // TODO: alarm_objects
         // Send it
         const char *json = yyjson_mut_write(json_doc, 0, NULL);
         if(json) {
@@ -139,8 +148,9 @@ static int alarm_state_callback(LOCALSDK_ALARM_EVENT_INFO *eventInfo) {
     int result = LOCALSDK_OK;
     // OSD rectangles callback
     result = osd_rectangles_callback(eventInfo);
-    // Remember the timestamps of events
+    // Getting information about the event
     if(eventInfo->state) {
+        // Remember the timestamps of events
         int current_timestamp = (int) time(NULL);
         switch(eventInfo->type) {
             case LOCALSDK_ALARM_TYPE_MOTION:
@@ -152,6 +162,18 @@ static int alarm_state_callback(LOCALSDK_ALARM_EVENT_INFO *eventInfo) {
             default:
                 logger("alarm", "alarm_state_callback", LOGGER_LEVEL_INFO, "Change %s status: %d", "unknown", eventInfo->state);
                 result = LOCALSDK_ERROR;
+        }
+        // Remember information about objects
+        int counter = 0;
+        for(int i=0;i<LOCALSDK_ALARM_MAXIMUM_OBJECTS;i++) {
+            if(eventInfo->objects[i].state) {
+                alarm_objects[counter].type = (eventInfo->objects[i].type == LOCALSDK_ALARM_TYPE_MOTION ? "motion" : "humanoid");
+                alarm_objects[counter].x = eventInfo->objects[i].x;
+                alarm_objects[counter].y = eventInfo->objects[i].y;
+                alarm_objects[counter].width = eventInfo->objects[i].width;
+                alarm_objects[counter].height = eventInfo->objects[i].height;
+                counter++;
+            }
         }
     }
     return result;
