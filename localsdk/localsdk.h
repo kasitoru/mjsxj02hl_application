@@ -264,9 +264,9 @@ typedef struct {
 } LOCALSDK_ALARM_OBJECT_INFO;
 
 typedef struct {
-    uint32_t unknown_1; // FIXME: what is it?
+    uint32_t _state;
+    uint32_t _type;
     uint32_t type; // type (motion/humanoid)
-    uint32_t unknown_3; // FIXME: what is it?
     uint32_t state; // state (start/stop)
     LOCALSDK_ALARM_OBJECT_INFO object; // coordinates
     uint32_t unknown_9; // FIXME: what is it?
