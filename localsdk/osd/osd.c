@@ -121,7 +121,7 @@ bool osd_free() {
             }
         }
         // Rectangle(s)
-        if(APP_CFG.osd.rectangles) {
+        if(APP_CFG.osd.motion || APP_CFG.osd.humanoid) {
             // Hide
             if(local_sdk_video_osd_update_rect_multi(LOCALSDK_VIDEO_PRIMARY_CHANNEL, false, NULL) == LOCALSDK_OK) {
                 logger("osd", "osd_free", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_video_osd_update_rect_multi()");
@@ -138,8 +138,30 @@ bool osd_free() {
 // Rectangles callback
 int osd_rectangles_callback(LOCALSDK_ALARM_EVENT_INFO *eventInfo) {
     if(APP_CFG.osd.enable) {
-        if(APP_CFG.osd.rectangles) {
-            // TODO
+        if(APP_CFG.osd.motion || APP_CFG.osd.humanoid) {
+            LOCALSDK_OSD_RECTANGLES rectangles;
+            rectangles.count = 0;
+            for(int i=0;i<LOCALSDK_ALARM_MAXIMUM_OBJECTS;i++) {
+                if((APP_CFG.osd.motion && eventInfo->objects[i].type == LOCALSDK_ALARM_TYPE_MOTION)
+                  ||
+                  (APP_CFG.osd.humanoid && eventInfo->objects[i].type == LOCALSDK_ALARM_TYPE_HUMANOID)
+                ) {
+                    if(eventInfo->objects[i].state) {
+                        rectangles.count++;
+                        rectangles.objects[rectangles.count-1].x = eventInfo->objects[i].x;
+                        rectangles.objects[rectangles.count-1].y = eventInfo->objects[i].y;
+                        rectangles.objects[rectangles.count-1].width = eventInfo->objects[i].width;
+                        rectangles.objects[rectangles.count-1].height = eventInfo->objects[i].height;
+                        rectangles.objects[rectangles.count-1].unknown = 1;
+                        if(eventInfo->objects[i].type == LOCALSDK_ALARM_TYPE_HUMANOID) {
+                            rectangles.objects[rectangles.count-1].color = LOCALSDK_OSD_COLOR_ORANGE;
+                        } else {
+                            rectangles.objects[rectangles.count-1].color = LOCALSDK_OSD_COLOR_GREEN;
+                        }
+                    }
+                }
+            }
+            local_sdk_video_osd_update_rect_multi(LOCALSDK_VIDEO_PRIMARY_CHANNEL, true, &rectangles);
         }
     }
     return LOCALSDK_OK;

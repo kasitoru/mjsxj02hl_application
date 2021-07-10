@@ -49,7 +49,8 @@ file =                      ; Write log to file (empty for disable)
 enable = false              ; Enable On-Screen Display (OSD)
 oem_logo = true             ; Display OEM logo (MI)
 date_time = true            ; Display date and time
-rectangles = false          ; Display detected objects in rectangles
+motion = false              ; Display detected motions in rectangles
+humanoid = false            ; Display detected humanoids in rectangles
 
 [video]
 flip = false                ; Flip image (all channels)

@@ -22,7 +22,8 @@ typedef struct {
         bool enable;
         bool oem_logo;
         bool date_time;
-        bool rectangles;
+        bool motion;
+        bool humanoid;
     } osd;
 
     // [video]

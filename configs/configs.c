@@ -19,7 +19,8 @@ APPLICATION_CONFIGURATION APP_CFG = {
     .osd.enable                 = false,                       // Enable On-Screen Display (OSD)
     .osd.oem_logo               = true,                        // Display OEM logo (MI)
     .osd.date_time              = true,                        // Display date and time
-    .osd.rectangles             = false,                       // Display detected objects in rectangles
+    .osd.motion                 = false,                       // Display detected motions in rectangles
+    .osd.humanoid               = false,                       // Display detected humanoids in rectangles
     
     // [video]
     .video.flip                 = false,                       // Flip image (all channels)
@@ -99,8 +100,10 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
         config->osd.oem_logo = atob(value);
     } else if(MATCH("osd", "date_time")) {
         config->osd.date_time = atob(value);
-    } else if(MATCH("osd", "rectangles")) {
-        config->osd.rectangles = atob(value);
+    } else if(MATCH("osd", "motion")) {
+        config->osd.motion = atob(value);
+    } else if(MATCH("osd", "humanoid")) {
+        config->osd.humanoid = atob(value);
     
     // [video]
     } else if(MATCH("video", "flip")) {
