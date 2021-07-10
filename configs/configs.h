@@ -20,6 +20,9 @@ typedef struct {
     // [osd]
     struct {
         bool enable;
+        bool oem_logo;
+        bool date_time;
+        bool rectangles;
     } osd;
 
     // [video]

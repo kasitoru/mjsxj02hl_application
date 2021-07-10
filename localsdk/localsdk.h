@@ -277,7 +277,6 @@ typedef struct {
 int local_sdk_alarm_init(int width, int height);
 
 // Set alarm sensitivity (1...255)
-// Type: LOCALSDK_ALARM_MOTION or LOCALSDK_ALARM_HUMANOID
 int local_sdk_set_alarm_sensitivity(int type, int value);
 
 // Exit alarm
@@ -302,7 +301,6 @@ int local_sdk_alarm_state_clear_callback(int (*callback)(LOCALSDK_ALARM_EVENT_IN
 int local_sdk_set_alarm_network_state();
 
 // Set alarm switch
-// Type: LOCALSDK_ALARM_MOTION or LOCALSDK_ALARM_HUMANOID
 int local_sdk_set_alarm_switch(int type, bool state);
 
 /********************
@@ -329,7 +327,7 @@ typedef struct {
 // Set osd parameters
 int local_sdk_video_osd_set_parameters(int chn, LOCALSDK_OSD_OPTIONS *options);
 
-// Display brand logo (MI)
+// Display OEM logo (MI)
 int local_sdk_video_osd_update_logo(int chn, bool state);
 
 // Display date and time

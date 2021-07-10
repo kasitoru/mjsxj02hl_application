@@ -4,6 +4,7 @@
 
 #include "./alarm.h"
 #include "./../localsdk.h"
+#include "./../osd/osd.h"
 #include "./../../logger/logger.h"
 #include "./../../configs/configs.h"
 #include "./../../yyjson/src/yyjson.h"
@@ -186,14 +187,17 @@ bool alarm_init() {
                     if(local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_HUMANOID, APP_CFG.alarm.humanoid_sens) == LOCALSDK_OK) {
                         logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_HUMANOID)");
                         if(local_sdk_alarm_state_set_callback(alarm_state_callback) == LOCALSDK_OK) {
-                            logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_alarm_state_set_callback()");
-                            if(pthread_create(&timeout_thread, NULL, alarm_state_timeout, NULL) == 0) {
-                                logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "pthread_create(timeout_thread)");
-
-                                logger("alarm", "alarm_init", LOGGER_LEVEL_DEBUG, "Function completed.");
-                                return true;
-                            } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "pthread_create(timeout_thread)");
-                        } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_alarm_state_set_callback()");
+                            logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_alarm_state_set_callback(alarm_state_callback)");
+                            if(local_sdk_alarm_state_set_callback(osd_rectangles_callback) == LOCALSDK_OK) {
+                                logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_alarm_state_set_callback(osd_rectangles_callback)");
+                                if(pthread_create(&timeout_thread, NULL, alarm_state_timeout, NULL) == 0) {
+                                    logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "pthread_create(timeout_thread)");
+                                    
+                                    logger("alarm", "alarm_init", LOGGER_LEVEL_DEBUG, "Function completed.");
+                                    return true;
+                                } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "pthread_create(timeout_thread)");
+                            } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_alarm_state_set_callback(osd_rectangles_callback)");
+                        } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_alarm_state_set_callback(alarm_state_callback)");
                     } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_HUMANOID)");
                 } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_MOTION)");
             } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_alarm_init()");

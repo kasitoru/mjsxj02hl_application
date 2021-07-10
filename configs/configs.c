@@ -17,6 +17,9 @@ APPLICATION_CONFIGURATION APP_CFG = {
     
     // [osd]
     .osd.enable                 = false,                       // Enable On-Screen Display (OSD)
+    .osd.oem_logo               = true,                        // Display OEM logo (MI)
+    .osd.date_time              = true,                        // Display date and time
+    .osd.rectangles             = false,                       // Display detected objects in rectangles
     
     // [video]
     .video.primary_enable       = true,                        // Enable video for primary channel
@@ -94,6 +97,12 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
     // [osd]
     } else if(MATCH("osd", "enable")) {
         config->osd.enable = atob(value);
+    } else if(MATCH("osd", "oem_logo")) {
+        config->osd.oem_logo = atob(value);
+    } else if(MATCH("osd", "date_time")) {
+        config->osd.date_time = atob(value);
+    } else if(MATCH("osd", "rectangles")) {
+        config->osd.rectangles = atob(value);
     
     // [video]
     } else if(MATCH("video", "primary_enable")) {

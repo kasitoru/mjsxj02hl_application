@@ -45,6 +45,12 @@ led = true                  ; Enable onboard LED indicator
 level = 2                   ; Log level (0 = disable, 1 = error, 2 = warning, 3 = info, 4 = debug)
 file =                      ; Write log to file (empty for disable)
 
+[osd]
+enable = false              ; Enable On-Screen Display (OSD)
+oem_logo = true             ; Display OEM logo (MI)
+date_time = true            ; Display date and time
+rectangles = false          ; Display detected objects in rectangles
+
 [video]
 primary_enable = true       ; Enable video for primary channel
 secondary_enable = true     ; Enable video for secondary channel
