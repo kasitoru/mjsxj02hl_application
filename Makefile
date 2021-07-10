@@ -10,12 +10,36 @@ LDFLAGS = -pthread -llocalsdk -l_hiae -livp -live -lmpi -lmd -l_hiawb -lisp -lse
 OUTPUT = ./bin
 LIBDIR = ./lib
 
+###############
+# APPLICATION #
+###############
+
 all: mkdirs mjsxj02hl
 
-mjsxj02hl: ./mjsxj02hl.c update-libs build-libs install-libs objects
+mjsxj02hl: ./mjsxj02hl.c external-libs objects
 	$(CC) $(CCFLAGS) -L$(LDPATH) ./mjsxj02hl.c $(OUTPUT)/objects/*.o $(LDFLAGS) -o $(OUTPUT)/mjsxj02hl
 
-objects: logger.o init.o configs.o inih.o osd.o video.o audio.o speaker.o alarm.o night.o mqtt.o rtsp.o
+#################
+# EXTERNAL LIBS #
+#################
+
+ifndef SKIP_EXTERNAL_LIBS
+external-libs: clean-libs mkdir-libs update-libs build-libs install-libs
+else
+external-libs:
+endif
+
+clean-libs:
+	-make clean OUTPUT="../$(OUTPUT)" LIBDIR="../$(LIBDIR)" -C ./rtsp
+	-make clean -C $(OUTPUT)/objects/paho.mqtt.c
+	-make clean -C $(OUTPUT)/objects/yyjson
+	-rm -rf $(LIBDIR)/*
+
+mkdir-libs:
+	-mkdir -p $(LIBDIR)
+	-mkdir -p $(OUTPUT)/objects/yyjson
+	-mkdir -p $(OUTPUT)/objects/paho.mqtt.c
+	-make BUILD_DIR OUTPUT="../$(OUTPUT)" LIBDIR="../$(LIBDIR)" -C ./rtsp
 
 update-libs:
 	git pull --recurse-submodules
@@ -39,6 +63,12 @@ libpaho-mqtt3c.so:
 
 librtspserver.so:
 	make -C ./rtsp
+
+#######################
+# APPLICATION OBJECTS #
+#######################
+
+objects: logger.o init.o configs.o inih.o osd.o video.o audio.o speaker.o alarm.o night.o mqtt.o rtsp.o
 
 logger.o: ./logger/logger.c
 	$(CC) $(CCFLAGS) -c ./logger/logger.c -o $(OUTPUT)/objects/logger.o
@@ -76,16 +106,8 @@ mqtt.o: ./mqtt/mqtt.c
 rtsp.o: ./rtsp/rtsp.c
 	$(CC) $(CCFLAGS) -c ./rtsp/rtsp.c -o $(OUTPUT)/objects/rtsp.o
 
-mkdirs: clean
-	-mkdir -p $(LIBDIR)
-	-mkdir -p $(OUTPUT)/objects
-	-mkdir -p $(OUTPUT)/objects/yyjson
-	-mkdir -p $(OUTPUT)/objects/paho.mqtt.c
-	-make BUILD_DIR OUTPUT="../$(OUTPUT)" LIBDIR="../$(LIBDIR)" -C ./rtsp
-
 clean:
-	-make clean OUTPUT="../$(OUTPUT)" LIBDIR="../$(LIBDIR)" -C ./rtsp
-	-make clean -C $(OUTPUT)/objects/paho.mqtt.c
-	-make clean -C $(OUTPUT)/objects/yyjson
 	-rm -rf $(OUTPUT)/*
-	-rm -rf $(LIBDIR)/*
+
+mkdirs: clean
+	-mkdir -p $(OUTPUT)/objects

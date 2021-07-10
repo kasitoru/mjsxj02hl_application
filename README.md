@@ -33,6 +33,12 @@ sudo chmod 755 /opt/hisi-linux/x86-arm/arm-himix100-linux/target/usr/app/lib
 make
 ```
 
+To save time, you can disable the build of external libraries:
+
+```bash
+make SKIP_EXTERNAL_LIBS=ON
+```
+
 ## Configuration
 
 Default config `/usr/app/share/mjsxj02hl.conf`:
