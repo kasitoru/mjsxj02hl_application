@@ -12,14 +12,18 @@ LIBDIR = ./lib
 
 all: mkdirs mjsxj02hl
 
-mjsxj02hl: ./mjsxj02hl.c lib install-lib objects
+mjsxj02hl: ./mjsxj02hl.c update-libs build-libs install-libs objects
 	$(CC) $(CCFLAGS) -L$(LDPATH) ./mjsxj02hl.c $(OUTPUT)/objects/*.o $(LDFLAGS) -o $(OUTPUT)/mjsxj02hl
 
 objects: logger.o init.o configs.o inih.o osd.o video.o audio.o speaker.o alarm.o night.o mqtt.o rtsp.o
 
-lib: libyyjson.so libpaho-mqtt3c.so librtspserver.so
+update-libs:
+	git pull --recurse-submodules
+	git submodule update --remote --recursive
 
-install-lib:
+build-libs: libyyjson.so libpaho-mqtt3c.so librtspserver.so
+
+install-libs:
 	-cp -arf $(LIBDIR)/. $(LDPATH)
 
 libyyjson.so:
