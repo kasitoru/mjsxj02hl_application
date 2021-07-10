@@ -37,4 +37,4 @@ $(OBJS_PATH)/%.o : ./RtspServer/src/xop/%.cpp
 	$(CXX) -c  $< -o  $@  $(CXX_FLAGS) $(INC)
 
 clean:
-	-rm -rf $(OBJS_PATH) $(TARGET)
+	-rm -rf $(OBJS_PATH)
