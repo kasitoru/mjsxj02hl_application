@@ -22,16 +22,14 @@ APPLICATION_CONFIGURATION APP_CFG = {
     .osd.rectangles             = false,                       // Display detected objects in rectangles
     
     // [video]
+    .video.flip                 = false,                       // Flip image (all channels)
+    .video.mirror               = false,                       // Mirror image (all channels)
     .video.primary_enable       = true,                        // Enable video for primary channel
     .video.secondary_enable     = true,                        // Enable video for secondary channel
     .video.primary_type         = LOCALSDK_VIDEO_PAYLOAD_H265, // Video compression standard for primary channel
     .video.secondary_type       = LOCALSDK_VIDEO_PAYLOAD_H264, // Video compression standard for secondary channel
     .video.primary_bitrate      = 8000,                        // Bitrate for primary channel
     .video.secondary_bitrate    = 1200,                        // Bitrate for secondary channel
-    .video.primary_flip         = false,                       // Flip image for primary channel
-    .video.secondary_flip       = false,                       // Flip image for secondary channel
-    .video.primary_mirror       = false,                       // Mirror image for primary channel
-    .video.secondary_mirror     = false,                       // Mirror image for secondary channel
 
     // [audio]
     .audio.volume               = 70,                          // Volume (0-100)
@@ -105,6 +103,10 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
         config->osd.rectangles = atob(value);
     
     // [video]
+    } else if(MATCH("video", "flip")) {
+        config->video.flip = atob(value);
+    } else if(MATCH("video", "mirror")) {
+        config->video.mirror = atob(value);
     } else if(MATCH("video", "primary_enable")) {
         config->video.primary_enable = atob(value);
     } else if(MATCH("video", "secondary_enable")) {
@@ -117,14 +119,6 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
         config->video.primary_bitrate = atoi(value);
     } else if(MATCH("video", "secondary_bitrate")) {
         config->video.secondary_bitrate = atoi(value);
-    } else if(MATCH("video", "primary_flip")) {
-        config->video.primary_flip = atob(value);
-    } else if(MATCH("video", "secondary_flip")) {
-        config->video.secondary_flip = atob(value);
-    } else if(MATCH("video", "primary_mirror")) {
-        config->video.primary_mirror = atob(value);
-    } else if(MATCH("video", "secondary_mirror")) {
-        config->video.secondary_mirror = atob(value);
 
     // [audio]
     } else if(MATCH("audio", "volume")) {

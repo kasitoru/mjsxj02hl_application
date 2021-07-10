@@ -52,16 +52,14 @@ date_time = true            ; Display date and time
 rectangles = false          ; Display detected objects in rectangles
 
 [video]
+flip = false                ; Flip image (all channels)
+mirror = false              ; Mirror image (all channels)
 primary_enable = true       ; Enable video for primary channel
 secondary_enable = true     ; Enable video for secondary channel
 primary_type = 1            ; Video compression standard for primary channel (1 = h264, 2 = h265)
 secondary_type = 1          ; Video compression standard for secondary channel (1 = h264, 2 = h265)
 primary_bitrate = 8000      ; Bitrate for primary channel
 secondary_bitrate = 1200    ; Bitrate for secondary channel
-primary_flip = false        ; Flip image for primary channel
-secondary_flip = false      ; Flip image for secondary channel
-primary_mirror = false      ; Mirror image for primary channel
-secondary_mirror = false    ; Mirror image for secondary channel
 
 [audio]
 volume = 70                 ; Audio volume level (0-100)

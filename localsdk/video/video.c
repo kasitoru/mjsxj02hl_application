@@ -51,8 +51,8 @@ bool video_init() {
                     .bitrate     = APP_CFG.video.primary_bitrate,
                     .fps         = LOCALSDK_VIDEO_FRAMERATE,
                     .resolution  = LOCALSDK_VIDEO_RESOLUTION_1920x1080,
-                    .flip        = APP_CFG.video.primary_flip,
-                    .mirror      = APP_CFG.video.primary_mirror,
+                    .flip        = APP_CFG.video.flip,
+                    .mirror      = APP_CFG.video.mirror,
                     .unknown_5   = 0, // FIXME: what is it?
                     .video       = APP_CFG.video.primary_enable,
                     .osd         = APP_CFG.osd.enable,
@@ -87,8 +87,8 @@ bool video_init() {
                                                     .bitrate     = APP_CFG.video.secondary_bitrate,
                                                     .fps         = LOCALSDK_VIDEO_FRAMERATE,
                                                     .resolution  = LOCALSDK_VIDEO_RESOLUTION_640x360,
-                                                    .flip        = APP_CFG.video.secondary_flip,
-                                                    .mirror      = APP_CFG.video.secondary_mirror,
+                                                    .flip        = APP_CFG.video.flip,
+                                                    .mirror      = APP_CFG.video.mirror,
                                                     .unknown_5   = 1, // FIXME: what is it?
                                                     .video       = APP_CFG.video.secondary_enable,
                                                     .osd         = false, // Not work for secondary channel
