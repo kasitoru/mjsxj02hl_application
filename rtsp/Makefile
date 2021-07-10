@@ -1,8 +1,11 @@
 ﻿DEBUG = -D_DEBUG
 
-TARGET = ../lib/librtspserver.so
+OUTPUT = ../bin
+LIBDIR = ../lib
 
-OBJS_PATH = ../bin/objects/librtspserver
+TARGET = $(LIBDIR)/librtspserver.so
+
+OBJS_PATH = $(OUTPUT)/objects/librtspserver
 
 CROSS_COMPILE = arm-himix100-linux-
 CXX   = $(CROSS_COMPILE)g++

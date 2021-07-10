@@ -8,6 +8,7 @@ CXX = $(CROSS_COMPILE)g++
 LDFLAGS = -pthread -llocalsdk -l_hiae -livp -live -lmpi -lmd -l_hiawb -lisp -lsecurec -lsceneauto -lVoiceEngine -lupvqe -l_hidehaze -l_hidrc -l_hildci -ldnvqe -lsns_f22 -lpaho-mqtt3c -lyyjson -lrtspserver -lstdc++
 
 OUTPUT = ./bin
+LIBDIR = ./lib
 
 all: mkdirs mjsxj02hl
 
@@ -19,17 +20,17 @@ objects: logger.o init.o configs.o inih.o osd.o video.o audio.o speaker.o alarm.
 lib: libyyjson.so libpaho-mqtt3c.so librtspserver.so
 
 install-lib:
-	-cp -arf lib/. $(LDPATH)
+	-cp -arf $(LIBDIR)/. $(LDPATH)
 
 libyyjson.so:
 	cmake -S./yyjson -B$(OUTPUT)/objects/yyjson -DCMAKE_C_COMPILER=$(CC) -DCMAKE_C_FLAGS="$(CCFLAGS)" -DCMAKE_CXX_COMPILER=$(CXX) -DCMAKE_CXX_FLAGS="$(CCFLAGS)" -DBUILD_SHARED_LIBS=ON
 	make -C $(OUTPUT)/objects/yyjson
-	cp -f $(OUTPUT)/objects/yyjson/libyyjson.so lib/
+	cp -f $(OUTPUT)/objects/yyjson/libyyjson.so $(LIBDIR)/
 
 libpaho-mqtt3c.so:
 	cmake -S./mqtt/paho.mqtt.c -B$(OUTPUT)/objects/paho.mqtt.c -DCMAKE_C_COMPILER=$(CC) -DCMAKE_C_FLAGS="$(CCFLAGS)"
 	make -C $(OUTPUT)/objects/paho.mqtt.c
-	cp -f $(OUTPUT)/objects/paho.mqtt.c/src/libpaho-mqtt3c.so lib/
+	cp -f $(OUTPUT)/objects/paho.mqtt.c/src/libpaho-mqtt3c.so $(LIBDIR)/
 
 librtspserver.so:
 	make -C ./rtsp
@@ -71,13 +72,15 @@ rtsp.o: ./rtsp/rtsp.c
 	$(CC) $(CCFLAGS) -c ./rtsp/rtsp.c -o $(OUTPUT)/objects/rtsp.o
 
 mkdirs: clean
-	mkdir -p $(OUTPUT)/objects
-	mkdir -p $(OUTPUT)/objects/yyjson
-	make BUILD_DIR -C ./rtsp
+	-mkdir -p $(LIBDIR)
+	-mkdir -p $(OUTPUT)/objects
+	-mkdir -p $(OUTPUT)/objects/yyjson
+	-mkdir -p $(OUTPUT)/objects/paho.mqtt.c
+	-make BUILD_DIR OUTPUT="../$(OUTPUT)" LIBDIR="../$(LIBDIR)" -C ./rtsp
 
 clean:
-	-make clean -C $(OUTPUT)/objects/yyjson
+	-make clean OUTPUT="../$(OUTPUT)" LIBDIR="../$(LIBDIR)" -C ./rtsp
 	-make clean -C $(OUTPUT)/objects/paho.mqtt.c
-	make clean -C ./rtsp
-	rm -rf $(OUTPUT)/*
-
+	-make clean -C $(OUTPUT)/objects/yyjson
+	-rm -rf $(OUTPUT)/*
+	-rm -rf $(LIBDIR)/*
