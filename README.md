@@ -59,8 +59,8 @@ primary_enable = true       ; Enable video for primary channel
 secondary_enable = true     ; Enable video for secondary channel
 primary_type = 2            ; Video compression standard for primary channel (1 = h264, 2 = h265)
 secondary_type = 1          ; Video compression standard for secondary channel (1 = h264, 2 = h265)
-primary_bitrate = 8000      ; Bitrate for primary channel
-secondary_bitrate = 1200    ; Bitrate for secondary channel
+primary_bitrate = 1800      ; Bitrate for primary channel
+secondary_bitrate = 900     ; Bitrate for secondary channel
 
 [audio]
 volume = 70                 ; Audio volume level (0-100)

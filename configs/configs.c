@@ -29,8 +29,8 @@ APPLICATION_CONFIGURATION APP_CFG = {
     .video.secondary_enable     = true,                        // Enable video for secondary channel
     .video.primary_type         = LOCALSDK_VIDEO_PAYLOAD_H265, // Video compression standard for primary channel
     .video.secondary_type       = LOCALSDK_VIDEO_PAYLOAD_H264, // Video compression standard for secondary channel
-    .video.primary_bitrate      = 8000,                        // Bitrate for primary channel
-    .video.secondary_bitrate    = 1200,                        // Bitrate for secondary channel
+    .video.primary_bitrate      = 1800,                        // Bitrate for primary channel
+    .video.secondary_bitrate    = 900,                         // Bitrate for secondary channel
 
     // [audio]
     .audio.volume               = 70,                          // Volume (0-100)
