@@ -253,24 +253,23 @@ int local_sdk_speaker_clean_buf_data();
         ALARM
 ********************/
 
-#define LOCALSDK_ALARM_MOTION   1
-#define LOCALSDK_ALARM_HUMANOID 7
+#define LOCALSDK_ALARM_TYPE_MOTION       1
+#define LOCALSDK_ALARM_TYPE_HUMANOID     7
+
+#define LOCALSDK_ALARM_MAXIMUM_OBJECTS   4
 
 typedef struct {
-    uint32_t x;
-    uint32_t width;
-    uint32_t y;
-    uint32_t height;
-} LOCALSDK_ALARM_OBJECT_INFO;
-
-typedef struct {
-    uint32_t _state;
-    uint32_t _type;
-    uint32_t type; // type (motion/humanoid)
-    uint32_t state; // state (start/stop)
-    LOCALSDK_ALARM_OBJECT_INFO object; // coordinates
-    uint32_t unknown_9; // FIXME: what is it?
-    uint32_t unknown_10; // FIXME: what is it?
+    uint32_t state;
+    uint32_t type;
+    struct {
+        uint32_t type;
+        uint32_t state;
+        uint32_t x;
+        uint32_t width;
+        uint32_t y;
+        uint32_t height;
+        uint32_t unknown[11]; // FIXME: what is it?
+    } objects[LOCALSDK_ALARM_MAXIMUM_OBJECTS];
 } LOCALSDK_ALARM_EVENT_INFO;
 
 // Init alarm
@@ -307,6 +306,9 @@ int local_sdk_set_alarm_switch(int type, bool state);
         OSD
 ********************/
 
+#define LOCALSDK_OSD_COLOR_GREEN  3
+#define LOCALSDK_OSD_COLOR_ORANGE 5
+
 typedef struct {
     uint32_t unknown_0; // FIXME: what is it?
     uint32_t unknown_1; // FIXME: what is it?
@@ -321,7 +323,14 @@ typedef struct {
 
 typedef struct {
     uint32_t count;
-    LOCALSDK_ALARM_OBJECT_INFO objects[8];
+    struct {
+        uint32_t x;
+        uint32_t width;
+        uint32_t y;
+        uint32_t height;
+        uint32_t unknown; // FIXME: what is it (always = 1)?
+        uint32_t color;
+    } objects[LOCALSDK_ALARM_MAXIMUM_OBJECTS];
 } LOCALSDK_OSD_RECTANGLES;
 
 // Set osd parameters

@@ -139,10 +139,10 @@ static int alarm_state_callback(LOCALSDK_ALARM_EVENT_INFO *eventInfo) {
     if(eventInfo->state) {
         int current_timestamp = (int) time(NULL);
         switch(eventInfo->type) {
-            case LOCALSDK_ALARM_MOTION:
+            case LOCALSDK_ALARM_TYPE_MOTION:
                 alarm_time_motion = current_timestamp;
                 break;
-            case LOCALSDK_ALARM_HUMANOID:
+            case LOCALSDK_ALARM_TYPE_HUMANOID:
                 alarm_time_humanoid = current_timestamp;
                 break;
             default:
@@ -158,15 +158,15 @@ bool alarm_switch(bool state) {
     logger("alarm", "alarm_switch", LOGGER_LEVEL_DEBUG, "Function is called...");
     logger("alarm", "alarm_switch", LOGGER_LEVEL_DEBUG, "State: %s", (state ? "true" : "false"));
     // Switch alarm for motion
-    if(local_sdk_set_alarm_switch(LOCALSDK_ALARM_MOTION, state) == LOCALSDK_OK) {
-        logger("alarm", "alarm_switch", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_set_alarm_switch(LOCALSDK_ALARM_MOTION)");
+    if(local_sdk_set_alarm_switch(LOCALSDK_ALARM_TYPE_MOTION, state) == LOCALSDK_OK) {
+        logger("alarm", "alarm_switch", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_set_alarm_switch(LOCALSDK_ALARM_TYPE_MOTION)");
         result = true;
-    } else logger("alarm", "alarm_switch", LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_set_alarm_switch(LOCALSDK_ALARM_MOTION)");
+    } else logger("alarm", "alarm_switch", LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_set_alarm_switch(LOCALSDK_ALARM_TYPE_MOTION)");
     // Switch alarm for humanoid
-    if(local_sdk_set_alarm_switch(LOCALSDK_ALARM_HUMANOID, state) == LOCALSDK_OK) {
-        logger("alarm", "alarm_switch", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_set_alarm_switch(LOCALSDK_ALARM_HUMANOID)");
+    if(local_sdk_set_alarm_switch(LOCALSDK_ALARM_TYPE_HUMANOID, state) == LOCALSDK_OK) {
+        logger("alarm", "alarm_switch", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_set_alarm_switch(LOCALSDK_ALARM_TYPE_HUMANOID)");
         result = true;
-    } else logger("alarm", "alarm_switch", LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_set_alarm_switch(LOCALSDK_ALARM_HUMANOID)");
+    } else logger("alarm", "alarm_switch", LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_set_alarm_switch(LOCALSDK_ALARM_TYPE_HUMANOID)");
     logger("alarm", "alarm_switch", LOGGER_LEVEL_DEBUG, "Function completed.");
     return result;
 }
@@ -182,10 +182,10 @@ bool alarm_init() {
             logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "SAMPLE_COMM_SYS_GetPicSize(LOCALSDK_VIDEO_RESOLUTION_640x360)");
             if(local_sdk_alarm_init(picture_size.width, picture_size.height) == LOCALSDK_OK) {
                 logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_alarm_init()");
-                if(local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_MOTION, APP_CFG.alarm.motion_sens) == LOCALSDK_OK) {
-                    logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_MOTION)");
-                    if(local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_HUMANOID, APP_CFG.alarm.humanoid_sens) == LOCALSDK_OK) {
-                        logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_HUMANOID)");
+                if(local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_TYPE_MOTION, APP_CFG.alarm.motion_sens) == LOCALSDK_OK) {
+                    logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_TYPE_MOTION)");
+                    if(local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_TYPE_HUMANOID, APP_CFG.alarm.humanoid_sens) == LOCALSDK_OK) {
+                        logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_TYPE_HUMANOID)");
                         if(local_sdk_alarm_state_set_callback(alarm_state_callback) == LOCALSDK_OK) {
                             logger("alarm", "alarm_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_alarm_state_set_callback(alarm_state_callback)");
                             if(local_sdk_alarm_state_set_callback(osd_rectangles_callback) == LOCALSDK_OK) {
@@ -198,8 +198,8 @@ bool alarm_init() {
                                 } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "pthread_create(timeout_thread)");
                             } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_alarm_state_set_callback(osd_rectangles_callback)");
                         } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_alarm_state_set_callback(alarm_state_callback)");
-                    } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_HUMANOID)");
-                } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_MOTION)");
+                    } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_TYPE_HUMANOID)");
+                } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_set_alarm_sensitivity(LOCALSDK_ALARM_TYPE_MOTION)");
             } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_alarm_init()");
         } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "SAMPLE_COMM_SYS_GetPicSize(LOCALSDK_VIDEO_RESOLUTION_640x360)");
     } else logger("alarm", "alarm_init", LOGGER_LEVEL_ERROR, "%s error!", "inner_change_resulu_type(LOCALSDK_VIDEO_RESOLUTION_640x360)");
