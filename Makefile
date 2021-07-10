@@ -31,6 +31,7 @@ libpaho-mqtt3c.so:
 	cmake -S./mqtt/paho.mqtt.c -B$(OUTPUT)/objects/paho.mqtt.c -DCMAKE_C_COMPILER=$(CC) -DCMAKE_C_FLAGS="$(CCFLAGS)"
 	make -C $(OUTPUT)/objects/paho.mqtt.c
 	cp -f $(OUTPUT)/objects/paho.mqtt.c/src/libpaho-mqtt3c.so $(LIBDIR)/
+	ln -s libpaho-mqtt3c.so $(LIBDIR)/libpaho-mqtt3c.so.1
 
 librtspserver.so:
 	make -C ./rtsp
