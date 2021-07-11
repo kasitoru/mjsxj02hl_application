@@ -203,7 +203,7 @@ bool night_free() {
     bool result = false;
     logger("night", "night_free", LOGGER_LEVEL_DEBUG, "Function is called...");
     // Disable night mode
-    if(local_sdk_close_ircut() == LOCALSDK_OK) { logger("night", "======", LOGGER_LEVEL_INFO, "OPENED");
+    if(local_sdk_close_ircut() == LOCALSDK_OK) {
         logger("night", "night_free", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_close_ircut()");
         if(local_sdk_close_night_light() == LOCALSDK_OK) {
             logger("night", "night_free", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_close_night_light()");
