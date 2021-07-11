@@ -20,6 +20,12 @@ extern "C"{
 // Set log printf function
 bool rtspserver_logprintf(int (*function)(const char*, ...));
 
+// Set connected callback function
+bool rtspserver_connected(void (*function)(uint32_t session_id, const char *peer_ip, uint16_t peer_port));
+
+// Set disconnected callback function
+bool rtspserver_disconnected(void (*function)(uint32_t session_id, const char *peer_ip, uint16_t peer_port));
+
 // Create RTSP server
 bool rtspserver_create(uint16_t port, char *username, char *password);
 

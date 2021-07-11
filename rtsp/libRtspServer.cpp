@@ -23,9 +23,29 @@ static int logprintf_default(const char *format, ...) {
 }
 static int (*logprintf_function)(const char*, ...) = logprintf_default;
 
+// Default connected callback function
+static void connected_default(uint32_t session_id, const char *peer_ip, uint16_t peer_port) { }
+static void (*connected_function)(uint32_t session_id, const char *peer_ip, uint16_t peer_port) = connected_default;
+
+// Default disconnected callback function
+static void disconnected_default(uint32_t session_id, const char *peer_ip, uint16_t peer_port) { }
+static void (*disconnected_function)(uint32_t session_id, const char *peer_ip, uint16_t peer_port) = disconnected_default;
+
 // Set log printf function
 bool rtspserver_logprintf(int (*function)(const char*, ...)) {
     logprintf_function = function;
+    return true;
+}
+
+// Set connected callback function
+bool rtspserver_connected(void (*function)(uint32_t session_id, const char *peer_ip, uint16_t peer_port)) {
+    connected_function = function;
+    return true;
+}
+
+// Set disconnected callback function
+bool rtspserver_disconnected(void (*function)(uint32_t session_id, const char *peer_ip, uint16_t peer_port)) {
+    disconnected_function = function;
     return true;
 }
 
@@ -90,9 +110,11 @@ uint32_t rtspserver_session(char *name, bool multicast, uint8_t video_type, uint
     // Callbacks
     session->AddNotifyConnectedCallback([] (xop::MediaSessionId session_id, std::string peer_ip, uint16_t peer_port) {
         logprintf_function("Client connected to media session #%d (IP = %s, port = %hu).", session_id, peer_ip.c_str(), peer_port);
+        connected_function(session_id, peer_ip.c_str(), peer_port);
     });
     session->AddNotifyDisconnectedCallback([](xop::MediaSessionId session_id, std::string peer_ip, uint16_t peer_port) {
         logprintf_function("Client disconnected from media session #%d (IP = %s, port = %hu).", session_id, peer_ip.c_str(), peer_port);
+        disconnected_function(session_id, peer_ip.c_str(), peer_port);
     });
     // Done
     xop::MediaSessionId session_id = rtsp_server->AddSession(session);
