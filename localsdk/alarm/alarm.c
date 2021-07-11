@@ -137,23 +137,25 @@ static void* alarm_state_timeout(void *args) {
 // Alarm callback
 static int alarm_state_callback(LOCALSDK_ALARM_EVENT_INFO *eventInfo) {
     int result = LOCALSDK_OK;
-    // OSD rectangles callback
-    result = osd_rectangles_callback(eventInfo);
-    // Remember the timestamps of events
-    if(eventInfo->state) {
-        int current_timestamp = (int) time(NULL);
-        switch(eventInfo->type) {
-            case LOCALSDK_ALARM_TYPE_MOTION:
-                alarm_time_motion = current_timestamp;
-                break;
-            case LOCALSDK_ALARM_TYPE_HUMANOID:
-                alarm_time_humanoid = current_timestamp;
-                break;
-            default:
-                logger("alarm", "alarm_state_callback", LOGGER_LEVEL_INFO, "Change %s status: %d", "unknown", eventInfo->state);
-                result = LOCALSDK_ERROR;
+    if(eventInfo) {
+        // OSD rectangles callback
+        result = osd_rectangles_callback(eventInfo);
+        // Remember the timestamps of events
+        if(eventInfo->state) {
+            int current_timestamp = (int) time(NULL);
+            switch(eventInfo->type) {
+                case LOCALSDK_ALARM_TYPE_MOTION:
+                    alarm_time_motion = current_timestamp;
+                    break;
+                case LOCALSDK_ALARM_TYPE_HUMANOID:
+                    alarm_time_humanoid = current_timestamp;
+                    break;
+                default:
+                    logger("alarm", "alarm_state_callback", LOGGER_LEVEL_INFO, "Change %s status: %d", "unknown", eventInfo->state);
+                    result = LOCALSDK_ERROR;
+            }
         }
-    }
+    } else result = LOCALSDK_ERROR;
     return result;
 }
 
