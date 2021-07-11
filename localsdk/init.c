@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "./init.h"
 #include "./localsdk.h"
@@ -38,10 +39,11 @@ char *firmware_version() {
     FILE *version_file;
     if(version_file = fopen("/usr/app/share/.version", "r")) {
         fseek(version_file, 0, SEEK_END);
-        long version_size = ftell(version_file) - 1;
+        long version_size = ftell(version_file);
         fseek(version_file, 0, SEEK_SET);
         firmware_version = malloc(version_size);
         fread(firmware_version, 1, version_size, version_file);
+        firmware_version[strcspn(firmware_version, "\r\n")] = 0;
         fclose(version_file);
     }
     return firmware_version;
