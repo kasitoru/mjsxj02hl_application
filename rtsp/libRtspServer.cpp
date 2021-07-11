@@ -142,8 +142,7 @@ bool rtspserver_frame(uint32_t session_id, signed char *data, uint8_t type, uint
         }
         return true;
     } else {
-        uint32_t offset = 0;
-        if(frame.type != xop::AUDIO_FRAME) { offset = 4; } // Skip 00 00 00 01
+        uint32_t offset = ((frame.type == xop::AUDIO_FRAME) ? 0 : 4); // Skip 00 00 00 01 (for video frames)
         frame.size = size - offset;
         frame.buffer.reset(new uint8_t[frame.size]);
         memcpy(frame.buffer.get(), data + offset, frame.size);
