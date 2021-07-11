@@ -126,8 +126,10 @@ int local_sdk_video_run(int chn);
 // Save video image to jpeg file
 int local_sdk_video_get_jpeg(int chn, char *file);
 
+// Request IDR frame
+int local_sdk_video_force_I_frame(int chn);
+
 // TODO:
-int local_sdk_video_force_I_frame(int param_1);
 int local_sdk_video_set_brightness(int param_1, int param_2, int param_3, int param_4);
 int local_sdk_video_set_flip(int param_1, int param_2);
 int local_sdk_video_set_fps(int param_1, int param_2, int param_3, int param_4);
