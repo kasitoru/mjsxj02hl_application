@@ -35,6 +35,7 @@ static int logprintf(const char *format, ...) {
 // Get firmware version
 char *firmware_version() {
     char *firmware_version = "Unknown";
+    int counter = 0;
     FILE *version_file;
     if(version_file = fopen("/usr/app/share/.version", "r")) {
         fseek(version_file, 0, SEEK_END);
