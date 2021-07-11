@@ -20,8 +20,8 @@ typedef struct {
     // [osd]
     struct {
         bool enable;
-        bool oem_logo;
-        bool date_time;
+        bool oemlogo;
+        bool datetime;
         bool motion;
         bool humanoid;
     } osd;

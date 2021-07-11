@@ -53,8 +53,8 @@ file =                      ; Write log to file (empty for disable)
 
 [osd]
 enable = false              ; Enable On-Screen Display (OSD)
-oem_logo = true             ; Display OEM logo (MI)
-date_time = true            ; Display date and time
+oemlogo = true              ; Display OEM logo (MI)
+datetime = true             ; Display date and time
 motion = false              ; Display detected motions in rectangles
 humanoid = false            ; Display detected humanoids in rectangles
 

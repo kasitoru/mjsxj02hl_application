@@ -63,7 +63,7 @@ bool osd_postinit() {
     logger("osd", "osd_postinit", LOGGER_LEVEL_DEBUG, "Function is called...");
     if(APP_CFG.osd.enable) {
         // Display OEM logo (MI)
-        if(APP_CFG.osd.oem_logo) {
+        if(APP_CFG.osd.oemlogo) {
             if(local_sdk_video_osd_update_logo(LOCALSDK_VIDEO_PRIMARY_CHANNEL, true) == LOCALSDK_OK) {
                 logger("osd", "osd_postinit", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_video_osd_update_logo(true)");
             } else {
@@ -72,7 +72,7 @@ bool osd_postinit() {
             }
         }
         // Display date and time
-        if(APP_CFG.osd.date_time) {
+        if(APP_CFG.osd.datetime) {
             if(pthread_create(&datetime_thread, NULL, osd_datetime_timer, NULL) == 0) {
                 logger("osd", "osd_postinit", LOGGER_LEVEL_INFO, "%s success.", "pthread_create(datetime_thread)");
             } else {
@@ -92,7 +92,7 @@ bool osd_free() {
     logger("osd", "osd_free", LOGGER_LEVEL_DEBUG, "Function is called...");
     if(APP_CFG.osd.enable) {
         // OEM logo
-        if(APP_CFG.osd.oem_logo) {
+        if(APP_CFG.osd.oemlogo) {
             // Hide
             if(local_sdk_video_osd_update_logo(LOCALSDK_VIDEO_PRIMARY_CHANNEL, false) == LOCALSDK_OK) {
                 logger("osd", "osd_free", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_video_osd_update_logo(false)");
@@ -102,7 +102,7 @@ bool osd_free() {
             }
         }
         // Date and time
-        if(APP_CFG.osd.date_time) {
+        if(APP_CFG.osd.datetime) {
             // Stop datetime thread
             if(datetime_thread) {
                 if(pthread_cancel(datetime_thread) == 0) {

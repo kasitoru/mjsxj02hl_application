@@ -17,8 +17,8 @@ APPLICATION_CONFIGURATION APP_CFG = {
     
     // [osd]
     .osd.enable                 = false,                                  // Enable On-Screen Display (OSD)
-    .osd.oem_logo               = true,                                   // Display OEM logo (MI)
-    .osd.date_time              = true,                                   // Display date and time
+    .osd.oemlogo                = true,                                   // Display OEM logo (MI)
+    .osd.datetime               = true,                                   // Display date and time
     .osd.motion                 = false,                                  // Display detected motions in rectangles
     .osd.humanoid               = false,                                  // Display detected humanoids in rectangles
     
@@ -99,10 +99,10 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
     // [osd]
     } else if(MATCH("osd", "enable")) {
         config->osd.enable = atob(value);
-    } else if(MATCH("osd", "oem_logo")) {
-        config->osd.oem_logo = atob(value);
-    } else if(MATCH("osd", "date_time")) {
-        config->osd.date_time = atob(value);
+    } else if(MATCH("osd", "oemlogo")) {
+        config->osd.oemlogo = atob(value);
+    } else if(MATCH("osd", "datetime")) {
+        config->osd.datetime = atob(value);
     } else if(MATCH("osd", "motion")) {
         config->osd.motion = atob(value);
     } else if(MATCH("osd", "humanoid")) {
