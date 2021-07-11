@@ -29,14 +29,14 @@ bool osd_init() {
         // Init primary channel (not work for secondary channel)
         LOCALSDK_OSD_OPTIONS osd_primary_options = {
             .unknown = 67, // FIXME: what is it?
-            .datetime_x = 48,
-            .datetime_y = 0,
-            .datetime_reduce = 1,
-            .datetime_increase = 1,
-            .oemlogo_x = 2,
-            .oemlogo_y = 0,
-            .oemlogo_reduce = 1,
-            .oemlogo_increase = 1,
+            .datetime_x = APP_CFG.osd.datetime_x,
+            .datetime_y = APP_CFG.osd.datetime_y,
+            .datetime_reduce = APP_CFG.osd.datetime_reduce,
+            .datetime_increase = APP_CFG.osd.datetime_increase,
+            .oemlogo_x = APP_CFG.osd.oemlogo_x,
+            .oemlogo_y = APP_CFG.osd.oemlogo_y,
+            .oemlogo_reduce = APP_CFG.osd.oemlogo_reduce,
+            .oemlogo_increase = APP_CFG.osd.oemlogo_increase,
         };
         if(local_sdk_video_osd_set_parameters(LOCALSDK_VIDEO_PRIMARY_CHANNEL, &osd_primary_options) == LOCALSDK_OK) {
             logger("osd", "osd_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_video_osd_set_parameters()");

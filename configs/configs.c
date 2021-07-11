@@ -18,7 +18,15 @@ APPLICATION_CONFIGURATION APP_CFG = {
     // [osd]
     .osd.enable                 = false,                                  // Enable On-Screen Display (OSD)
     .osd.oemlogo                = true,                                   // Display OEM logo (MI)
+    .osd.oemlogo_x              = 2,                                      // X position of the OEM logo
+    .osd.oemlogo_y              = 0,                                      // Y position of the OEM logo
+    .osd.oemlogo_reduce         = 1,                                      // How many times to reduce the OEM logo
+    .osd.oemlogo_increase       = 1,                                      // How many times to increase the OEM logo
     .osd.datetime               = true,                                   // Display date and time
+    .osd.datetime_x             = 48,                                     // X position of the date and time
+    .osd.datetime_y             = 0,                                      // Y position of the date and time
+    .osd.datetime_reduce        = 1,                                      // How many times to reduce the date and time
+    .osd.datetime_increase      = 1,                                      // How many times to increase the date and time
     .osd.motion                 = false,                                  // Display detected motions in rectangles
     .osd.humanoid               = false,                                  // Display detected humanoids in rectangles
     
@@ -101,8 +109,24 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
         config->osd.enable = atob(value);
     } else if(MATCH("osd", "oemlogo")) {
         config->osd.oemlogo = atob(value);
+    } else if(MATCH("osd", "oemlogo_x")) {
+        config->osd.oemlogo_x = atoi(value);
+    } else if(MATCH("osd", "oemlogo_y")) {
+        config->osd.oemlogo_y = atoi(value);
+    } else if(MATCH("osd", "oemlogo_reduce")) {
+        config->osd.oemlogo_reduce = atoi(value);
+    } else if(MATCH("osd", "oemlogo_increase")) {
+        config->osd.oemlogo_increase = atoi(value);
     } else if(MATCH("osd", "datetime")) {
         config->osd.datetime = atob(value);
+    } else if(MATCH("osd", "datetime_x")) {
+        config->osd.datetime_x = atoi(value);
+    } else if(MATCH("osd", "datetime_y")) {
+        config->osd.datetime_y = atoi(value);
+    } else if(MATCH("osd", "datetime_reduce")) {
+        config->osd.datetime_reduce = atoi(value);
+    } else if(MATCH("osd", "datetime_increase")) {
+        config->osd.datetime_increase = atoi(value);
     } else if(MATCH("osd", "motion")) {
         config->osd.motion = atob(value);
     } else if(MATCH("osd", "humanoid")) {

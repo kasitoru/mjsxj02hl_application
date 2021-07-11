@@ -21,7 +21,15 @@ typedef struct {
     struct {
         bool enable;
         bool oemlogo;
+        int oemlogo_x;
+        int oemlogo_y;
+        int oemlogo_reduce;
+        int oemlogo_increase;
         bool datetime;
+        int datetime_x;
+        int datetime_y;
+        int datetime_reduce;
+        int datetime_increase;
         bool motion;
         bool humanoid;
     } osd;
