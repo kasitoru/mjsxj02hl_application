@@ -146,38 +146,36 @@ static void* alarm_state_timeout(void *args) {
 // Alarm callback
 static int alarm_state_callback(LOCALSDK_ALARM_EVENT_INFO *eventInfo) {
     int result = LOCALSDK_OK;
-    if(eventInfo) {
-        // OSD rectangles callback
-        result = osd_rectangles_callback(eventInfo);
-        // Getting information about the event
-        if(eventInfo->state) {
-            // Remember the timestamps of events
-            int current_timestamp = (int) time(NULL);
-            switch(eventInfo->type) {
-                case LOCALSDK_ALARM_TYPE_MOTION:
-                    alarm_time_motion = current_timestamp;
-                    break;
-                case LOCALSDK_ALARM_TYPE_HUMANOID:
-                    alarm_time_humanoid = current_timestamp;
-                    break;
-                default:
-                    logger("alarm", "alarm_state_callback", LOGGER_LEVEL_INFO, "Change %s status: %d", "unknown", eventInfo->state);
-                    result = LOCALSDK_ERROR;
-            }
-            // Remember information about objects
-            int counter = 0;
-            for(int i=0;i<LOCALSDK_ALARM_MAXIMUM_OBJECTS;i++) {
-                if(eventInfo->objects[i].state) {
-                    alarm_objects[counter].type = (eventInfo->objects[i].type == LOCALSDK_ALARM_TYPE_MOTION ? "motion" : "humanoid");
-                    alarm_objects[counter].x = eventInfo->objects[i].x;
-                    alarm_objects[counter].y = eventInfo->objects[i].y;
-                    alarm_objects[counter].width = eventInfo->objects[i].width;
-                    alarm_objects[counter].height = eventInfo->objects[i].height;
-                    counter++;
-                }
+    // OSD rectangles callback
+    result = osd_rectangles_callback(eventInfo);
+    // Getting information about the event
+    if(eventInfo->state) {
+        // Remember the timestamps of events
+        int current_timestamp = (int) time(NULL);
+        switch(eventInfo->type) {
+            case LOCALSDK_ALARM_TYPE_MOTION:
+                alarm_time_motion = current_timestamp;
+                break;
+            case LOCALSDK_ALARM_TYPE_HUMANOID:
+                alarm_time_humanoid = current_timestamp;
+                break;
+            default:
+                logger("alarm", "alarm_state_callback", LOGGER_LEVEL_INFO, "Change %s status: %d", "unknown", eventInfo->state);
+                result = LOCALSDK_ERROR;
+        }
+        // Remember information about objects
+        int counter = 0;
+        for(int i=0;i<LOCALSDK_ALARM_MAXIMUM_OBJECTS;i++) {
+            if(eventInfo->objects[i].state) {
+                alarm_objects[counter].type = (eventInfo->objects[i].type == LOCALSDK_ALARM_TYPE_MOTION ? "motion" : "humanoid");
+                alarm_objects[counter].x = eventInfo->objects[i].x;
+                alarm_objects[counter].y = eventInfo->objects[i].y;
+                alarm_objects[counter].width = eventInfo->objects[i].width;
+                alarm_objects[counter].height = eventInfo->objects[i].height;
+                counter++;
             }
         }
-    } else result = LOCALSDK_ERROR;
+    }
     return result;
 }
 
