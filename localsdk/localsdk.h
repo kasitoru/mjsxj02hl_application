@@ -318,15 +318,15 @@ int local_sdk_set_alarm_switch(int type, bool state);
 #define LOCALSDK_OSD_COLOR_ORANGE 5
 
 typedef struct {
-    uint32_t unknown_0; // FIXME: what is it?
-    uint32_t unknown_1; // FIXME: what is it?
-    uint32_t unknown_2; // FIXME: what is it?
-    uint32_t unknown_3; // FIXME: what is it?
-    uint32_t unknown_4; // FIXME: what is it?
-    uint32_t unknown_5; // FIXME: what is it?
-    uint32_t unknown_6; // FIXME: what is it?
-    uint32_t unknown_7; // FIXME: what is it?
-    uint32_t unknown_8; // FIXME: what is it?
+    uint32_t unknown; // FIXME: what is it?
+    uint32_t datetime_x;
+    uint32_t datetime_y;
+    uint32_t datetime_reduce;
+    uint32_t datetime_increase;
+    uint32_t oemlogo_x;
+    uint32_t oemlogo_y;
+    uint32_t oemlogo_reduce;
+    uint32_t oemlogo_increase;
 } LOCALSDK_OSD_OPTIONS;
 
 typedef struct {
