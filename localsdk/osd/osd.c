@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "./osd.h"
 #include "./../localsdk.h"
@@ -31,12 +32,12 @@ bool osd_init() {
             .unknown = 67, // FIXME: what is it?
             .datetime_x = APP_CFG.osd.datetime_x,
             .datetime_y = APP_CFG.osd.datetime_y,
-            .datetime_reduce = APP_CFG.osd.datetime_reduce,
-            .datetime_increase = APP_CFG.osd.datetime_increase,
+            .datetime_reduce = ((APP_CFG.osd.datetime_size < 0) ? abs(APP_CFG.osd.datetime_size)+1 : 1),
+            .datetime_increase = ((APP_CFG.osd.datetime_size > 0) ? APP_CFG.osd.datetime_size+1 : 1),
             .oemlogo_x = APP_CFG.osd.oemlogo_x,
             .oemlogo_y = APP_CFG.osd.oemlogo_y,
-            .oemlogo_reduce = APP_CFG.osd.oemlogo_reduce,
-            .oemlogo_increase = APP_CFG.osd.oemlogo_increase,
+            .oemlogo_reduce = ((APP_CFG.osd.oemlogo_size < 0) ? abs(APP_CFG.osd.oemlogo_size)+1 : 1),
+            .oemlogo_increase = ((APP_CFG.osd.oemlogo_size > 0) ? APP_CFG.osd.oemlogo_size+1 : 1),
         };
         if(local_sdk_video_osd_set_parameters(LOCALSDK_VIDEO_PRIMARY_CHANNEL, &osd_primary_options) == LOCALSDK_OK) {
             logger("osd", "osd_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_video_osd_set_parameters()");

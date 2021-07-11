@@ -56,13 +56,11 @@ enable = false                 ; Enable On-Screen Display (OSD)
 oemlogo = true                 ; Display OEM logo (MI)
 oemlogo_x = 2                  ; X position of the OEM logo
 oemlogo_y = 0                  ; Y position of the OEM logo
-oemlogo_reduce = 1             ; How many times to reduce the OEM logo
-oemlogo_increase = 1           ; How many times to increase the OEM logo
+oemlogo_size = 0               ; Size of the OEM logo (can take negative values)
 datetime = true                ; Display date and time
 datetime_x = 48                ; X position of the date and time
 datetime_y = 0                 ; Y position of the date and time
-datetime_reduce = 1            ; How many times to reduce the date and time
-datetime_increase = 1          ; How many times to increase the date and time
+datetime_size = 0              ; Size of the date and time (can take negative values)
 motion = false                 ; Display detected motions in rectangles
 humanoid = false               ; Display detected humanoids in rectangles
 

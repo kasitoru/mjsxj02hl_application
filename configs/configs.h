@@ -23,13 +23,11 @@ typedef struct {
         bool oemlogo;
         int oemlogo_x;
         int oemlogo_y;
-        int oemlogo_reduce;
-        int oemlogo_increase;
+        int oemlogo_size;
         bool datetime;
         int datetime_x;
         int datetime_y;
-        int datetime_reduce;
-        int datetime_increase;
+        int datetime_size;
         bool motion;
         bool humanoid;
     } osd;
