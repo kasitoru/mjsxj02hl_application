@@ -134,13 +134,13 @@ uint32_t rtspserver_timestamp(uint8_t source, uint32_t samplerate) {
 }
 
 // Send media frame
-bool rtspserver_frame(uint32_t session_id, signed char *data, uint8_t type, uint32_t size, uint32_t timestamp, bool split_iframes) {
+bool rtspserver_frame(uint32_t session_id, signed char *data, uint8_t type, uint32_t size, uint32_t timestamp, bool split_video) {
     if(!rtsp_server) { return false; }
     xop::AVFrame frame = {0};
     frame.type = type;
     frame.timestamp = timestamp;
     // Prepare and send
-    if(split_iframes) {
+    if(split) {
         xop::Nal nal;
         uint32_t endpoint = ((uint32_t) data) + size;
         while(true) {

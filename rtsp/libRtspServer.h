@@ -36,7 +36,7 @@ uint32_t rtspserver_session(char *name, bool multicast, uint8_t video_type, uint
 uint32_t rtspserver_timestamp(uint8_t source, uint32_t samplerate);
 
 // Send media frame
-bool rtspserver_frame(uint32_t session_id, signed char *data, uint8_t type, uint32_t size, uint32_t timestamp, bool split_iframes);
+bool rtspserver_frame(uint32_t session_id, signed char *data, uint8_t type, uint32_t size, uint32_t timestamp, bool split_video);
 
 // Free RTSP server
 bool rtspserver_free(uint32_t count, ...);

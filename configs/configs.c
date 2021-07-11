@@ -69,8 +69,8 @@ APPLICATION_CONFIGURATION APP_CFG = {
     .rtsp.secondary_name          = "secondary",                            // Name of the secondary channel
     .rtsp.primary_multicast       = false,                                  // Use multicast for primary channel
     .rtsp.secondary_multicast     = false,                                  // Use multicast for secondary channel
-    .rtsp.primary_split_iframes   = true,                                   // Split i-frames into separate packets for primary channel
-    .rtsp.secondary_split_iframes = true,                                   // Split i-frames into separate packets for secondary channel
+    .rtsp.primary_split_vframes   = true,                                   // Split video frames into separate packets for primary channel
+    .rtsp.secondary_split_vframes = true,                                   // Split video frames into separate packets for secondary channel
     
     // [mqtt]
     .mqtt.enable                  = false,                                  // Enable MQTT client
@@ -202,10 +202,10 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
         config->rtsp.primary_multicast = atob(value);
     } else if(MATCH("rtsp", "secondary_multicast")) {
         config->rtsp.secondary_multicast = atob(value);
-    } else if(MATCH("rtsp", "primary_split_iframes")) {
-        config->rtsp.primary_split_iframes = atob(value);
-    } else if(MATCH("rtsp", "secondary_split_iframes")) {
-        config->rtsp.secondary_split_iframes = atob(value);
+    } else if(MATCH("rtsp", "primary_split_vframes")) {
+        config->rtsp.primary_split_vframes = atob(value);
+    } else if(MATCH("rtsp", "secondary_split_vframes")) {
+        config->rtsp.secondary_split_vframes = atob(value);
 
     // [mqtt]
     } else if(MATCH("mqtt", "enable")) {
