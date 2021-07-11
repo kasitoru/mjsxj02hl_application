@@ -59,6 +59,7 @@ motion = false              ; Display detected motions in rectangles
 humanoid = false            ; Display detected humanoids in rectangles
 
 [video]
+gop = 1                     ; Group of pictures (GOP) every N*FPS (20)
 flip = false                ; Flip image (all channels)
 mirror = false              ; Mirror image (all channels)
 primary_enable = true       ; Enable video for primary channel

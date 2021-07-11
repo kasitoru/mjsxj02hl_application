@@ -28,6 +28,7 @@ typedef struct {
 
     // [video]
     struct {
+        int gop;
         bool flip;
         bool mirror;
         bool primary_enable;

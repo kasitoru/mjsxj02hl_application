@@ -23,6 +23,7 @@ APPLICATION_CONFIGURATION APP_CFG = {
     .osd.humanoid               = false,                                  // Display detected humanoids in rectangles
     
     // [video]
+    .video.gop                  = 1,                                      // Group of pictures (GOP) every N*FPS (20)
     .video.flip                 = false,                                  // Flip image (all channels)
     .video.mirror               = false,                                  // Mirror image (all channels)
     .video.primary_enable       = true,                                   // Enable video for primary channel
@@ -108,6 +109,8 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
         config->osd.humanoid = atob(value);
     
     // [video]
+    } else if(MATCH("video", "gop")) {
+        config->video.gop = atoi(value);
     } else if(MATCH("video", "flip")) {
         config->video.flip = atob(value);
     } else if(MATCH("video", "mirror")) {

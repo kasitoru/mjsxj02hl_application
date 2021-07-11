@@ -58,7 +58,7 @@ bool video_init() {
                     .osd         = APP_CFG.osd.enable,
                     .payload     = APP_CFG.video.primary_type,
                     .rcmode      = APP_CFG.video.primary_rcmode,
-                    .gop         = 1 * LOCALSDK_VIDEO_FRAMERATE,
+                    .gop         = APP_CFG.video.gop * LOCALSDK_VIDEO_FRAMERATE,
                     .screen_size = primary_picture_size.width * primary_picture_size.height,
                     .frame_size  = LOCALSDK_VIDEO_PRIMARY_FRAMESIZE,
                     .jpeg        = false,
@@ -94,7 +94,7 @@ bool video_init() {
                                                     .osd         = false, // Not work for secondary channel
                                                     .payload     = APP_CFG.video.secondary_type,
                                                     .rcmode      = APP_CFG.video.secondary_rcmode,
-                                                    .gop         = 1 * LOCALSDK_VIDEO_FRAMERATE,
+                                                    .gop         = APP_CFG.video.gop * LOCALSDK_VIDEO_FRAMERATE,
                                                     .screen_size = secondary_picture_size.width * secondary_picture_size.height,
                                                     .frame_size  = LOCALSDK_VIDEO_SECONDARY_FRAMESIZE,
                                                     .jpeg        = true,
