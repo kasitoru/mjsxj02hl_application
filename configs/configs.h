@@ -36,6 +36,8 @@ typedef struct {
         int secondary_type;
         int primary_bitrate;
         int secondary_bitrate;
+        int primary_rcmode;
+        int secondary_rcmode;
     } video;
 
     // [audio]

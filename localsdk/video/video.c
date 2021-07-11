@@ -57,10 +57,10 @@ bool video_init() {
                     .video       = APP_CFG.video.primary_enable,
                     .osd         = APP_CFG.osd.enable,
                     .payload     = APP_CFG.video.primary_type,
-                    .rcmode      = LOCALSDK_VIDEO_RCMODE_TYPE,
+                    .rcmode      = APP_CFG.video.primary_rcmode,
                     .gop         = 1 * LOCALSDK_VIDEO_FRAMERATE,
                     .screen_size = primary_picture_size.width * primary_picture_size.height,
-                    .unknown_12  = 327680, // FIXME: what is it?
+                    .frame_size  = LOCALSDK_VIDEO_PRIMARY_FRAMESIZE,
                     .jpeg        = false,
                     .unknown_14  = 0, // FIXME: what is it?
                 };
@@ -93,10 +93,10 @@ bool video_init() {
                                                     .video       = APP_CFG.video.secondary_enable,
                                                     .osd         = false, // Not work for secondary channel
                                                     .payload     = APP_CFG.video.secondary_type,
-                                                    .rcmode      = LOCALSDK_VIDEO_RCMODE_TYPE,
+                                                    .rcmode      = APP_CFG.video.secondary_rcmode,
                                                     .gop         = 1 * LOCALSDK_VIDEO_FRAMERATE,
                                                     .screen_size = secondary_picture_size.width * secondary_picture_size.height,
-                                                    .unknown_12  = 50000, // FIXME: what is it? oldExp=1928067
+                                                    .frame_size  = LOCALSDK_VIDEO_SECONDARY_FRAMESIZE,
                                                     .jpeg        = true,
                                                     .unknown_14  = 1, // FIXME: what is it?
                                                 };

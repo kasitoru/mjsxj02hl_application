@@ -48,20 +48,26 @@ int SAMPLE_COMM_SYS_GetPicSize(int resolution, LOCALSDK_PICTURE_SIZE *size);
         VIDEO
 ********************/
 
-#define LOCALSDK_VIDEO_PAYLOAD_H264         1
-#define LOCALSDK_VIDEO_PAYLOAD_H265         2
+#define LOCALSDK_VIDEO_PAYLOAD_H264            1
+#define LOCALSDK_VIDEO_PAYLOAD_H265            2
 
-#define LOCALSDK_VIDEO_RESOLUTION_640x360   3
-#define LOCALSDK_VIDEO_RESOLUTION_1920x1080 6
+#define LOCALSDK_VIDEO_RESOLUTION_640x360      3
+#define LOCALSDK_VIDEO_RESOLUTION_1920x1080    6
 
-#define LOCALSDK_VIDEO_PRIMARY_CHANNEL      0
-#define LOCALSDK_VIDEO_SECONDARY_CHANNEL    1
+#define LOCALSDK_VIDEO_PRIMARY_CHANNEL         0
+#define LOCALSDK_VIDEO_SECONDARY_CHANNEL       1
 
-#define LOCALSDK_VIDEO_FRAMERATE            20
-#define LOCALSDK_VIDEO_RCMODE_TYPE          2
+#define LOCALSDK_VIDEO_PRIMARY_FRAMESIZE       327680
+#define LOCALSDK_VIDEO_SECONDARY_FRAMESIZE     81920
 
-#define LOCALSDK_VIDEO_H26X_FRAME_I         0
-#define LOCALSDK_VIDEO_H26X_FRAME_P         1
+#define LOCALSDK_VIDEO_FRAMERATE               20
+
+#define LOCALSDK_VIDEO_RCMODE_CONSTANT_BITRATE 0
+#define LOCALSDK_VIDEO_RCMODE_CONSTANT_QUALITY 1
+#define LOCALSDK_VIDEO_RCMODE_VARIABLE_BITRATE 2
+
+#define LOCALSDK_VIDEO_H26X_FRAME_I            0
+#define LOCALSDK_VIDEO_H26X_FRAME_P            1
 
 typedef struct {
     signed char *data;
@@ -86,7 +92,7 @@ typedef struct {
     uint32_t rcmode;
     uint32_t gop;
     uint32_t screen_size;
-    uint32_t unknown_12; // FIXME: what is it?
+    uint32_t frame_size;
     uint32_t jpeg;
     uint32_t unknown_14; // FIXME: what is it?
 } LOCALSDK_VIDEO_OPTIONS;

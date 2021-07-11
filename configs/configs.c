@@ -9,70 +9,72 @@
 // Default values
 APPLICATION_CONFIGURATION APP_CFG = {
     // [general]
-    .general.led                = true,                        // Enable onboard LED indicator
+    .general.led                = true,                                   // Enable onboard LED indicator
 
     // [logger]
-    .logger.level               = LOGGER_LEVEL_WARNING,        // Log level
-    .logger.file                = "",                          // Write log to file
+    .logger.level               = LOGGER_LEVEL_WARNING,                   // Log level
+    .logger.file                = "",                                     // Write log to file
     
     // [osd]
-    .osd.enable                 = false,                       // Enable On-Screen Display (OSD)
-    .osd.oem_logo               = true,                        // Display OEM logo (MI)
-    .osd.date_time              = true,                        // Display date and time
-    .osd.motion                 = false,                       // Display detected motions in rectangles
-    .osd.humanoid               = false,                       // Display detected humanoids in rectangles
+    .osd.enable                 = false,                                  // Enable On-Screen Display (OSD)
+    .osd.oem_logo               = true,                                   // Display OEM logo (MI)
+    .osd.date_time              = true,                                   // Display date and time
+    .osd.motion                 = false,                                  // Display detected motions in rectangles
+    .osd.humanoid               = false,                                  // Display detected humanoids in rectangles
     
     // [video]
-    .video.flip                 = false,                       // Flip image (all channels)
-    .video.mirror               = false,                       // Mirror image (all channels)
-    .video.primary_enable       = true,                        // Enable video for primary channel
-    .video.secondary_enable     = true,                        // Enable video for secondary channel
-    .video.primary_type         = LOCALSDK_VIDEO_PAYLOAD_H265, // Video compression standard for primary channel
-    .video.secondary_type       = LOCALSDK_VIDEO_PAYLOAD_H264, // Video compression standard for secondary channel
-    .video.primary_bitrate      = 1800,                        // Bitrate for primary channel
-    .video.secondary_bitrate    = 900,                         // Bitrate for secondary channel
+    .video.flip                 = false,                                  // Flip image (all channels)
+    .video.mirror               = false,                                  // Mirror image (all channels)
+    .video.primary_enable       = true,                                   // Enable video for primary channel
+    .video.secondary_enable     = true,                                   // Enable video for secondary channel
+    .video.primary_type         = LOCALSDK_VIDEO_PAYLOAD_H265,            // Video compression standard for primary channel
+    .video.secondary_type       = LOCALSDK_VIDEO_PAYLOAD_H264,            // Video compression standard for secondary channel
+    .video.primary_bitrate      = 1800,                                   // Bitrate for primary channel
+    .video.secondary_bitrate    = 900,                                    // Bitrate for secondary channel
+    .video.primary_rcmode       = LOCALSDK_VIDEO_RCMODE_VARIABLE_BITRATE, // Rate control mode for primary channel
+    .video.secondary_rcmode     = LOCALSDK_VIDEO_RCMODE_VARIABLE_BITRATE, // Rate control mode for secondary channel
 
     // [audio]
-    .audio.volume               = 70,                          // Volume (0-100)
-    .audio.primary_enable       = true,                        // Enable audio for primary channel
-    .audio.secondary_enable     = true,                        // Enable audio for secondary channel
+    .audio.volume               = 70,                                     // Volume (0-100)
+    .audio.primary_enable       = true,                                   // Enable audio for primary channel
+    .audio.secondary_enable     = true,                                   // Enable audio for secondary channel
     
     // [speaker]
-    .speaker.volume             = 70,                          // Volume (0-100)
-    .speaker.type               = LOCALSDK_SPEAKER_PCM_TYPE,   // Default file format
+    .speaker.volume             = 70,                                     // Volume (0-100)
+    .speaker.type               = LOCALSDK_SPEAKER_PCM_TYPE,              // Default file format
     
     // [alarm]
-    .alarm.motion_sens          = 150,                         // Motion sensitivity (1-255)
-    .alarm.humanoid_sens        = 150,                         // Humanoid sensitivity (1-255)
-    .alarm.motion_timeout       = 60,                          // Motion timeout (in seconds)
-    .alarm.humanoid_timeout     = 60,                          // Humanoid timeout (in seconds)
-    .alarm.motion_detect_exec   = "",                          // Execute the command when motion is detected
-    .alarm.humanoid_detect_exec = "",                          // Execute the command when humanoid is detected
-    .alarm.motion_lost_exec     = "",                          // Execute the command when motion is lost
-    .alarm.humanoid_lost_exec   = "",                          // Execute the command when humanoid is lost
+    .alarm.motion_sens          = 150,                                    // Motion sensitivity (1-255)
+    .alarm.humanoid_sens        = 150,                                    // Humanoid sensitivity (1-255)
+    .alarm.motion_timeout       = 60,                                     // Motion timeout (in seconds)
+    .alarm.humanoid_timeout     = 60,                                     // Humanoid timeout (in seconds)
+    .alarm.motion_detect_exec   = "",                                     // Execute the command when motion is detected
+    .alarm.humanoid_detect_exec = "",                                     // Execute the command when humanoid is detected
+    .alarm.motion_lost_exec     = "",                                     // Execute the command when motion is lost
+    .alarm.humanoid_lost_exec   = "",                                     // Execute the command when humanoid is lost
     
     // [rtsp]
-    .rtsp.enable                = true,                        // Enable RTSP server
-    .rtsp.port                  = 554,                         // Port number
-    .rtsp.username              = "",                          // Username (empty for disable)
-    .rtsp.password              = "",                          // Password
-    .rtsp.primary_name          = "primary",                   // Name of the primary channel
-    .rtsp.secondary_name        = "secondary",                 // Name of the secondary channel
-    .rtsp.primary_multicast     = false,                       // Use multicast for primary channel
-    .rtsp.secondary_multicast   = false,                       // Use multicast for secondary channel
+    .rtsp.enable                = true,                                   // Enable RTSP server
+    .rtsp.port                  = 554,                                    // Port number
+    .rtsp.username              = "",                                     // Username (empty for disable)
+    .rtsp.password              = "",                                     // Password
+    .rtsp.primary_name          = "primary",                              // Name of the primary channel
+    .rtsp.secondary_name        = "secondary",                            // Name of the secondary channel
+    .rtsp.primary_multicast     = false,                                  // Use multicast for primary channel
+    .rtsp.secondary_multicast   = false,                                  // Use multicast for secondary channel
     
     // [mqtt]
-    .mqtt.server                = "",                          // Address (empty for disable)
-    .mqtt.port                  = 1883,                        // Port number
-    .mqtt.username              = "",                          // Username (empty for anonimous)
-    .mqtt.password              = "",                          // Password (empty for disable)
-    .mqtt.topic                 = "mjsxj02hl",                 // Topic name
-    .mqtt.qos                   = 1,                           // Quality of Service (0, 1 or 2)
-    .mqtt.retain                = false,                       // Retained messages
+    .mqtt.server                = "",                                     // Address (empty for disable)
+    .mqtt.port                  = 1883,                                   // Port number
+    .mqtt.username              = "",                                     // Username (empty for anonimous)
+    .mqtt.password              = "",                                     // Password (empty for disable)
+    .mqtt.topic                 = "mjsxj02hl",                            // Topic name
+    .mqtt.qos                   = 1,                                      // Quality of Service (0, 1 or 2)
+    .mqtt.retain                = false,                                  // Retained messages
     
     // [night]
-    .night.mode                 = 2,                           // Night mode (0 = off, 1 = on, 2 = auto)
-    .night.gray                 = 2,                           // Grayscale (0 = off, 1 = on, 2 = auto)
+    .night.mode                 = 2,                                      // Night mode (0 = off, 1 = on, 2 = auto)
+    .night.gray                 = 2,                                      // Grayscale (0 = off, 1 = on, 2 = auto)
 };
 
 // Handler for ini parser
@@ -122,6 +124,10 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
         config->video.primary_bitrate = atoi(value);
     } else if(MATCH("video", "secondary_bitrate")) {
         config->video.secondary_bitrate = atoi(value);
+    } else if(MATCH("video", "primary_rcmode")) {
+        config->video.primary_rcmode = atoi(value);
+    } else if(MATCH("video", "secondary_rcmode")) {
+        config->video.secondary_rcmode = atoi(value);
 
     // [audio]
     } else if(MATCH("audio", "volume")) {

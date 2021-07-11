@@ -67,6 +67,8 @@ primary_type = 2            ; Video compression standard for primary channel (1 
 secondary_type = 1          ; Video compression standard for secondary channel (1 = h264, 2 = h265)
 primary_bitrate = 1800      ; Bitrate for primary channel
 secondary_bitrate = 900     ; Bitrate for secondary channel
+primary_rcmode = 2          ; Rate control mode for primary channel (0 = constant bitrate, 1 = constant quality, 2 = variable bitrate)
+secondary_rcmode = 2        ; Rate control mode for secondary channel (0 = constant bitrate, 1 = constant quality, 2 = variable bitrate)
 
 [audio]
 volume = 70                 ; Audio volume level (0-100)
