@@ -101,7 +101,8 @@ static void* mqtt_periodical(void *arg) {
             yyjson_mut_obj_add_int(json_doc, json_root, "sdk_version", sdk_version);
             // FW version
             char *fw_version = firmware_version();
-            yyjson_mut_obj_add_str(json_doc, json_root, "fw_version", fw_version);
+            yyjson_mut_obj_add_strcpy(json_doc, json_root, "fw_version", fw_version);
+            free(fw_version);
             // Build time
             int build_time = -1;
             struct tm compile_time;
@@ -138,7 +139,7 @@ static void* mqtt_periodical(void *arg) {
                 }
                 freeifaddrs(if_list);
             } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_WARNING, "%s error!", "getifaddrs()");
-            yyjson_mut_obj_add_str(json_doc, json_root, "ip_address", ip_address);
+            yyjson_mut_obj_add_strcpy(json_doc, json_root, "ip_address", ip_address);
             // RAM
             unsigned long total_ram = 0;
             unsigned long free_ram = 0;
@@ -185,7 +186,7 @@ static void* mqtt_periodical(void *arg) {
                     logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_INFO, "%s success.", "asprintf()");
                 } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_WARNING, "%s error!", "asprintf()");
             } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_WARNING, "%s error!", "ip_address is null so image_url");
-            yyjson_mut_obj_add_str(json_doc, json_root, "image_url", image_url);
+            yyjson_mut_obj_add_strcpy(json_doc, json_root, "image_url", image_url);
             // Send it
             const char *json = yyjson_mut_write(json_doc, 0, NULL);
             if(json) {
@@ -197,9 +198,6 @@ static void* mqtt_periodical(void *arg) {
             } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_ERROR, "%s error!", "yyjson_mut_write()");
             // Free resources
             yyjson_mut_doc_free(json_doc);
-            free(image_url);
-            free(ip_address);
-            free(fw_version);
             free(topic);
         } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_ERROR, "%s error!", "mqtt_fulltopic()");
         // Sleep
