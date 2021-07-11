@@ -186,7 +186,6 @@ static void* mqtt_periodical(void *arg) {
                 } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_WARNING, "%s error!", "asprintf()");
             } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_WARNING, "%s error!", "ip_address is null so image_url");
             yyjson_mut_obj_add_str(json_doc, json_root, "image_url", image_url);
-            free(image_url);
             // Send it
             const char *json = yyjson_mut_write(json_doc, 0, NULL);
             if(json) {
@@ -198,6 +197,7 @@ static void* mqtt_periodical(void *arg) {
             } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_ERROR, "%s error!", "yyjson_mut_write()");
             // Free resources
             yyjson_mut_doc_free(json_doc);
+            free(image_url);
             free(ip_address);
             free(fw_version);
             free(topic);
