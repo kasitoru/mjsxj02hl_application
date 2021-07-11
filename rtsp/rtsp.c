@@ -125,8 +125,10 @@ bool rtsp_media_frame(int chn, signed char *data, size_t size, uint32_t timestam
                 timestamp = rtspserver_timestamp(LIBRTSPSERVER_TYPE_H265, 0);
             }
         }
+        // Split i-frames into separate packets
+        bool split_iframes = (((type == LOCALSDK_VIDEO_H26X_FRAME_I) && (chn == LOCALSDK_VIDEO_SECONDARY_CHANNEL)) ? APP_CFG.rtsp.secondary_split_iframes : APP_CFG.rtsp.primary_split_iframes);
         // Send frame
-        if(rtspserver_frame((chn == LOCALSDK_VIDEO_SECONDARY_CHANNEL ? secondary_session : primary_session), data, librtspserver_frame_type(type), size, timestamp)) {
+        if(rtspserver_frame((chn == LOCALSDK_VIDEO_SECONDARY_CHANNEL ? secondary_session : primary_session), data, librtspserver_frame_type(type), size, timestamp, split_iframes)) {
             result = true;
         }
     } else result = true;

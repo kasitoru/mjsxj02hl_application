@@ -84,6 +84,8 @@ typedef struct {
         char* secondary_name;
         bool primary_multicast;
         bool secondary_multicast;
+        bool primary_split_iframes;
+        bool secondary_split_iframes;
     } rtsp;
     
     // [mqtt]

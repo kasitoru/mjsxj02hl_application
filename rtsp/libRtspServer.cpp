@@ -112,42 +112,43 @@ uint32_t rtspserver_timestamp(uint8_t source, uint32_t samplerate) {
 }
 
 // Send media frame
-bool rtspserver_frame(uint32_t session_id, signed char *data, uint8_t type, uint32_t size, uint32_t timestamp) {
+bool rtspserver_frame(uint32_t session_id, signed char *data, uint8_t type, uint32_t size, uint32_t timestamp, bool split_iframes) {
     if(!rtsp_server) { return false; }
     xop::AVFrame frame = {0};
     frame.type = type;
     frame.timestamp = timestamp;
     // Prepare and send
-    xop::Nal nal;
-    uint32_t endpoint = ((uint32_t) data) + size;
-    while(true) {
-        // Divide the video package into separate frames
-        if(frame.type != xop::AUDIO_FRAME) {
-            nal = xop::H264Parser::findNal((const uint8_t*) data, size);
-            data = (signed char *) nal.first;
-            size = ((uint32_t) nal.second) - ((uint32_t) nal.first) + 1;
-        }
-        // Send current frame
-        if(data) {
-            frame.size = size;
-            frame.buffer.reset(new uint8_t[frame.size]);
-            memcpy(frame.buffer.get(), data, frame.size);
-            rtsp_server->PushFrame(session_id, (frame.type != xop::AUDIO_FRAME ? xop::channel_0 : xop::channel_1), frame);
+    if(split_iframes) {
+        xop::Nal nal;
+        uint32_t endpoint = ((uint32_t) data) + size;
+        while(true) {
+            // Divide the video package into separate frames
             if(frame.type != xop::AUDIO_FRAME) {
-                data = (signed char *) nal.second;
-                size = endpoint - ((uint32_t) nal.second) + 1;
+                nal = xop::H264Parser::findNal((const uint8_t*) data, size);
+                data = (signed char *) nal.first;
+                size = ((uint32_t) nal.second) - ((uint32_t) nal.first) + 1;
+            }
+            // Send current frame
+            if(data) {
+                frame.size = size;
+                frame.buffer.reset(new uint8_t[frame.size]);
+                memcpy(frame.buffer.get(), data, frame.size);
+                rtsp_server->PushFrame(session_id, (frame.type != xop::AUDIO_FRAME ? xop::channel_0 : xop::channel_1), frame);
+                if(frame.type != xop::AUDIO_FRAME) {
+                    data = (signed char *) nal.second;
+                    size = endpoint - ((uint32_t) nal.second) + 1;
+                } else break;
             } else break;
-        } else break;
+        }
+        return true;
+    } else {
+        uint32_t offset = 0;
+        if(frame.type != xop::AUDIO_FRAME) { offset = 4; } // Skip 00 00 00 01
+        frame.size = size - offset;
+        frame.buffer.reset(new uint8_t[frame.size]);
+        memcpy(frame.buffer.get(), data + offset, frame.size);
+        return rtsp_server->PushFrame(session_id, (frame.type != xop::AUDIO_FRAME ? xop::channel_0 : xop::channel_1), frame);
     }
-    return true;
-    /*
-    uint32_t offset = 0;
-    if(frame.type != xop::AUDIO_FRAME) { offset = 4; } // Skip 00 00 00 01
-    frame.size = size - offset;
-    frame.buffer.reset(new uint8_t[frame.size]);
-    memcpy(frame.buffer.get(), data + offset, frame.size);
-    return rtsp_server->PushFrame(session_id, (frame.type != xop::AUDIO_FRAME ? xop::channel_0 : xop::channel_1), frame);
-    */
 }
 
 // Free RTSP server
