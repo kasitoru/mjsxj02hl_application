@@ -340,7 +340,7 @@ static void* mqtt_reconnection(void *args) {
 
 // Is enabled
 bool mqtt_is_enabled() {
-    return (APP_CFG.mqtt.server && APP_CFG.mqtt.server[0]);
+    return (APP_CFG.mqtt.enable && APP_CFG.mqtt.server && APP_CFG.mqtt.server[0]);
 }
 
 // Init mqtt (local)
@@ -396,7 +396,7 @@ static bool mqtt_initialization(bool first_init) {
             } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_WARNING, "%s error!", "pthread_create(reconnection_thread)");
         }
     } else {
-        logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_WARNING, "MQTT is disabled because server address not set.");
+        logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_WARNING, "MQTT is disabled in the settings or server address not set.");
         result = true;
     }
     logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_DEBUG, "Function completed.");

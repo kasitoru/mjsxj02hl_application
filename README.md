@@ -109,7 +109,8 @@ primary_split_iframes = true   ; Split i-frames into separate packets for primar
 secondary_split_iframes = true ; Split i-frames into separate packets for secondary channel
 
 [mqtt]
-server =                       ; Address (empty for disable)
+enable = false                 ; Enable MQTT client
+server =                       ; Server address
 port = 1883                    ; Port number
 username =                     ; Username (empty for anonimous)
 password =                     ; Password (empty for disable)

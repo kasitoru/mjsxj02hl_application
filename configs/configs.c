@@ -73,7 +73,8 @@ APPLICATION_CONFIGURATION APP_CFG = {
     .rtsp.secondary_split_iframes = true,                                   // Split i-frames into separate packets for secondary channel
     
     // [mqtt]
-    .mqtt.server                  = "",                                     // Address (empty for disable)
+    .mqtt.enable                  = false,                                  // Enable MQTT client
+    .mqtt.server                  = "",                                     // Server address
     .mqtt.port                    = 1883,                                   // Port number
     .mqtt.username                = "",                                     // Username (empty for anonimous)
     .mqtt.password                = "",                                     // Password (empty for disable)
@@ -207,6 +208,8 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
         config->rtsp.secondary_split_iframes = atob(value);
 
     // [mqtt]
+    } else if(MATCH("mqtt", "enable")) {
+        config->mqtt.enable = atob(value);
     } else if(MATCH("mqtt", "server")) {
         config->mqtt.server = strdup(value);
     } else if(MATCH("mqtt", "port")) {

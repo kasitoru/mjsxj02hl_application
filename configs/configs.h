@@ -88,6 +88,7 @@ typedef struct {
     
     // [mqtt]
     struct {
+        bool enable;
         char* server;
         int port;
         char* username;
