@@ -395,10 +395,7 @@ static bool mqtt_initialization(bool first_init) {
                 logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_INFO, "%s success.", "pthread_create(reconnection_thread)");
             } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_WARNING, "%s error!", "pthread_create(reconnection_thread)");
         }
-    } else {
-        logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_WARNING, "MQTT is disabled in the settings or server address not set.");
-        result = true;
-    }
+    } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_WARNING, "MQTT is disabled in the settings or server address not set.");
     logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_DEBUG, "Function completed.");
     return result;
 }
