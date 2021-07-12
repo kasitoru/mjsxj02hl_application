@@ -23,15 +23,24 @@ static int g711_capture_callback(int chn, LOCALSDK_AUDIO_G711_FRAME_INFO *frameI
 }
 
 static int g711_capture_primary_channel(LOCALSDK_AUDIO_G711_FRAME_INFO *frameInfo) {
-    if(APP_CFG.audio.primary_enable) {
+    if(audio_is_enabled(LOCALSDK_VIDEO_PRIMARY_CHANNEL)) {
         return g711_capture_callback(LOCALSDK_VIDEO_PRIMARY_CHANNEL, frameInfo);
     } else return LOCALSDK_ERROR;
 }
 
 static int g711_capture_secondary_channel(LOCALSDK_AUDIO_G711_FRAME_INFO *frameInfo) {
-    if(APP_CFG.audio.secondary_enable) {
+    if(audio_is_enabled(LOCALSDK_VIDEO_SECONDARY_CHANNEL)) {
         return g711_capture_callback(LOCALSDK_VIDEO_SECONDARY_CHANNEL, frameInfo);
     } else return LOCALSDK_ERROR;
+}
+
+// Is enabled
+bool audio_is_enabled(int channel) {
+    switch(channel) {
+        case LOCALSDK_VIDEO_PRIMARY_CHANNEL: return APP_CFG.audio.primary_enable;
+        case LOCALSDK_VIDEO_SECONDARY_CHANNEL: return APP_CFG.audio.secondary_enable;
+        default: return false;
+    }
 }
 
 // Init audio

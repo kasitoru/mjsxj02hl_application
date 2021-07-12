@@ -9,6 +9,8 @@
 #include "./rtsp.h"
 #include "./libRtspServer.h"
 #include "./../localsdk/localsdk.h"
+#include "./../localsdk/video/video.h"
+#include "./../localsdk/audio/audio.h"
 #include "./../logger/logger.h"
 #include "./../configs/configs.h"
 
@@ -88,7 +90,7 @@ bool rtsp_init() {
                         bool primary_multicast = APP_CFG.rtsp.primary_multicast;
                         uint8_t primary_video_type = (video_is_enabled(LOCALSDK_VIDEO_PRIMARY_CHANNEL) ? librtspserver_video_type(APP_CFG.video.primary_type) : LIBRTSPSERVER_TYPE_NONE);
                         uint32_t primary_framerate = LOCALSDK_VIDEO_FRAMERATE;
-                        uint8_t primary_audio_type = (APP_CFG.audio.primary_enable ? LIBRTSPSERVER_TYPE_G711A : LIBRTSPSERVER_TYPE_NONE);
+                        uint8_t primary_audio_type = (audio_is_enabled(LOCALSDK_VIDEO_PRIMARY_CHANNEL) ? LIBRTSPSERVER_TYPE_G711A : LIBRTSPSERVER_TYPE_NONE);
                         if(primary_session = rtspserver_session(primary_name, primary_multicast, primary_video_type, primary_framerate, primary_audio_type, 0, 0, false)) {
                             logger("rtsp", "rtsp_init", LOGGER_LEVEL_INFO, "%s success.", "rtspserver_session(primary)");
                             primary_result = true;
@@ -101,7 +103,7 @@ bool rtsp_init() {
                         bool secondary_multicast = APP_CFG.rtsp.secondary_multicast;
                         uint8_t secondary_video_type = (video_is_enabled(LOCALSDK_VIDEO_SECONDARY_CHANNEL) ? librtspserver_video_type(APP_CFG.video.secondary_type) : LIBRTSPSERVER_TYPE_NONE);
                         uint32_t secondary_framerate = LOCALSDK_VIDEO_FRAMERATE;
-                        uint8_t secondary_audio_type = (APP_CFG.audio.secondary_enable ? LIBRTSPSERVER_TYPE_G711A : LIBRTSPSERVER_TYPE_NONE);
+                        uint8_t secondary_audio_type = (audio_is_enabled(LOCALSDK_VIDEO_SECONDARY_CHANNEL) ? LIBRTSPSERVER_TYPE_G711A : LIBRTSPSERVER_TYPE_NONE);
                         if(secondary_session = rtspserver_session(secondary_name, secondary_multicast, secondary_video_type, secondary_framerate, secondary_audio_type, 0, 0, false)) {
                             logger("rtsp", "rtsp_init", LOGGER_LEVEL_INFO, "%s success.", "rtspserver_session(secondary)");
                             secondary_result = true;

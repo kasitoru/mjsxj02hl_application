@@ -3,6 +3,9 @@
 
 #include <stdbool.h>
 
+// Is enabled
+bool audio_is_enabled(int channel);
+
 // Init audio
 bool audio_init();
 
