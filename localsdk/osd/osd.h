@@ -6,6 +6,9 @@
 #include "./../localsdk.h"
 
 
+// Is enabled
+bool osd_is_enabled();
+
 // Init OSD
 bool osd_init();
 

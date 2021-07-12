@@ -22,11 +22,16 @@ static void *osd_datetime_timer(void *args) {
     local_sdk_video_osd_update_timestamp(LOCALSDK_VIDEO_PRIMARY_CHANNEL, false, NULL);
 }
 
+// Is enabled
+bool osd_is_enabled() {
+    return APP_CFG.osd.enable;
+}
+
 // Init OSD
 bool osd_init() {
     bool result = false;
     logger("osd", "osd_init", LOGGER_LEVEL_DEBUG, "Function is called...");
-    if(APP_CFG.osd.enable) {
+    if(osd_is_enabled()) {
         // Init primary channel (not work for secondary channel)
         LOCALSDK_OSD_OPTIONS osd_primary_options = {
             .unknown = 67, // FIXME: what is it?
@@ -62,7 +67,7 @@ bool osd_init() {
 bool osd_postinit() {
     bool result = true;
     logger("osd", "osd_postinit", LOGGER_LEVEL_DEBUG, "Function is called...");
-    if(APP_CFG.osd.enable) {
+    if(osd_is_enabled()) {
         // Display OEM logo (MI)
         if(APP_CFG.osd.oemlogo) {
             if(local_sdk_video_osd_update_logo(LOCALSDK_VIDEO_PRIMARY_CHANNEL, true) == LOCALSDK_OK) {
@@ -91,7 +96,7 @@ bool osd_postinit() {
 bool osd_free() {
     bool result = true;
     logger("osd", "osd_free", LOGGER_LEVEL_DEBUG, "Function is called...");
-    if(APP_CFG.osd.enable) {
+    if(osd_is_enabled()) {
         // OEM logo
         if(APP_CFG.osd.oemlogo) {
             // Hide
@@ -138,7 +143,7 @@ bool osd_free() {
 
 // Rectangles callback
 int osd_rectangles_callback(LOCALSDK_ALARM_EVENT_INFO *eventInfo) {
-    if(APP_CFG.osd.enable) {
+    if(osd_is_enabled()) {
         if(APP_CFG.osd.motion || APP_CFG.osd.humanoid) {
             LOCALSDK_OSD_RECTANGLES rectangles;
             rectangles.count = 0;

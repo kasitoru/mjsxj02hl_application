@@ -55,7 +55,7 @@ bool video_init() {
                     .mirror      = APP_CFG.video.mirror,
                     .unknown_5   = 0, // FIXME: what is it?
                     .video       = APP_CFG.video.primary_enable,
-                    .osd         = APP_CFG.osd.enable,
+                    .osd         = osd_is_enabled(),
                     .payload     = APP_CFG.video.primary_type,
                     .rcmode      = APP_CFG.video.primary_rcmode,
                     .gop         = APP_CFG.video.gop * LOCALSDK_VIDEO_FRAMERATE,
