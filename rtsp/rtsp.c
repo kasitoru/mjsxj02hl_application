@@ -12,7 +12,8 @@
 #include "./../logger/logger.h"
 #include "./../configs/configs.h"
 
-static uint32_t primary_session, secondary_session;
+static uint32_t primary_session = 0;
+static uint32_t secondary_session = 0;
 
 // Logger function for libRtspServer
 static int librtspserver_logger(const char *format, ...) {
@@ -58,15 +59,22 @@ static uint8_t librtspserver_frame_type(uint8_t type) {
 }
 
 // Is enabled
-bool rtsp_is_enabled() {
-    return APP_CFG.rtsp.enable;
+bool rtsp_is_enabled(int channel) {
+    switch(channel) {
+        case LOCALSDK_VIDEO_PRIMARY_CHANNEL:
+            return (APP_CFG.rtsp.enable && APP_CFG.video.primary_enable && APP_CFG.rtsp.primary_name && APP_CFG.rtsp.primary_name[0]);
+        case LOCALSDK_VIDEO_SECONDARY_CHANNEL:
+            return (APP_CFG.rtsp.enable && APP_CFG.video.secondary_enable && APP_CFG.rtsp.secondary_name && APP_CFG.rtsp.secondary_name[0]);
+        default:
+            return (APP_CFG.rtsp.enable && (rtsp_is_enabled(LOCALSDK_VIDEO_PRIMARY_CHANNEL) || rtsp_is_enabled(LOCALSDK_VIDEO_SECONDARY_CHANNEL)));
+    }
 }
 
 // Init RTSP
 bool rtsp_init() {
     bool result = false;
     logger("rtsp", "rtsp_init", LOGGER_LEVEL_DEBUG, "Function is called...");
-    if(rtsp_is_enabled()) { // If RTSP enabled
+    if(rtsp_is_enabled(-1)) { // If RTSP enabled
         if(rtspserver_logprintf(librtspserver_logger)) {
             logger("rtsp", "rtsp_init", LOGGER_LEVEL_INFO, "%s success.", "rtspserver_logprintf()");
             if(rtspserver_create(APP_CFG.rtsp.port, APP_CFG.rtsp.username, APP_CFG.rtsp.password)) {
@@ -74,14 +82,21 @@ bool rtsp_init() {
                 if(rtspserver_connected(librtspserver_connected)) {
                     logger("rtsp", "rtsp_init", LOGGER_LEVEL_INFO, "%s success.", "rtspserver_connected()");
                     // Primary channel
-                    char *primary_name = APP_CFG.rtsp.primary_name;
-                    bool primary_multicast = APP_CFG.rtsp.primary_multicast;
-                    uint8_t primary_video_type = (APP_CFG.video.primary_enable ? librtspserver_video_type(APP_CFG.video.primary_type) : LIBRTSPSERVER_TYPE_NONE);
-                    uint32_t primary_framerate = LOCALSDK_VIDEO_FRAMERATE;
-                    uint8_t primary_audio_type = (APP_CFG.audio.primary_enable ? LIBRTSPSERVER_TYPE_G711A : LIBRTSPSERVER_TYPE_NONE);
-                    if(primary_session = rtspserver_session(primary_name, primary_multicast, primary_video_type, primary_framerate, primary_audio_type, 0, 0, false)) {
-                        logger("rtsp", "rtsp_init", LOGGER_LEVEL_INFO, "%s success.", "rtspserver_session(primary)");
-                        // Secondary channel
+                    bool primary_result = false;
+                    if(rtsp_is_enabled(LOCALSDK_VIDEO_PRIMARY_CHANNEL)) {
+                        char *primary_name = APP_CFG.rtsp.primary_name;
+                        bool primary_multicast = APP_CFG.rtsp.primary_multicast;
+                        uint8_t primary_video_type = (APP_CFG.video.primary_enable ? librtspserver_video_type(APP_CFG.video.primary_type) : LIBRTSPSERVER_TYPE_NONE);
+                        uint32_t primary_framerate = LOCALSDK_VIDEO_FRAMERATE;
+                        uint8_t primary_audio_type = (APP_CFG.audio.primary_enable ? LIBRTSPSERVER_TYPE_G711A : LIBRTSPSERVER_TYPE_NONE);
+                        if(primary_session = rtspserver_session(primary_name, primary_multicast, primary_video_type, primary_framerate, primary_audio_type, 0, 0, false)) {
+                            logger("rtsp", "rtsp_init", LOGGER_LEVEL_INFO, "%s success.", "rtspserver_session(primary)");
+                            primary_result = true;
+                        } else logger("rtsp", "rtsp_init", LOGGER_LEVEL_ERROR, "%s error!", "rtspserver_session(primary)");
+                    } else logger("rtsp", "rtsp_init", LOGGER_LEVEL_WARNING, "%s channel is disabled in the settings or its name is not set.", "Primary");
+                    // Secondary channel
+                    bool secondary_result = false;
+                    if(rtsp_is_enabled(LOCALSDK_VIDEO_SECONDARY_CHANNEL)) {
                         char *secondary_name = APP_CFG.rtsp.secondary_name;
                         bool secondary_multicast = APP_CFG.rtsp.secondary_multicast;
                         uint8_t secondary_video_type = (APP_CFG.video.secondary_enable ? librtspserver_video_type(APP_CFG.video.secondary_type) : LIBRTSPSERVER_TYPE_NONE);
@@ -89,16 +104,15 @@ bool rtsp_init() {
                         uint8_t secondary_audio_type = (APP_CFG.audio.secondary_enable ? LIBRTSPSERVER_TYPE_G711A : LIBRTSPSERVER_TYPE_NONE);
                         if(secondary_session = rtspserver_session(secondary_name, secondary_multicast, secondary_video_type, secondary_framerate, secondary_audio_type, 0, 0, false)) {
                             logger("rtsp", "rtsp_init", LOGGER_LEVEL_INFO, "%s success.", "rtspserver_session(secondary)");
-                            result = true;
+                            secondary_result = true;
                         } else logger("rtsp", "rtsp_init", LOGGER_LEVEL_ERROR, "%s error!", "rtspserver_session(secondary)");
-                    } else logger("rtsp", "rtsp_init", LOGGER_LEVEL_ERROR, "%s error!", "rtspserver_session(primary)");
+                    } else logger("rtsp", "rtsp_init", LOGGER_LEVEL_WARNING, "%s channel is disabled in the settings or its name is not set.", "Secondary");
+                    // Results
+                    result = (primary_result || secondary_result);
                 } else logger("rtsp", "rtsp_init", LOGGER_LEVEL_ERROR, "%s error!", "rtspserver_connected()");
             } else logger("rtsp", "rtsp_init", LOGGER_LEVEL_ERROR, "%s error!", "rtspserver_create()");
         } else logger("rtsp", "rtsp_init", LOGGER_LEVEL_ERROR, "%s error!", "rtspserver_logprintf()");
-    } else {
-        logger("rtsp", "rtsp_init", LOGGER_LEVEL_WARNING, "RTSP server is disabled in the settings.");
-        result = true;
-    }
+    } else logger("rtsp", "rtsp_init", LOGGER_LEVEL_WARNING, "RTSP server is disabled in the settings.");
     logger("rtsp", "rtsp_init", LOGGER_LEVEL_DEBUG, "Function completed.");
     return result;
 }
@@ -107,7 +121,7 @@ bool rtsp_init() {
 bool rtsp_free() {
     bool result = false;
     logger("rtsp", "rtsp_free", LOGGER_LEVEL_DEBUG, "Function is called...");
-    if(rtsp_is_enabled()) { // If RTSP enabled
+    if(rtsp_is_enabled(-1)) { // If RTSP enabled
         if(result = rtspserver_free(2, primary_session, secondary_session)) {
             logger("rtsp", "rtsp_free", LOGGER_LEVEL_INFO, "%s success.", "rtspserver_free()");
         } else logger("rtsp", "rtsp_free", LOGGER_LEVEL_ERROR, "%s error!", "rtspserver_free()");
@@ -119,7 +133,7 @@ bool rtsp_free() {
 // Send data frame
 bool rtsp_media_frame(int chn, signed char *data, size_t size, uint32_t timestamp, uint8_t type) {
     bool result = false;
-    if(rtsp_is_enabled()) { // If RTSP enabled
+    if(rtsp_is_enabled(chn)) { // If RTSP enabled
         // Get current timestamp
         if(type == LOCALSDK_AUDIO_G711_FRAME) {
             timestamp = rtspserver_timestamp(LIBRTSPSERVER_TYPE_G711A, 0);
@@ -141,10 +155,8 @@ bool rtsp_media_frame(int chn, signed char *data, size_t size, uint32_t timestam
         // Split video frames into separate packets
         bool split_video = (chn == LOCALSDK_VIDEO_SECONDARY_CHANNEL ? APP_CFG.rtsp.secondary_split_vframes : APP_CFG.rtsp.primary_split_vframes);
         // Send frame
-        if(rtspserver_frame((chn == LOCALSDK_VIDEO_SECONDARY_CHANNEL ? secondary_session : primary_session), data, librtspserver_frame_type(type), size, timestamp, split_video)) {
-            result = true;
-        }
-    } else result = true;
+        result = rtspserver_frame((chn == LOCALSDK_VIDEO_SECONDARY_CHANNEL ? secondary_session : primary_session), data, librtspserver_frame_type(type), size, timestamp, split_video);
+    }
     return result;
 }
 

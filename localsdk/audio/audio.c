@@ -13,7 +13,7 @@ static int g711_capture_callback(int chn, LOCALSDK_AUDIO_G711_FRAME_INFO *frameI
     int result = LOCALSDK_OK;
     if(frameInfo && frameInfo->size) {
         // RTSP
-        if(rtsp_is_enabled()) {
+        if(rtsp_is_enabled(chn)) {
             if(!rtsp_media_frame(chn, frameInfo->data, frameInfo->size, frameInfo->timestamp, LOCALSDK_AUDIO_G711_FRAME)) {
                 result = LOCALSDK_ERROR;
             }

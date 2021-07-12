@@ -14,7 +14,7 @@ static int h26x_capture_callback(int chn, LOCALSDK_H26X_FRAME_INFO *frameInfo) {
     int result = LOCALSDK_OK;
     if(frameInfo && frameInfo->size) {
         // RTSP
-        if(rtsp_is_enabled()) {
+        if(rtsp_is_enabled(chn)) {
             if(!rtsp_media_frame(chn, frameInfo->data, frameInfo->size, frameInfo->timestamp, frameInfo->type)) {
                 result = LOCALSDK_ERROR;
             }

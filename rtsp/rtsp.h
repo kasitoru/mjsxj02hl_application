@@ -8,7 +8,7 @@
 bool rtsp_init();
 
 // Is enabled
-bool rtsp_is_enabled();
+bool rtsp_is_enabled(int channel);
 
 // Free RTSP
 bool rtsp_free();
