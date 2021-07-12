@@ -62,9 +62,9 @@ static uint8_t librtspserver_frame_type(uint8_t type) {
 bool rtsp_is_enabled(int channel) {
     switch(channel) {
         case LOCALSDK_VIDEO_PRIMARY_CHANNEL:
-            return (APP_CFG.rtsp.enable && APP_CFG.video.primary_enable && APP_CFG.rtsp.primary_name && APP_CFG.rtsp.primary_name[0]);
+            return (APP_CFG.rtsp.enable && video_is_enabled(channel) && APP_CFG.rtsp.primary_name && APP_CFG.rtsp.primary_name[0]);
         case LOCALSDK_VIDEO_SECONDARY_CHANNEL:
-            return (APP_CFG.rtsp.enable && APP_CFG.video.secondary_enable && APP_CFG.rtsp.secondary_name && APP_CFG.rtsp.secondary_name[0]);
+            return (APP_CFG.rtsp.enable && video_is_enabled(channel) && APP_CFG.rtsp.secondary_name && APP_CFG.rtsp.secondary_name[0]);
         default:
             return (APP_CFG.rtsp.enable && (rtsp_is_enabled(LOCALSDK_VIDEO_PRIMARY_CHANNEL) || rtsp_is_enabled(LOCALSDK_VIDEO_SECONDARY_CHANNEL)));
     }
@@ -86,7 +86,7 @@ bool rtsp_init() {
                     if(rtsp_is_enabled(LOCALSDK_VIDEO_PRIMARY_CHANNEL)) {
                         char *primary_name = APP_CFG.rtsp.primary_name;
                         bool primary_multicast = APP_CFG.rtsp.primary_multicast;
-                        uint8_t primary_video_type = (APP_CFG.video.primary_enable ? librtspserver_video_type(APP_CFG.video.primary_type) : LIBRTSPSERVER_TYPE_NONE);
+                        uint8_t primary_video_type = (video_is_enabled(LOCALSDK_VIDEO_PRIMARY_CHANNEL) ? librtspserver_video_type(APP_CFG.video.primary_type) : LIBRTSPSERVER_TYPE_NONE);
                         uint32_t primary_framerate = LOCALSDK_VIDEO_FRAMERATE;
                         uint8_t primary_audio_type = (APP_CFG.audio.primary_enable ? LIBRTSPSERVER_TYPE_G711A : LIBRTSPSERVER_TYPE_NONE);
                         if(primary_session = rtspserver_session(primary_name, primary_multicast, primary_video_type, primary_framerate, primary_audio_type, 0, 0, false)) {
@@ -99,7 +99,7 @@ bool rtsp_init() {
                     if(rtsp_is_enabled(LOCALSDK_VIDEO_SECONDARY_CHANNEL)) {
                         char *secondary_name = APP_CFG.rtsp.secondary_name;
                         bool secondary_multicast = APP_CFG.rtsp.secondary_multicast;
-                        uint8_t secondary_video_type = (APP_CFG.video.secondary_enable ? librtspserver_video_type(APP_CFG.video.secondary_type) : LIBRTSPSERVER_TYPE_NONE);
+                        uint8_t secondary_video_type = (video_is_enabled(LOCALSDK_VIDEO_SECONDARY_CHANNEL) ? librtspserver_video_type(APP_CFG.video.secondary_type) : LIBRTSPSERVER_TYPE_NONE);
                         uint32_t secondary_framerate = LOCALSDK_VIDEO_FRAMERATE;
                         uint8_t secondary_audio_type = (APP_CFG.audio.secondary_enable ? LIBRTSPSERVER_TYPE_G711A : LIBRTSPSERVER_TYPE_NONE);
                         if(secondary_session = rtspserver_session(secondary_name, secondary_multicast, secondary_video_type, secondary_framerate, secondary_audio_type, 0, 0, false)) {
@@ -131,31 +131,31 @@ bool rtsp_free() {
 }
 
 // Send data frame
-bool rtsp_media_frame(int chn, signed char *data, size_t size, uint32_t timestamp, uint8_t type) {
+bool rtsp_media_frame(int channel, signed char *data, size_t size, uint32_t timestamp, uint8_t type) {
     bool result = false;
-    if(rtsp_is_enabled(chn)) { // If RTSP enabled
+    if(rtsp_is_enabled(channel)) { // If RTSP enabled
         // Get current timestamp
         if(type == LOCALSDK_AUDIO_G711_FRAME) {
             timestamp = rtspserver_timestamp(LIBRTSPSERVER_TYPE_G711A, 0);
         } else {
             if(
-                ((chn == LOCALSDK_VIDEO_PRIMARY_CHANNEL) && (APP_CFG.video.primary_type == LOCALSDK_VIDEO_PAYLOAD_H264))
+                ((channel == LOCALSDK_VIDEO_PRIMARY_CHANNEL) && (APP_CFG.video.primary_type == LOCALSDK_VIDEO_PAYLOAD_H264))
                 ||
-                ((chn == LOCALSDK_VIDEO_SECONDARY_CHANNEL) && (APP_CFG.video.secondary_type == LOCALSDK_VIDEO_PAYLOAD_H264))
+                ((channel == LOCALSDK_VIDEO_SECONDARY_CHANNEL) && (APP_CFG.video.secondary_type == LOCALSDK_VIDEO_PAYLOAD_H264))
             ) {
                 timestamp = rtspserver_timestamp(LIBRTSPSERVER_TYPE_H264, 0);
             } else if(
-                ((chn == LOCALSDK_VIDEO_PRIMARY_CHANNEL) && (APP_CFG.video.primary_type == LOCALSDK_VIDEO_PAYLOAD_H265))
+                ((channel == LOCALSDK_VIDEO_PRIMARY_CHANNEL) && (APP_CFG.video.primary_type == LOCALSDK_VIDEO_PAYLOAD_H265))
                 ||
-                ((chn == LOCALSDK_VIDEO_SECONDARY_CHANNEL) && (APP_CFG.video.secondary_type == LOCALSDK_VIDEO_PAYLOAD_H265))
+                ((channel == LOCALSDK_VIDEO_SECONDARY_CHANNEL) && (APP_CFG.video.secondary_type == LOCALSDK_VIDEO_PAYLOAD_H265))
             ) {
                 timestamp = rtspserver_timestamp(LIBRTSPSERVER_TYPE_H265, 0);
             }
         }
         // Split video frames into separate packets
-        bool split_video = (chn == LOCALSDK_VIDEO_SECONDARY_CHANNEL ? APP_CFG.rtsp.secondary_split_vframes : APP_CFG.rtsp.primary_split_vframes);
+        bool split_video = (channel == LOCALSDK_VIDEO_SECONDARY_CHANNEL ? APP_CFG.rtsp.secondary_split_vframes : APP_CFG.rtsp.primary_split_vframes);
         // Send frame
-        result = rtspserver_frame((chn == LOCALSDK_VIDEO_SECONDARY_CHANNEL ? secondary_session : primary_session), data, librtspserver_frame_type(type), size, timestamp, split_video);
+        result = rtspserver_frame((channel == LOCALSDK_VIDEO_SECONDARY_CHANNEL ? secondary_session : primary_session), data, librtspserver_frame_type(type), size, timestamp, split_video);
     }
     return result;
 }

@@ -14,6 +14,6 @@ bool rtsp_is_enabled(int channel);
 bool rtsp_free();
 
 // Send data frame
-bool rtsp_media_frame(int chn, signed char *data, size_t size, uint32_t timestamp, uint8_t type);
+bool rtsp_media_frame(int channel, signed char *data, size_t size, uint32_t timestamp, uint8_t type);
 
 #endif
