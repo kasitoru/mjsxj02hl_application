@@ -161,7 +161,7 @@ static void* mqtt_periodical(void *arg) {
             } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_WARNING, "%s error!", "statvfs(\"/mnt/mmc\")");
             yyjson_mut_obj_add_uint(json_doc, json_root, "total_sdmem", total_sdmem);
             yyjson_mut_obj_add_uint(json_doc, json_root, "free_sdmem", free_sdmem);
-            // Configs free memory
+            // Configs memory
             unsigned long total_configs = 0;
             unsigned long free_configs = 0;
             struct statvfs stat_configs;
