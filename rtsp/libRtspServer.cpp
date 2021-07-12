@@ -140,7 +140,7 @@ bool rtspserver_frame(uint32_t session_id, signed char *data, uint8_t type, uint
     frame.type = type;
     frame.timestamp = timestamp;
     // Prepare and send
-    if(split) {
+    if(split_video) {
         xop::Nal nal;
         uint32_t endpoint = ((uint32_t) data) + size;
         while(true) {
