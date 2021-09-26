@@ -80,6 +80,10 @@ uint32_t rtspserver_session(char *name, bool multicast, uint8_t video_type, uint
             session->AddSource(xop::channel_0, xop::H265Source::CreateNew(framerate));
             logprintf_function("%s source is %s for session \"%s\" (channel = %d).", "H265", "enabled", name, xop::channel_0);
             break;
+        case LIBRTSPSERVER_TYPE_VP8:
+            session->AddSource(xop::channel_0, xop::VP8Source::CreateNew(framerate));
+            logprintf_function("%s source is %s for session \"%s\" (channel = %d).", "VP8", "enabled", name, xop::channel_0);
+            break;
         case LIBRTSPSERVER_TYPE_NONE:
             logprintf_function("%s source is %s for session \"%s\" (channel = %d).", "Video", "disabled", name, xop::channel_0);
             break;
@@ -129,6 +133,7 @@ uint32_t rtspserver_timestamp(uint8_t source, uint32_t samplerate) {
         case LIBRTSPSERVER_TYPE_H265:  return xop::H265Source::GetTimestamp();
         case LIBRTSPSERVER_TYPE_AAC:   return xop::AACSource::GetTimestamp(samplerate);
         case LIBRTSPSERVER_TYPE_G711A: return xop::G711ASource::GetTimestamp();
+        case LIBRTSPSERVER_TYPE_VP8:   return xop::VP8Source::GetTimestamp();
         default: return 0;
     }
 }

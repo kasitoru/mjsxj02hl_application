@@ -26,7 +26,7 @@ bool mqtt_is_connected();
 bool mqtt_is_ready();
 
 // Free mqtt
-bool mqtt_free();
+bool mqtt_free(bool force);
 
 // Get full topic
 char* mqtt_fulltopic(char *topic);
