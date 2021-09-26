@@ -53,11 +53,6 @@ static int night_mode_change_callback(int state) {
     logger("night", "night_mode_change_callback", LOGGER_LEVEL_DEBUG, "state = %d", state);
     switch(state) {
         case NIGHT_MODE_STATE_NIGHTTIME: // night
-            // Open IR-cut filter
-            if(local_sdk_open_ircut() == LOCALSDK_ERROR) {
-                logger("night", "night_mode_change_callback", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_open_ircut()");
-                result = LOCALSDK_ERROR;
-            } else logger("night", "night_mode_change_callback", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_open_ircut()");
             // Enable grayscale
             if(APP_CFG.night.gray == 2) { // auto
                 if(local_sdk_video_set_night_mode() == LOCALSDK_ERROR) {
@@ -65,6 +60,11 @@ static int night_mode_change_callback(int state) {
                     result = LOCALSDK_ERROR;
                 } else logger("night", "night_mode_change_callback", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_video_set_night_mode()");
             }
+            // Open IR-cut filter
+            if(local_sdk_open_ircut() == LOCALSDK_ERROR) {
+                logger("night", "night_mode_change_callback", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_open_ircut()");
+                result = LOCALSDK_ERROR;
+            } else logger("night", "night_mode_change_callback", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_open_ircut()");
             // MQTT
             if(mqtt_is_ready()) {
                 if(night_state_mqtt(true, (APP_CFG.night.gray == 2 ? true : (APP_CFG.night.gray == 1)))) {
