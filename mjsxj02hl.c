@@ -32,10 +32,10 @@ void signal_callback(int signal) {
     }
 
     // MQTT free
-    if(mqtt_free()) {
-        logger("mjsxj02hl_application", "signal_callback", LOGGER_LEVEL_INFO, "%s success.", "mqtt_free()");
+    if(mqtt_free(true)) {
+        logger("mjsxj02hl_application", "signal_callback", LOGGER_LEVEL_INFO, "%s success.", "mqtt_free(true)");
     } else {
-        logger("mjsxj02hl_application", "signal_callback", LOGGER_LEVEL_WARNING, "%s error!", "mqtt_free()");
+        logger("mjsxj02hl_application", "signal_callback", LOGGER_LEVEL_WARNING, "%s error!", "mqtt_free(true)");
         signal = EX_SOFTWARE;
     }
 

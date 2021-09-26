@@ -323,7 +323,7 @@ static void mqtt_disconnect_callback(void *context, char *cause) {
     logger("mqtt", "mqtt_disconnect_callback", LOGGER_LEVEL_DEBUG, "Function is called...");
     do {
         logger("mqtt", "mqtt_disconnect_callback", LOGGER_LEVEL_WARNING, "The connection to the MQTT server was lost! Wait %d seconds...", MQTT_RECONNECT_INTERVAL);
-        mqtt_free();
+        mqtt_free(false);
         sleep(MQTT_RECONNECT_INTERVAL);
         pthread_testcancel();
     } while(mqtt_initialization(false) == false);
@@ -420,17 +420,19 @@ bool mqtt_is_ready() {
 }
 
 // Free mqtt
-bool mqtt_free() {
+bool mqtt_free(bool force) {
     bool result = true;
     logger("mqtt", "mqtt_free", LOGGER_LEVEL_DEBUG, "Function is called...");
     if(mqtt_is_enabled()) { // If MQTT enabled
         // Stop reconnection
-        if(reconnection_thread) {
-            if(pthread_cancel(reconnection_thread) == 0) {
-                logger("mqtt", "mqtt_free", LOGGER_LEVEL_INFO, "%s success.", "pthread_cancel(reconnection_thread)");
-            } else {
-                logger("mqtt", "mqtt_free", LOGGER_LEVEL_WARNING, "%s error!", "pthread_cancel(reconnection_thread)");
-                result = false;
+        if(force) {
+            if(reconnection_thread) {
+                if(pthread_cancel(reconnection_thread) == 0) {
+                    logger("mqtt", "mqtt_free", LOGGER_LEVEL_INFO, "%s success.", "pthread_cancel(reconnection_thread)");
+                } else {
+                    logger("mqtt", "mqtt_free", LOGGER_LEVEL_WARNING, "%s error!", "pthread_cancel(reconnection_thread)");
+                    result = false;
+                }
             }
         }
         // Stop periodic data sending
