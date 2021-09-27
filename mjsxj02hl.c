@@ -139,13 +139,6 @@ int main(int argc, char **argv) {
     logger("mjsxj02hl_application", "main", LOGGER_LEVEL_FORCED, "Firmware version: %s", fw_version);
     free(fw_version);
     
-    // Build time
-    struct tm compile_time;
-    if(strptime(__DATE__ ", " __TIME__, "%b %d %Y, %H:%M:%S", &compile_time) != NULL) {
-        int build_time = (int) mktime(&compile_time);
-        logger("mjsxj02hl_application", "main", LOGGER_LEVEL_FORCED, "Build time: %d", build_time);
-    } else logger("mjsxj02hl_application", "main", LOGGER_LEVEL_WARNING, "%s error!", "strptime()");
-    
     // Main thread
     if(configs_init(config_filename)) { // Init configs
         logger("mjsxj02hl_application", "main", LOGGER_LEVEL_INFO, "%s success.", "configs_init()");

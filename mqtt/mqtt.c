@@ -102,14 +102,6 @@ static void* mqtt_periodical(void *arg) {
             // FW version
             char *fw_version = firmware_version();
             yyjson_mut_obj_add_str(json_doc, json_root, "fw_version", fw_version);
-            // Build time
-            int build_time = -1;
-            struct tm compile_time;
-            if(strptime(__DATE__ ", " __TIME__, "%b %d %Y, %H:%M:%S", &compile_time) != NULL) {
-                logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_INFO, "%s success.", "strptime()");
-                build_time = (int) mktime(&compile_time);
-            } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_WARNING, "%s error!", "strptime()");
-            yyjson_mut_obj_add_int(json_doc, json_root, "build_time", build_time);
             // Startup timestamp
             int startup = (int) -1;
             struct stat proc_self;
