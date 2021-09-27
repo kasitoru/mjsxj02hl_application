@@ -28,7 +28,12 @@ cd mjsxj02hl_application
 sudo chmod 755 /opt/hisi-linux/x86-arm/arm-himix100-linux/target/usr/app/lib
 ```
 
-5. Build application:
+5. Update submodules (optional):
+```bash
+make update-libs
+```
+
+6. Build application:
 ```bash
 make
 ```
@@ -38,6 +43,8 @@ To save time, you can disable the build of external libraries:
 ```bash
 make SKIP_EXTERNAL_LIBS=ON
 ```
+
+...and skip step №5.
 
 ## Configuration
 
