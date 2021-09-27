@@ -102,14 +102,6 @@ static void* mqtt_periodical(void *arg) {
             // FW version
             char *fw_version = firmware_version();
             yyjson_mut_obj_add_str(json_doc, json_root, "fw_version", fw_version);
-            // Build time
-            int build_time = -1;
-            struct tm compile_time;
-            if(strptime(__DATE__ ", " __TIME__, "%b %d %Y, %H:%M:%S", &compile_time) != NULL) {
-                logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_INFO, "%s success.", "strptime()");
-                build_time = (int) mktime(&compile_time);
-            } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_WARNING, "%s error!", "strptime()");
-            yyjson_mut_obj_add_int(json_doc, json_root, "build_time", build_time);
             // Startup timestamp
             int startup = (int) -1;
             struct stat proc_self;
@@ -198,7 +190,6 @@ static void* mqtt_periodical(void *arg) {
             // Free resources
             yyjson_mut_doc_free(json_doc);
             free(image_url);
-            free(ip_address);
             free(fw_version);
             free(topic);
         } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_ERROR, "%s error!", "mqtt_fulltopic()");
@@ -298,6 +289,18 @@ static int mqtt_message_callback(void *context, char *topicName, int topicLen, M
                 if(speaker_stop_media()) {
                     logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_INFO, "%s success.", "speaker_stop_media()");
                 } else logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_ERROR, "%s error!", "speaker_stop_media()");
+            // Restart
+            } else if(strcmp(yyjson_get_str(json_action), "restart") == 0) {
+                logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_INFO, "%s success.", "strcmp(\"restart\")");
+                if(system("restart.sh &") == 0) {
+                    logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_INFO, "%s success.", "system(\"restart.sh\")");
+                } else logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_ERROR, "%s error!", "system(\"restart.sh\")");
+            // Reboot
+            } else if(strcmp(yyjson_get_str(json_action), "reboot") == 0) {
+                logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_INFO, "%s success.", "strcmp(\"reboot\")");
+                if(system("reboot &") == 0) {
+                    logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_INFO, "%s success.", "system(\"reboot\")");
+                } else logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_ERROR, "%s error!", "system(\"reboot\")");
             // Unknown action
             } else logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_ERROR, "%s error!", "Unknown action");
             mqtt_periodical((void *) false); // Send new data

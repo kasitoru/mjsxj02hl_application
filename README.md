@@ -159,6 +159,8 @@ Command | Parameters | Description | Example payload
 `set_volume` | `value` (integer) | Set volume level for speaker (0-100). | { "action": "set_volume", "value": 100 }
 `play_media` | `filename` (string), `type` (string, optional), `volume` (integer, optional) | Play the specified media file. Two types are supported: "pcm" (WAV, 8000 hz, 16-bit, mono) and "g711" (A-Law, 8000 hz, 16-bit, mono). | { "action": "play_media", "filename": "/mnt/mmc/media.wav", "type": "pcm", "volume": 75 }
 `stop_media` | | Stop current playback. | { "action": "stop_media" }
+`restart` | | Restart the main thread of mjsxj02hl application | { "action": "restart" }
+`reboot` | | Reboot the device. | { "action": "reboot" }
 
 ### Output topics
 
@@ -170,7 +172,6 @@ Field | Description
 ----- | -----------
 `sdk_version` | Version of localsdk library.
 `fw_version` | Version of the firmware.
-`build_time` | Application compile timestamp.
 `startup` | Application startup timestamp.
 `timestamp` | Current timestamp.
 `ip_address` | IP address of the device.
