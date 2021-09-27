@@ -290,6 +290,12 @@ static int mqtt_message_callback(void *context, char *topicName, int topicLen, M
                 if(speaker_stop_media()) {
                     logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_INFO, "%s success.", "speaker_stop_media()");
                 } else logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_ERROR, "%s error!", "speaker_stop_media()");
+            // Reboot
+            } else if(strcmp(yyjson_get_str(json_action), "reboot") == 0) {
+                logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_INFO, "%s success.", "strcmp(\"reboot\")");
+                if(system("reboot") == 0) {
+                    logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_INFO, "%s success.", "system(\"reboot\")");
+                } else logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_ERROR, "%s error!", "system(\"reboot\")");
             // Unknown action
             } else logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_ERROR, "%s error!", "Unknown action");
             mqtt_periodical((void *) false); // Send new data
