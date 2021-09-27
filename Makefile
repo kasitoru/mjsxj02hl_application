@@ -24,7 +24,7 @@ mjsxj02hl: ./mjsxj02hl.c external-libs objects
 #################
 
 ifndef SKIP_EXTERNAL_LIBS
-external-libs: clean-libs mkdir-libs update-libs build-libs install-libs
+external-libs: clean-libs mkdir-libs build-libs install-libs
 else
 external-libs:
 endif
