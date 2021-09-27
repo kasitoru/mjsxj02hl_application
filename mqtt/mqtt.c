@@ -294,6 +294,7 @@ static int mqtt_message_callback(void *context, char *topicName, int topicLen, M
             } else if(strcmp(yyjson_get_str(json_action), "reboot") == 0) {
                 logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_INFO, "%s success.", "strcmp(\"reboot\")");
                 if(system("reboot") == 0) {
+                if(system("reboot &") == 0) {
                     logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_INFO, "%s success.", "system(\"reboot\")");
                 } else logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_ERROR, "%s error!", "system(\"reboot\")");
             // Unknown action
