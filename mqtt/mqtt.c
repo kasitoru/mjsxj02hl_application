@@ -190,7 +190,6 @@ static void* mqtt_periodical(void *arg) {
             // Free resources
             yyjson_mut_doc_free(json_doc);
             free(image_url);
-            free(ip_address);
             free(fw_version);
             free(topic);
         } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_ERROR, "%s error!", "mqtt_fulltopic()");
@@ -290,10 +289,15 @@ static int mqtt_message_callback(void *context, char *topicName, int topicLen, M
                 if(speaker_stop_media()) {
                     logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_INFO, "%s success.", "speaker_stop_media()");
                 } else logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_ERROR, "%s error!", "speaker_stop_media()");
+            // Restart
+            } else if(strcmp(yyjson_get_str(json_action), "restart") == 0) {
+                logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_INFO, "%s success.", "strcmp(\"restart\")");
+                if(system("restart.sh &") == 0) {
+                    logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_INFO, "%s success.", "system(\"restart.sh\")");
+                } else logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_ERROR, "%s error!", "system(\"restart.sh\")");
             // Reboot
             } else if(strcmp(yyjson_get_str(json_action), "reboot") == 0) {
                 logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_INFO, "%s success.", "strcmp(\"reboot\")");
-                if(system("reboot") == 0) {
                 if(system("reboot &") == 0) {
                     logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_INFO, "%s success.", "system(\"reboot\")");
                 } else logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_ERROR, "%s error!", "system(\"reboot\")");
