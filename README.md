@@ -18,7 +18,7 @@ sudo ./arm-himix100-linux.install
 3. Clone the repository:
 
 ```bash
-git clone https://github.com/avdeevsv91/mjsxj02hl_application
+git clone https://github.com/kasitoru/mjsxj02hl_application
 cd mjsxj02hl_application
 ```
 

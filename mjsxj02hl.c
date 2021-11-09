@@ -126,7 +126,7 @@ int main(int argc, char **argv) {
             printf("\n");
             printf("  --help                    Display this message.\n");
             printf("\n");
-            printf("Report an error or help in the development of the project you can on the page %s\n", "https://github.com/avdeevsv91/mjsxj02hl_application");
+            printf("Report an error or help in the development of the project you can on the page %s\n", "https://github.com/kasitoru/mjsxj02hl_application");
             return EX_OK;
         } else {
             printf("Error: unknown action! Use the --help option for more information.\n");
