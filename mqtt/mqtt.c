@@ -195,8 +195,8 @@ static void* mqtt_periodical(void *arg) {
         } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_ERROR, "%s error!", "mqtt_fulltopic()");
         // Sleep
         if(endless_cycle) {
-            logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_INFO, "Wait %d seconds until the next sending...", MQTT_PERIODICAL_INTERVAL);
-            sleep(MQTT_PERIODICAL_INTERVAL);
+            logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_INFO, "Wait %d seconds until the next sending...", APP_CFG.mqtt.periodical_interval);
+            sleep(APP_CFG.mqtt.periodical_interval);
             pthread_testcancel();
         }
     } while(endless_cycle);

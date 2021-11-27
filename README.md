@@ -125,6 +125,7 @@ topic = mjsxj02hl              ; Topic name
 qos = 1                        ; Quality of Service (0, 1 or 2)
 retain = false                 ; Retained messages
 reconnection_interval = 60     ; Reconnection interval (in seconds)
+periodical_interval = 300      ; Interval of periodic message (in seconds)
 
 [night]
 mode = 2                       ; Night mode (0 = off, 1 = on, 2 = auto)

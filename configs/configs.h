@@ -97,6 +97,7 @@ typedef struct {
         int qos;
         bool retain;
         int reconnection_interval;
+        int periodical_interval;
     } mqtt;
     
     // [night]
