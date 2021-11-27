@@ -96,6 +96,7 @@ typedef struct {
         char* topic;
         int qos;
         bool retain;
+        int reconnection_interval;
     } mqtt;
     
     // [night]

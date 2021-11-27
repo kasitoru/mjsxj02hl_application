@@ -325,9 +325,9 @@ static bool mqtt_initialization(bool first_init);
 static void mqtt_disconnect_callback(void *context, char *cause) {
     logger("mqtt", "mqtt_disconnect_callback", LOGGER_LEVEL_DEBUG, "Function is called...");
     do {
-        logger("mqtt", "mqtt_disconnect_callback", LOGGER_LEVEL_WARNING, "The connection to the MQTT server was lost! Wait %d seconds...", MQTT_RECONNECT_INTERVAL);
+        logger("mqtt", "mqtt_disconnect_callback", LOGGER_LEVEL_WARNING, "The connection to the MQTT server was lost! Wait %d seconds...", APP_CFG.mqtt.reconnection_interval);
         mqtt_free(false);
-        sleep(MQTT_RECONNECT_INTERVAL);
+        sleep(APP_CFG.mqtt.reconnection_interval);
         pthread_testcancel();
     } while(mqtt_initialization(false) == false);
     logger("mqtt", "mqtt_disconnect_callback", LOGGER_LEVEL_DEBUG, "Function completed.");
