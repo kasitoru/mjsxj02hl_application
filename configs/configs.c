@@ -81,7 +81,7 @@ APPLICATION_CONFIGURATION APP_CFG = {
     .mqtt.qos                     = 1,                                      // Quality of Service (0, 1 or 2)
     .mqtt.retain                  = false,                                  // Retained messages
     .mqtt.reconnection_interval   = 60,                                     // Reconnection interval (in seconds)
-    .mqtt.periodical_interval     = 300,                                    // Interval of periodic message (in seconds)
+    .mqtt.periodical_interval     = 60,                                     // Interval of periodic message (in seconds)
     
     // [night]
     .night.mode                   = 2,                                      // Night mode (0 = off, 1 = on, 2 = auto)
