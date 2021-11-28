@@ -39,11 +39,17 @@ int logger(const char *module, const char *function, const int level, const char
     char *frmt_buffer = malloc(frmt_size);
     strncpy(frmt_buffer, format, frmt_size);
     frmt_buffer[strcspn(frmt_buffer, "\r\n")] = 0;
+    // Date & Time
+    time_t rawtime;
+    time(&rawtime);
+    struct tm *timeinfo = localtime(&rawtime); 
+    char datetime[18];
+    strftime(datetime, sizeof(datetime), "%x %X", timeinfo);
     // Print message
     va_list params;
     va_start(params, format);
     if(vasprintf(&message, frmt_buffer, params) > 0) {
-        result = logger_write(level, "[%s][%s]: %s\n", module, function, message);
+        result = logger_write(level, "[%s] [%s][%s]: %s\n", datetime, module, function, message);
     }
     va_end(params);
     free(message);
