@@ -383,7 +383,9 @@ static bool mqtt_initialization(bool first_init) {
                 // Set callbacks
                 if(MQTTClient_setCallbacks(MQTTclient, NULL, mqtt_disconnect_callback, mqtt_message_callback, mqtt_delivery_callback) == MQTTCLIENT_SUCCESS) {
                     logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_INFO, "%s success.", "MQTTClient_setCallbacks()");
+                    // Connection options
                     MQTTClient_connectOptions connect_options = MQTTClient_connectOptions_initializer;
+                    connect_options.connectTimeout = MQTT_TIMEOUT;
                     // Get authorization data
                     if(APP_CFG.mqtt.username && APP_CFG.mqtt.username[0]) {
                         connect_options.username = APP_CFG.mqtt.username;
@@ -506,7 +508,7 @@ bool mqtt_free(bool force) {
                 } else logger("mqtt", "mqtt_free", LOGGER_LEVEL_WARNING, "%s error!", "mqtt_fulltopic()");
             }
             // Disconnect
-            if(MQTTClient_disconnect(MQTTclient, MQTT_DISCONNECT_TIMEOUT) == MQTTCLIENT_SUCCESS) {
+            if(MQTTClient_disconnect(MQTTclient, MQTT_TIMEOUT * 1000) == MQTTCLIENT_SUCCESS) {
                 logger("mqtt", "mqtt_free", LOGGER_LEVEL_INFO, "%s success.", "MQTTClient_disconnect()");
             } else {
                 logger("mqtt", "mqtt_free", LOGGER_LEVEL_WARNING, "%s error!", "MQTTClient_disconnect()");

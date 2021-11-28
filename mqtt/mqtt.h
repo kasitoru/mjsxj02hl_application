@@ -4,7 +4,7 @@
 #include <stdbool.h>
 
 #define MQTT_CLIENT_ID           "MJSXJ02HL"
-#define MQTT_DISCONNECT_TIMEOUT  10000
+#define MQTT_TIMEOUT             5
 
 #define MQTT_INFO_TOPIC          "info"
 #define MQTT_ALARM_TOPIC         "alarm"
