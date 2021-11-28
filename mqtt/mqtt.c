@@ -101,16 +101,16 @@ static void* mqtt_periodical(void *arg) {
         // First iteration
         if(first) {
             first = false;
+            // Send online status
+            char *status_topic = mqtt_fulltopic(MQTT_STATUS_TOPIC);
+            if(status_topic && status_topic[0]) {
+                logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_INFO, "%s success.", "mqtt_fulltopic()");
+                if(mqtt_send(status_topic, MQTT_STATUS_ONLINE)) {
+                    logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_INFO, "%s success.", "mqtt_send()");
+                } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_ERROR, "%s error!", "mqtt_send()");
+                free(status_topic);
+            } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_ERROR, "%s error!", "mqtt_fulltopic()");
         }
-        // Send online status
-        char *status_topic = mqtt_fulltopic(MQTT_STATUS_TOPIC);
-        if(status_topic && status_topic[0]) {
-            logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_INFO, "%s success.", "mqtt_fulltopic()");
-            if(mqtt_send(status_topic, MQTT_STATUS_ONLINE)) {
-                logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_INFO, "%s success.", "mqtt_send()");
-            } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_ERROR, "%s error!", "mqtt_send()");
-            free(status_topic);
-        } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_ERROR, "%s error!", "mqtt_fulltopic()");
         // Send system info
         char *info_topic = mqtt_fulltopic(MQTT_INFO_TOPIC);
         if(info_topic && info_topic[0]) {
