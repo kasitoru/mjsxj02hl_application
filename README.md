@@ -149,15 +149,15 @@ Running without arguments starts the main thread of the application.
 
 ## RTSP
 
-Network URL: `rtsp://<ip-address>:<port>/<channel_name>`
+Network URL: `rtsp://[<rtsp_user>:<rtsp_password>@]<ip-address>:<port>/<channel_name>`
 
-Example: `rtsp://192.168.1.18:554/primary`
+Example: `rtsp://192.168.1.18:554/primary` or `rtsp://user:password@192.168.1.18:554/secondary`
 
 ## MQTT
 
 ### Input topics
 
-**Topic: mjsxj02hl/cmd**
+**Topic: mjsxj02hl/<device>/cmd**
 
 Execute the specified command on the device.
 
@@ -172,7 +172,7 @@ Command | Parameters | Description | Example payload
 
 ### Output topics
 
-**Topic: mjsxj02hl/info**
+**Topic: mjsxj02hl/<device>/info**
 
 This is a topic where general device state is published.
 
@@ -193,7 +193,7 @@ Field | Description
 `media_status` | Playback status (0 = stopped, 1 = playing, 2 = stopping).
 `image_url` | URL address of the JPEG image from the camera.
 
-**Topic: mjsxj02hl/alarm**
+**Topic: mjsxj02hl/<device>/alarm**
 
 This is a topic where motion detection events is published.
 
@@ -203,7 +203,7 @@ Field | Description
 `humanoid` | Humanoid detection state.
 `timestamp` | Current timestamp.
 
-**Topic: mjsxj02hl/night**
+**Topic: mjsxj02hl/<device>/night**
 
 This is a topic where the state of night mode is published.
 
