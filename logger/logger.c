@@ -36,7 +36,7 @@ int logger(const char *module, const char *function, const int level, const char
     char *message;
     // Trim new line symbols
     size_t frmt_size = strlen(format) + 1;
-    char* frmt_buffer = malloc(frmt_size);
+    char *frmt_buffer = malloc(frmt_size);
     strncpy(frmt_buffer, format, frmt_size);
     frmt_buffer[strcspn(frmt_buffer, "\r\n")] = 0;
     // Print message
