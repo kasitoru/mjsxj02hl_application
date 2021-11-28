@@ -9,6 +9,7 @@
 // Default values
 APPLICATION_CONFIGURATION APP_CFG = {
     // [general]
+    .general.name                 = "MJSXJ02HL",                            // Device name
     .general.led                  = true,                                   // Enable onboard LED indicator
 
     // [logger]
@@ -96,7 +97,9 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
     #define atob(v) strcmp(value, "true") == 0 || strcmp(value, "yes") == 0 || strcmp(value, "on") == 0 || strcmp(value, "1") == 0
     
     // [general]
-    if(MATCH("general", "led")) {
+    if(MATCH("general", "name")) {
+        config->general.name = strdup(value);
+    } else if(MATCH("general", "led")) {
         config->general.led = atob(value);
     
     // [logger]

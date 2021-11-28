@@ -8,6 +8,7 @@ typedef struct {
 
     // [general]
     struct {
+        char* name;
         bool led;
     } general;
 
