@@ -75,8 +75,6 @@ humanoid = false               ; Display detected humanoids in rectangles
 gop = 1                        ; Group of pictures (GOP) every N*FPS (20)
 flip = false                   ; Flip image (all channels)
 mirror = false                 ; Mirror image (all channels)
-primary_enable = true          ; Enable video for primary channel
-secondary_enable = true        ; Enable video for secondary channel
 primary_type = 1               ; Video compression standard for primary channel (1 = h264, 2 = h265)
 secondary_type = 1             ; Video compression standard for secondary channel (1 = h264, 2 = h265)
 primary_bitrate = 1800         ; Bitrate for primary channel

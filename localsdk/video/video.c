@@ -24,24 +24,11 @@ static int h26x_capture_callback(int chn, LOCALSDK_H26X_FRAME_INFO *frameInfo) {
 }
 
 static int h26x_capture_primary_channel(LOCALSDK_H26X_FRAME_INFO *frameInfo) {
-    if(video_is_enabled(LOCALSDK_VIDEO_PRIMARY_CHANNEL)) {
-        return h26x_capture_callback(LOCALSDK_VIDEO_PRIMARY_CHANNEL, frameInfo);
-    } else return LOCALSDK_ERROR;
+    return h26x_capture_callback(LOCALSDK_VIDEO_PRIMARY_CHANNEL, frameInfo);
 }
 
 static int h26x_capture_secondary_channel(LOCALSDK_H26X_FRAME_INFO *frameInfo) {
-    if(video_is_enabled(LOCALSDK_VIDEO_SECONDARY_CHANNEL)) {
-        return h26x_capture_callback(LOCALSDK_VIDEO_SECONDARY_CHANNEL, frameInfo);
-    } else return LOCALSDK_ERROR;
-}
-
-// Is enabled
-bool video_is_enabled(int channel) {
-    switch(channel) {
-        case LOCALSDK_VIDEO_PRIMARY_CHANNEL: return APP_CFG.video.primary_enable;
-        case LOCALSDK_VIDEO_SECONDARY_CHANNEL: return APP_CFG.video.secondary_enable;
-        default: return false;
-    }
+    return h26x_capture_callback(LOCALSDK_VIDEO_SECONDARY_CHANNEL, frameInfo);
 }
 
 // Init video
@@ -63,7 +50,7 @@ bool video_init() {
                     .flip        = APP_CFG.video.flip,
                     .mirror      = APP_CFG.video.mirror,
                     .unknown_5   = 0, // FIXME: what is it?
-                    .video       = video_is_enabled(LOCALSDK_VIDEO_PRIMARY_CHANNEL),
+                    .video       = true,
                     .osd         = osd_is_enabled(),
                     .payload     = APP_CFG.video.primary_type,
                     .rcmode      = APP_CFG.video.primary_rcmode,
@@ -99,7 +86,7 @@ bool video_init() {
                                                     .flip        = APP_CFG.video.flip,
                                                     .mirror      = APP_CFG.video.mirror,
                                                     .unknown_5   = 1, // FIXME: what is it?
-                                                    .video       = video_is_enabled(LOCALSDK_VIDEO_SECONDARY_CHANNEL),
+                                                    .video       = true,
                                                     .osd         = false, // Not work for secondary channel
                                                     .payload     = APP_CFG.video.secondary_type,
                                                     .rcmode      = APP_CFG.video.secondary_rcmode,

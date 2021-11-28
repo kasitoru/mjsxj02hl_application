@@ -3,9 +3,6 @@
 
 #include <stdbool.h>
 
-// Is enabled
-bool video_is_enabled(int channel);
-
 // Init video
 bool video_init();
 

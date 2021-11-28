@@ -37,8 +37,6 @@ typedef struct {
         int gop;
         bool flip;
         bool mirror;
-        bool primary_enable;
-        bool secondary_enable;
         int primary_type;
         int secondary_type;
         int primary_bitrate;

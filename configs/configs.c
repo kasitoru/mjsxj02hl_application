@@ -32,8 +32,6 @@ APPLICATION_CONFIGURATION APP_CFG = {
     .video.gop                    = 1,                                      // Group of pictures (GOP) every N*FPS (20)
     .video.flip                   = false,                                  // Flip image (all channels)
     .video.mirror                 = false,                                  // Mirror image (all channels)
-    .video.primary_enable         = true,                                   // Enable video for primary channel
-    .video.secondary_enable       = true,                                   // Enable video for secondary channel
     .video.primary_type           = LOCALSDK_VIDEO_PAYLOAD_H264,            // Video compression standard for primary channel
     .video.secondary_type         = LOCALSDK_VIDEO_PAYLOAD_H264,            // Video compression standard for secondary channel
     .video.primary_bitrate        = 1800,                                   // Bitrate for primary channel
@@ -138,10 +136,6 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
         config->video.flip = atob(value);
     } else if(MATCH("video", "mirror")) {
         config->video.mirror = atob(value);
-    } else if(MATCH("video", "primary_enable")) {
-        config->video.primary_enable = atob(value);
-    } else if(MATCH("video", "secondary_enable")) {
-        config->video.secondary_enable = atob(value);
     } else if(MATCH("video", "primary_type")) {
         config->video.primary_type = atoi(value);
     } else if(MATCH("video", "secondary_type")) {
