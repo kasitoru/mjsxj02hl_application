@@ -79,7 +79,7 @@ APPLICATION_CONFIGURATION APP_CFG = {
     .mqtt.password                = "",                                     // Password (empty for disable)
     .mqtt.topic                   = "mjsxj02hl",                            // Name of the root topic
     .mqtt.qos                     = 1,                                      // Quality of Service (0, 1 or 2)
-    .mqtt.retain                  = false,                                  // Retained messages
+    .mqtt.retain                  = true,                                   // Retained messages
     .mqtt.reconnection_interval   = 60,                                     // Reconnection interval (in seconds)
     .mqtt.periodical_interval     = 60,                                     // Interval of periodic message (in seconds)
     
