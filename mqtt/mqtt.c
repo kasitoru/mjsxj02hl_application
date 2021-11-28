@@ -2,6 +2,7 @@
 #define _GNU_SOURCE 1
 #endif
 
+#include <ctype.h>
 #include <stdbool.h>
 #include <unistd.h>
 #include <stdarg.h>
@@ -29,9 +30,24 @@ static pthread_t playmedia_thread;
 char* mqtt_fulltopic(char *topic) {
     char *payload;
     logger("mqtt", "mqtt_fulltopic", LOGGER_LEVEL_DEBUG, "Function is called...");
-    if(asprintf(&payload, "%s/%s", APP_CFG.mqtt.topic, topic) > 0) {
+    // Get subtopic from device name
+    size_t j = 0;
+    size_t length = strlen(APP_CFG.general.name) + 1;
+    char *subtopic = malloc(length);
+    memset(subtopic, '\0', length);
+    for(size_t i = 0; APP_CFG.general.name[i] != '\0'; i++) {
+        char chr = tolower(APP_CFG.general.name[i]);
+        if(isspace(chr)) {
+            subtopic[i-j] = '_';
+        } else if(isalnum(chr)) {
+            subtopic[i-j] = chr;
+        } else j++;
+    }
+    // Glue the parts into a full topic
+    if(asprintf(&payload, "%s/%s/%s", APP_CFG.mqtt.topic, subtopic, topic) > 0) {
         logger("mqtt", "mqtt_fulltopic", LOGGER_LEVEL_INFO, "%s success.", "asprintf()");
     } else logger("mqtt", "mqtt_fulltopic", LOGGER_LEVEL_ERROR, "%s error!", "asprintf()");
+    free(subtopic);
     logger("mqtt", "mqtt_fulltopic", LOGGER_LEVEL_DEBUG, "Function completed.");
     return payload;
 }
@@ -374,8 +390,9 @@ static bool mqtt_initialization(bool first_init) {
                     if(MQTTClient_connect(MQTTclient, &connect_options) == MQTTCLIENT_SUCCESS) {
                         logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_INFO, "%s success.", "MQTTClient_connect()");
                         // Subscribe to topic
-                        char *command_topic;
-                        if(asprintf(&command_topic, "%s/%s", APP_CFG.mqtt.topic, MQTT_COMMAND_TOPIC) > 0) {
+                        char *command_topic = mqtt_fulltopic(MQTT_COMMAND_TOPIC);
+                        if(command_topic && command_topic[0]) {
+                            logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_INFO, "%s success.", "mqtt_fulltopic()");
                             logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_DEBUG, "Command topic: %s", command_topic);
                             if(MQTTClient_subscribe(MQTTclient, command_topic, true) == MQTTCLIENT_SUCCESS) {
                                 logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_INFO, "%s success.", "MQTTClient_subscribe()");
@@ -386,7 +403,7 @@ static bool mqtt_initialization(bool first_init) {
                                 } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_ERROR, "%s error!", "pthread_create(periodical_thread)");
                             } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_ERROR, "%s error!", "MQTTClient_subscribe()");
                             free(command_topic);
-                        } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_ERROR, "%s error!", "asprintf()");
+                        } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_ERROR, "%s error!", "mqtt_fulltopic()");
                     } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_ERROR, "%s error!", "MQTTClient_connect()");
                 } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_ERROR, "%s error!", "MQTTClient_setCallbacks()");
             } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_ERROR, "%s error!", "MQTTClient_create()");
@@ -448,8 +465,9 @@ bool mqtt_free(bool force) {
             }
         }
         // Unsubscribe
-        char *command_topic;
-        if(asprintf(&command_topic, "%s/%s", APP_CFG.mqtt.topic, MQTT_COMMAND_TOPIC) > 0) {
+        char *command_topic = mqtt_fulltopic(MQTT_COMMAND_TOPIC);
+        if(command_topic && command_topic[0]) {
+            logger("mqtt", "mqtt_free", LOGGER_LEVEL_INFO, "%s success.", "mqtt_fulltopic()");
             if(MQTTClient_unsubscribe(MQTTclient, command_topic) == MQTTCLIENT_SUCCESS) {
                 logger("mqtt", "mqtt_free", LOGGER_LEVEL_INFO, "%s success.", "MQTTClient_unsubscribe()");
             } else {
@@ -458,7 +476,7 @@ bool mqtt_free(bool force) {
             }
             free(command_topic);
         } else {
-            logger("mqtt", "mqtt_free", LOGGER_LEVEL_WARNING, "%s error!", "asprintf()");
+            logger("mqtt", "mqtt_free", LOGGER_LEVEL_WARNING, "%s error!", "mqtt_fulltopic()");
             result = false;
         }
         // Disconnect
