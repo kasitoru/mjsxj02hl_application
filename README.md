@@ -172,6 +172,10 @@ Command | Parameters | Description | Example payload
 
 ### Output topics
 
+**Topic: mjsxj02hl/<device>/status**
+
+This is a topic where availability status of the device is published (`online` or `offline`).
+
 **Topic: mjsxj02hl/<device>/info**
 
 This is a topic where general device state is published.

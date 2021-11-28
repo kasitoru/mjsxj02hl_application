@@ -102,6 +102,15 @@ static void* mqtt_periodical(void *arg) {
         if(first) {
             first = false;
         }
+        // Send online status
+        char *status_topic = mqtt_fulltopic(MQTT_STATUS_TOPIC);
+        if(status_topic && status_topic[0]) {
+            logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_INFO, "%s success.", "mqtt_fulltopic()");
+            if(mqtt_send(status_topic, MQTT_STATUS_ONLINE)) {
+                logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_INFO, "%s success.", "mqtt_send()");
+            } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_ERROR, "%s error!", "mqtt_send()");
+            free(status_topic);
+        } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_ERROR, "%s error!", "mqtt_fulltopic()");
         // Send system info
         char *info_topic = mqtt_fulltopic(MQTT_INFO_TOPIC);
         if(info_topic && info_topic[0]) {
@@ -384,6 +393,13 @@ static bool mqtt_initialization(bool first_init) {
                             logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_DEBUG, "Password: %s", "<hidden>");
                         } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_DEBUG, "Password: %s", "<not_set> (shared connection)");
                     } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_DEBUG, "Username: %s", "<not_set> (anonymous connection)");
+                    // LWT
+                    MQTTClient_willOptions lwt_options = MQTTClient_willOptions_initializer;
+                    lwt_options.topicName = mqtt_fulltopic(MQTT_STATUS_TOPIC);
+                    lwt_options.message = MQTT_STATUS_OFFLINE;
+                    lwt_options.retained = APP_CFG.mqtt.retain;
+                    lwt_options.qos = APP_CFG.mqtt.qos;
+                    connect_options.will = &lwt_options;
                     // Connection to server
                     if(MQTTClient_connect(MQTTclient, &connect_options) == MQTTCLIENT_SUCCESS) {
                         logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_INFO, "%s success.", "MQTTClient_connect()");
@@ -477,6 +493,17 @@ bool mqtt_free(bool force) {
             } else {
                 logger("mqtt", "mqtt_free", LOGGER_LEVEL_WARNING, "%s error!", "mqtt_fulltopic()");
                 result = false;
+            }
+            // Send offline status
+            if(force) {
+                char *status_topic = mqtt_fulltopic(MQTT_STATUS_TOPIC);
+                if(status_topic && status_topic[0]) {
+                    logger("mqtt", "mqtt_free", LOGGER_LEVEL_INFO, "%s success.", "mqtt_fulltopic()");
+                    if(mqtt_send(status_topic, MQTT_STATUS_OFFLINE)) {
+                        logger("mqtt", "mqtt_free", LOGGER_LEVEL_INFO, "%s success.", "mqtt_send()");
+                    } else logger("mqtt", "mqtt_free", LOGGER_LEVEL_WARNING, "%s error!", "mqtt_send()");
+                    free(status_topic);
+                } else logger("mqtt", "mqtt_free", LOGGER_LEVEL_WARNING, "%s error!", "mqtt_fulltopic()");
             }
             // Disconnect
             if(MQTTClient_disconnect(MQTTclient, MQTT_DISCONNECT_TIMEOUT) == MQTTCLIENT_SUCCESS) {
