@@ -77,6 +77,9 @@ int factory_reset_callback() {
 int main(int argc, char **argv) {
     logger("mjsxj02hl_application", "main", LOGGER_LEVEL_DEBUG, "Function is called...");
 
+    // Initialize pseudo-random number generator
+    srand(time(NULL));
+
     // Default path of config file
     char *config_filename = "/usr/app/share/mjsxj02hl.conf";
 
