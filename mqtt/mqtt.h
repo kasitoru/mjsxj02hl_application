@@ -9,10 +9,10 @@
 #define MQTT_ALARM_TOPIC         "alarm"
 #define MQTT_NIGHT_TOPIC         "night"
 #define MQTT_COMMAND_TOPIC       "cmd"
-#define MQTT_STATUS_TOPIC        "status"
+#define MQTT_STATE_TOPIC         "state"
 
-#define MQTT_STATUS_ONLINE       "online"
-#define MQTT_STATUS_OFFLINE      "offline"
+#define MQTT_STATE_ONLINE        "online"
+#define MQTT_STATE_OFFLINE       "offline"
 
 // Init mqtt
 bool mqtt_init();

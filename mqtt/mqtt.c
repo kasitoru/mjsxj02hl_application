@@ -106,12 +106,12 @@ static void* mqtt_periodical(void *arg) {
         // First iteration
         if(first) {
             first = false;
-            // Send online status
-            char *status_topic = mqtt_fulltopic(MQTT_STATUS_TOPIC);
-            if(mqtt_send(status_topic, MQTT_STATUS_ONLINE)) {
+            // Send online state
+            char *state_topic = mqtt_fulltopic(MQTT_STATE_TOPIC);
+            if(mqtt_send(state_topic, MQTT_STATE_ONLINE)) {
                 logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_INFO, "%s success.", "mqtt_send()");
             } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_ERROR, "%s error!", "mqtt_send()");
-            free(status_topic);
+            free(state_topic);
         }
         // Send system info
         char *info_topic = mqtt_fulltopic(MQTT_INFO_TOPIC);
@@ -396,8 +396,8 @@ static bool mqtt_initialization(bool first_init) {
                 } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_DEBUG, "Username: %s", "<not_set> (anonymous connection)");
                 // LWT
                 MQTTClient_willOptions lwt_options = MQTTClient_willOptions_initializer;
-                lwt_options.topicName = mqtt_fulltopic(MQTT_STATUS_TOPIC);
-                lwt_options.message = MQTT_STATUS_OFFLINE;
+                lwt_options.topicName = mqtt_fulltopic(MQTT_STATE_TOPIC);
+                lwt_options.message = MQTT_STATE_OFFLINE;
                 lwt_options.retained = APP_CFG.mqtt.retain;
                 lwt_options.qos = APP_CFG.mqtt.qos;
                 connect_options.will = &lwt_options;
@@ -487,13 +487,13 @@ bool mqtt_free(bool force) {
                 result = false;
             }
             free(command_topic);
-            // Send offline status
+            // Send offline state
             if(force) {
-                char *status_topic = mqtt_fulltopic(MQTT_STATUS_TOPIC);
-                if(mqtt_send(status_topic, MQTT_STATUS_OFFLINE)) {
+                char *state_topic = mqtt_fulltopic(MQTT_STATE_TOPIC);
+                if(mqtt_send(state_topic, MQTT_STATE_OFFLINE)) {
                     logger("mqtt", "mqtt_free", LOGGER_LEVEL_INFO, "%s success.", "mqtt_send()");
                 } else logger("mqtt", "mqtt_free", LOGGER_LEVEL_WARNING, "%s error!", "mqtt_send()");
-                free(status_topic);
+                free(state_topic);
             }
             // Disconnect
             if(MQTTClient_disconnect(MQTTclient, MQTT_TIMEOUT * 1000) == MQTTCLIENT_SUCCESS) {
