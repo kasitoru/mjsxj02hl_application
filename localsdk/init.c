@@ -47,6 +47,22 @@ char *firmware_version() {
     return firmware_version;
 }
 
+// Get device id
+char *device_id() {
+    char *device_id = "null";
+    FILE *devid_file;
+    if(devid_file = fopen("/usr/app/share/.device_id", "r")) {
+        fseek(devid_file, 0, SEEK_END);
+        long devid_size = ftell(devid_file);
+        fseek(devid_file, 0, SEEK_SET);
+        device_id = malloc(devid_size);
+        fread(device_id, 1, devid_size, devid_file);
+        device_id[strcspn(device_id, "\r\n")] = 0;
+        fclose(devid_file);
+    }
+    return device_id;
+}
+
 // Init all
 bool all_init() {
     logger("localsdk-init", "all_init", LOGGER_LEVEL_DEBUG, "Function is called...");

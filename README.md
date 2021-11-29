@@ -184,6 +184,7 @@ Field | Description
 ----- | -----------
 `sdk_version` | Version of localsdk library.
 `fw_version` | Version of the firmware.
+`device_id` | Unique device identifier.
 `startup` | Application startup timestamp.
 `timestamp` | Current timestamp.
 `ip_address` | IP address of the device.

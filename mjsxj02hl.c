@@ -140,6 +140,11 @@ int main(int argc, char **argv) {
     logger("mjsxj02hl_application", "main", LOGGER_LEVEL_FORCED, "Firmware version: %s", fw_version);
     free(fw_version);
     
+    // Device id
+    char *dev_id = device_id();
+    logger("mjsxj02hl_application", "main", LOGGER_LEVEL_FORCED, "Device ID: %s", dev_id);
+    free(dev_id);
+    
     // Main thread
     if(configs_init(config_filename)) { // Init configs
         logger("mjsxj02hl_application", "main", LOGGER_LEVEL_INFO, "%s success.", "configs_init()");

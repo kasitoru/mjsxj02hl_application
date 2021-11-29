@@ -125,6 +125,9 @@ static void* mqtt_periodical(void *arg) {
         // FW version
         char *fw_version = firmware_version();
         yyjson_mut_obj_add_str(json_doc, json_root, "fw_version", fw_version);
+        // Device ID
+        char *dev_id = device_id();
+        yyjson_mut_obj_add_str(json_doc, json_root, "device_id", dev_id);
         // Startup timestamp
         int startup = (int) -1;
         struct stat proc_self;
@@ -209,6 +212,7 @@ static void* mqtt_periodical(void *arg) {
         // Free resources
         yyjson_mut_doc_free(json_doc);
         free(image_url);
+        free(dev_id);
         free(fw_version);
         free(info_topic);
         // Sleep
