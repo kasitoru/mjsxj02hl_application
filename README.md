@@ -52,7 +52,7 @@ Default config `/usr/app/share/mjsxj02hl.conf`:
 
 ```ini
 [general]
-name = MJSXJ02HL               ; Device name
+name = My Camera               ; Device name
 led = true                     ; Enable onboard LED indicator
 
 [logger]

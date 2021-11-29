@@ -9,7 +9,7 @@
 // Default values
 APPLICATION_CONFIGURATION APP_CFG = {
     // [general]
-    .general.name                 = "MJSXJ02HL",                            // Device name
+    .general.name                 = "My Camera",                            // Device name
     .general.led                  = true,                                   // Enable onboard LED indicator
 
     // [logger]
