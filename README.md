@@ -155,9 +155,13 @@ Example: `rtsp://192.168.1.18:554/primary` or `rtsp://user:password@192.168.1.18
 
 ## MQTT
 
+<root_topic>: The value is set in the settings file (section: `mqtt`, name: `topic`). It is recommended not to change the default value.
+
+<device_name>: Value based on a parameter in the settings file (section: `general`, name: `name`). It is converted to lowercase, all characters except letters and numbers are cut off, spaces are replaced with underscores.
+
 ### Input topics
 
-**Topic: mjsxj02hl/<device>/cmd**
+**Topic: <root_topic>/<device_name>/cmd**
 
 Execute the specified command on the device.
 
@@ -172,11 +176,11 @@ Command | Parameters | Description | Example payload
 
 ### Output topics
 
-**Topic: mjsxj02hl/<device>/status**
+**Topic: <root_topic>/<device_name>/status**
 
 This is a topic where availability status of the device is published (`online` or `offline`).
 
-**Topic: mjsxj02hl/<device>/info**
+**Topic: <root_topic>/<device_name>/info**
 
 This is a topic where general device state is published.
 
@@ -198,7 +202,7 @@ Field | Description
 `media_status` | Playback status (0 = stopped, 1 = playing, 2 = stopping).
 `image_url` | URL address of the JPEG image from the camera.
 
-**Topic: mjsxj02hl/<device>/alarm**
+**Topic: <root_topic>/<device_name>/alarm**
 
 This is a topic where motion detection events is published.
 
@@ -208,7 +212,7 @@ Field | Description
 `humanoid` | Humanoid detection state.
 `timestamp` | Current timestamp.
 
-**Topic: mjsxj02hl/<device>/night**
+**Topic: <root_topic>/<device_name>/night**
 
 This is a topic where the state of night mode is published.
 
