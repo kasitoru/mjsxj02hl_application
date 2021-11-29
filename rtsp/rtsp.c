@@ -19,14 +19,12 @@ static uint32_t secondary_session = 0;
 
 // Logger function for libRtspServer
 static int librtspserver_logger(const char *format, ...) {
-    int result = 0;
-    char *message;
+    char *message = "";
     va_list params;
     va_start(params, format);
-    if(vasprintf(&message, format, params) > 0) {
-        result = logger("rtsp", "rtspserver", LOGGER_LEVEL_INFO, message);
-        free(message);
-    }
+    vasprintf(&message, format, params);
+    int result = logger("rtsp", "rtspserver", LOGGER_LEVEL_INFO, message);
+    free(message);
     va_end(params);
     return result;
 }

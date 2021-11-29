@@ -15,33 +15,30 @@ static bool night_state_mqtt(bool night, bool gray) {
     logger("night", "night_state_mqtt", LOGGER_LEVEL_DEBUG, "Function is called...");
     // Send night mode info
     char *topic = mqtt_fulltopic(MQTT_NIGHT_TOPIC);
-    if(topic && topic[0]) {
-        logger("night", "night_state_mqtt", LOGGER_LEVEL_INFO, "%s success.", "mqtt_fulltopic()");
-        // JSON Data
-        yyjson_mut_doc *json_doc = yyjson_mut_doc_new(NULL);
-        yyjson_mut_val *json_root = yyjson_mut_obj(json_doc);
-        yyjson_mut_doc_set_root(json_doc, json_root);
-        // Motion state
-        yyjson_mut_obj_add_bool(json_doc, json_root, "state", night);
-        // Humanoid state
-        yyjson_mut_obj_add_bool(json_doc, json_root, "gray", gray);
-        // Current timestamp
-        int timestamp = (int) time(NULL);
-        yyjson_mut_obj_add_int(json_doc, json_root, "timestamp", timestamp);
-        // Send it
-        const char *json = yyjson_mut_write(json_doc, 0, NULL);
-        if(json) {
-            logger("night", "night_state_mqtt", LOGGER_LEVEL_INFO, "%s success.", "yyjson_mut_write()");
-            if(mqtt_send(topic, (char *) json)) {
-                logger("night", "night_state_mqtt", LOGGER_LEVEL_INFO, "%s success.", "mqtt_send()");
-                result = true;
-            } else logger("night", "night_state_mqtt", LOGGER_LEVEL_ERROR, "%s error!", "mqtt_send()");
-            free((void *)json);
-        } else logger("night", "night_state_mqtt", LOGGER_LEVEL_ERROR, "%s error!", "yyjson_mut_write()");
-        // Free resources
-        yyjson_mut_doc_free(json_doc);
-        free(topic);
-    } else logger("night", "night_state_mqtt", LOGGER_LEVEL_ERROR, "%s error!", "mqtt_fulltopic()");
+    // JSON Data
+    yyjson_mut_doc *json_doc = yyjson_mut_doc_new(NULL);
+    yyjson_mut_val *json_root = yyjson_mut_obj(json_doc);
+    yyjson_mut_doc_set_root(json_doc, json_root);
+    // Motion state
+    yyjson_mut_obj_add_bool(json_doc, json_root, "state", night);
+    // Humanoid state
+    yyjson_mut_obj_add_bool(json_doc, json_root, "gray", gray);
+    // Current timestamp
+    int timestamp = (int) time(NULL);
+    yyjson_mut_obj_add_int(json_doc, json_root, "timestamp", timestamp);
+    // Send it
+    const char *json = yyjson_mut_write(json_doc, 0, NULL);
+    if(json) {
+        logger("night", "night_state_mqtt", LOGGER_LEVEL_INFO, "%s success.", "yyjson_mut_write()");
+        if(mqtt_send(topic, (char *) json)) {
+            logger("night", "night_state_mqtt", LOGGER_LEVEL_INFO, "%s success.", "mqtt_send()");
+            result = true;
+        } else logger("night", "night_state_mqtt", LOGGER_LEVEL_ERROR, "%s error!", "mqtt_send()");
+        free((void *)json);
+    } else logger("night", "night_state_mqtt", LOGGER_LEVEL_ERROR, "%s error!", "yyjson_mut_write()");
+    // Free resources
+    yyjson_mut_doc_free(json_doc);
+    free(topic);
     logger("night", "night_state_mqtt", LOGGER_LEVEL_DEBUG, "Function completed.");
     return result;
 }

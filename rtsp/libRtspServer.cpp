@@ -10,14 +10,12 @@ static std::shared_ptr<xop::RtspServer> rtsp_server;
 
 // Default log printf function
 static int logprintf_default(const char *format, ...) {
-    int result = 0;
     char *message;
     va_list params;
     va_start(params, format);
-    if(vasprintf(&message, format, params) > 0) {
-        result = printf("[rtspserver]: %s\n", message);
-        free(message);
-    }
+    vasprintf(&message, format, params);
+    int result = printf("[rtspserver]: %s\n", message);
+    free(message);
     va_end(params);
     return result;
 }

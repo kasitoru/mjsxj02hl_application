@@ -32,8 +32,7 @@ static int logger_write(const int level, const char *format, ...) {
 
 // Add message to log
 int logger(const char *module, const char *function, const int level, const char *format, ...) {
-    int result = 0;
-    char *message;
+    char *message = "";
     // Trim new line symbols
     size_t frmt_size = strlen(format) + 1;
     char *frmt_buffer = malloc(frmt_size);
@@ -48,9 +47,9 @@ int logger(const char *module, const char *function, const int level, const char
     // Print message
     va_list params;
     va_start(params, format);
-    if(vasprintf(&message, frmt_buffer, params) > 0) {
-        result = logger_write(level, "[%s] [%s][%s]: %s\n", datetime, module, function, message);
-    }
+    vasprintf(&message, frmt_buffer, params);
+    free(frmt_buffer);
+    int result = logger_write(level, "[%s] [%s][%s]: %s\n", datetime, module, function, message);
     va_end(params);
     free(message);
     return result;
