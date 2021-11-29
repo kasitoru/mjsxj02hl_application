@@ -375,7 +375,7 @@ static bool mqtt_initialization(bool first_init) {
         // Get client id
         char *client_id = "";
         char *device_name = mqtt_device_name();
-        asprintf(&client_id, "%s-%s-%d", "MJSXJ02HL", device_name, rand());
+        asprintf(&client_id, "%s-%s-%d", "mjsxj02hl", device_name, (rand() % 90000000 + 10000000));
         // Create MQTT client
         if(MQTTClient_create(&MQTTclient, server_address, client_id, MQTTCLIENT_PERSISTENCE_NONE, NULL) == MQTTCLIENT_SUCCESS) {
             logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_INFO, "%s success.", "MQTTClient_create()");
