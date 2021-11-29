@@ -2,7 +2,7 @@
 
 [![Donate](https://img.shields.io/badge/donate-Yandex-red.svg)](https://money.yandex.ru/to/4100110221014297)
 
-Application for Xiaomi Smart Camera Standard Edition (MJSXJ02HL) with RTSP and MQTT support.
+Application for Xiaomi Smart Camera Standard Edition (MJSXJ02HL) with RTSP and MQTT support. It is used in a [custom firmware](https://github.com/kasitoru/mjsxj02hl_firmware).
 
 ## Build
 
@@ -139,11 +139,11 @@ mjsxj02hl [<action> [options...]]
 
 Running without arguments starts the main thread of the application.
 
-***--config <filename>*** Specify the location of the configuration file for the main thread of application.
+***--config \<filename\>*** Specify the location of the configuration file for the main thread of application.
 
 ***--factory-reset*** Reset device settings to default values. Attention: this action cannot be undone!
 
-***--get-image <filename>*** Output the camera image to a file. Requires a running main thread of mjsxj02hl application.
+***--get-image \<filename\>*** Output the camera image to a file. Requires a running main thread of mjsxj02hl application.
 
 ***--help*** Display help message.
 
@@ -155,9 +155,9 @@ Example: `rtsp://192.168.1.18:554/primary` or `rtsp://user:password@192.168.1.18
 
 ## MQTT
 
-<root_topic>: The value is set in the settings file (section: `mqtt`, name: `topic`). It is recommended not to change the default value.
+***<root_topic>***: The value is set in the settings file (section: `mqtt`, name: `topic`). It is recommended not to change the default value.
 
-<device_name>: Value based on a parameter in the settings file (section: `general`, name: `name`). It is converted to lowercase, all characters except letters and numbers are cut off, spaces are replaced with underscores.
+***<device_name>***: Value based on a parameter in the settings file (section: `general`, name: `name`). It is converted to lowercase, all characters except letters and numbers are cut off, spaces are replaced with underscores.
 
 ### Input topics
 
