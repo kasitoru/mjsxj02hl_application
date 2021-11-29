@@ -27,15 +27,15 @@ static pthread_t reconnection_thread;
 static pthread_t playmedia_thread;
 
 // Get device name
-static char* mqtt_device_name() {
-    logger("mqtt", "mqtt_device_name", LOGGER_LEVEL_DEBUG, "Function is called...");
+static char *mqtt_prepare_string(const char *string) {
+    logger("mqtt", "mqtt_prepare_string", LOGGER_LEVEL_DEBUG, "Function is called...");
     // Device name
     size_t j = 0;
-    size_t length = strlen(APP_CFG.general.name) + 1;
+    size_t length = strlen(string) + 1;
     char *device_name = malloc(length);
     memset(device_name, '\0', length);
-    for(size_t i = 0; APP_CFG.general.name[i] != '\0'; i++) {
-        char chr = tolower(APP_CFG.general.name[i]);
+    for(size_t i = 0; string[i] != '\0'; i++) {
+        char chr = tolower(string[i]);
         if(isspace(chr)) {
             device_name[i-j] = '_';
         } else if(isalnum(chr)) {
@@ -43,16 +43,16 @@ static char* mqtt_device_name() {
         } else j++;
     }
     // Results
-    logger("mqtt", "mqtt_device_name", LOGGER_LEVEL_DEBUG, "Function completed.");
+    logger("mqtt", "mqtt_prepare_string", LOGGER_LEVEL_DEBUG, "Function completed.");
     return device_name;
 }
 
 // Get full topic
-char* mqtt_fulltopic(char *topic) {
+char *mqtt_fulltopic(const char *topic) {
     char *payload = "";
     logger("mqtt", "mqtt_fulltopic", LOGGER_LEVEL_DEBUG, "Function is called...");
     // Glue the parts into a full topic
-    char *subtopic = mqtt_device_name();
+    char *subtopic = mqtt_prepare_string(APP_CFG.general.name);
     asprintf(&payload, "%s/%s/%s", APP_CFG.mqtt.topic, subtopic, topic);
     free(subtopic);
     logger("mqtt", "mqtt_fulltopic", LOGGER_LEVEL_DEBUG, "Function completed.");
@@ -60,7 +60,7 @@ char* mqtt_fulltopic(char *topic) {
 }
 
 // Send data
-bool mqtt_send(char *topic, char *payload) {
+bool mqtt_send(const char *topic, char *payload) {
     bool result = false;
     logger("mqtt", "mqtt_send", LOGGER_LEVEL_DEBUG, "Function is called...");
     if(mqtt_is_ready()) {
@@ -83,7 +83,7 @@ bool mqtt_send(char *topic, char *payload) {
 }
 
 // Send formatted data
-bool mqtt_sendf(char *topic, const char *format, ...) {
+bool mqtt_sendf(const char *topic, const char *format, ...) {
     bool result = false;
     logger("mqtt", "mqtt_sendf", LOGGER_LEVEL_DEBUG, "Function is called...");
     va_list params;
@@ -374,7 +374,7 @@ static bool mqtt_initialization(bool first_init) {
         asprintf(&server_address, "tcp://%s:%d", APP_CFG.mqtt.server, APP_CFG.mqtt.port);
         // Get client id
         char *client_id = "";
-        char *device_name = mqtt_device_name();
+        char *device_name = mqtt_prepare_string(APP_CFG.general.name);
         asprintf(&client_id, "%s-%s-%d", "mjsxj02hl", device_name, (rand() % 90000000 + 10000000));
         // Create MQTT client
         if(MQTTClient_create(&MQTTclient, server_address, client_id, MQTTCLIENT_PERSISTENCE_NONE, NULL) == MQTTCLIENT_SUCCESS) {

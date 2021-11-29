@@ -19,7 +19,7 @@ static int logprintf_default(const char *format, ...) {
     va_end(params);
     return result;
 }
-static int (*logprintf_function)(const char*, ...) = logprintf_default;
+static int (*logprintf_function)(const char *, ...) = logprintf_default;
 
 // Default connected callback function
 static void connected_default(uint32_t session_id, const char *peer_ip, uint16_t peer_port) { }
@@ -30,7 +30,7 @@ static void disconnected_default(uint32_t session_id, const char *peer_ip, uint1
 static void (*disconnected_function)(uint32_t session_id, const char *peer_ip, uint16_t peer_port) = disconnected_default;
 
 // Set log printf function
-bool rtspserver_logprintf(int (*function)(const char*, ...)) {
+bool rtspserver_logprintf(int (*function)(const char *, ...)) {
     logprintf_function = function;
     return true;
 }

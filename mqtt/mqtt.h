@@ -30,12 +30,12 @@ bool mqtt_is_ready();
 bool mqtt_free(bool force);
 
 // Get full topic
-char* mqtt_fulltopic(char *topic);
+char *mqtt_fulltopic(const char *topic);
 
 // Send data
-bool mqtt_send(char *topic, char *payload);
+bool mqtt_send(const char *topic, char *payload);
 
 // Send formatted data
-bool mqtt_sendf(char *topic, const char *format, ...);
+bool mqtt_sendf(const char *topic, const char *format, ...);
 
 #endif

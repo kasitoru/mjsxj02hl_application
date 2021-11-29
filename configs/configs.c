@@ -89,7 +89,7 @@ APPLICATION_CONFIGURATION APP_CFG = {
 };
 
 // Handler for ini parser
-static int parser_handler(void* cfg, const char* section, const char* name, const char* value) {
+static int parser_handler(void* cfg, const char *section, const char *name, const char *value) {
     bool result = true;
 
     APPLICATION_CONFIGURATION* config = (APPLICATION_CONFIGURATION*) cfg;
