@@ -3,7 +3,6 @@
 
 #include <stdbool.h>
 
-#define MQTT_CLIENT_ID           "MJSXJ02HL"
 #define MQTT_TIMEOUT             5
 
 #define MQTT_INFO_TOPIC          "info"

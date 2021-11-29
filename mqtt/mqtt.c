@@ -49,13 +49,11 @@ static char* mqtt_device_name() {
 
 // Get full topic
 char* mqtt_fulltopic(char *topic) {
-    char *payload;
+    char *payload = "";
     logger("mqtt", "mqtt_fulltopic", LOGGER_LEVEL_DEBUG, "Function is called...");
     // Glue the parts into a full topic
     char *subtopic = mqtt_device_name();
-    if(asprintf(&payload, "%s/%s/%s", APP_CFG.mqtt.topic, subtopic, topic) > 0) {
-        logger("mqtt", "mqtt_fulltopic", LOGGER_LEVEL_INFO, "%s success.", "asprintf()");
-    } else logger("mqtt", "mqtt_fulltopic", LOGGER_LEVEL_ERROR, "%s error!", "asprintf()");
+    asprintf(&payload, "%s/%s/%s", APP_CFG.mqtt.topic, subtopic, topic);
     free(subtopic);
     logger("mqtt", "mqtt_fulltopic", LOGGER_LEVEL_DEBUG, "Function completed.");
     return payload;
@@ -90,12 +88,10 @@ bool mqtt_sendf(char *topic, const char *format, ...) {
     logger("mqtt", "mqtt_sendf", LOGGER_LEVEL_DEBUG, "Function is called...");
     va_list params;
     va_start(params, format);
-    char *payload;
-    if(vasprintf(&payload, format, params) > 0) {
-        logger("mqtt", "mqtt_sendf", LOGGER_LEVEL_INFO, "%s success.", "vasprintf()");
-        result = mqtt_send(topic, payload);
-        free(payload);
-    } else logger("mqtt", "mqtt_sendf", LOGGER_LEVEL_ERROR, "%s error!", "vasprintf()");
+    char *payload = "";
+    vasprintf(&payload, format, params);
+    result = mqtt_send(topic, payload);
+    free(payload);
     va_end(params);
     logger("mqtt", "mqtt_sendf", LOGGER_LEVEL_DEBUG, "Function completed.");
     return result;
@@ -112,119 +108,109 @@ static void* mqtt_periodical(void *arg) {
             first = false;
             // Send online status
             char *status_topic = mqtt_fulltopic(MQTT_STATUS_TOPIC);
-            if(status_topic && status_topic[0]) {
-                logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_INFO, "%s success.", "mqtt_fulltopic()");
-                if(mqtt_send(status_topic, MQTT_STATUS_ONLINE)) {
-                    logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_INFO, "%s success.", "mqtt_send()");
-                } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_ERROR, "%s error!", "mqtt_send()");
-                free(status_topic);
-            } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_ERROR, "%s error!", "mqtt_fulltopic()");
+            if(mqtt_send(status_topic, MQTT_STATUS_ONLINE)) {
+                logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_INFO, "%s success.", "mqtt_send()");
+            } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_ERROR, "%s error!", "mqtt_send()");
+            free(status_topic);
         }
         // Send system info
         char *info_topic = mqtt_fulltopic(MQTT_INFO_TOPIC);
-        if(info_topic && info_topic[0]) {
-            logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_INFO, "%s success.", "mqtt_fulltopic()");
-            // JSON Data
-            yyjson_mut_doc *json_doc = yyjson_mut_doc_new(NULL);
-            yyjson_mut_val *json_root = yyjson_mut_obj(json_doc);
-            yyjson_mut_doc_set_root(json_doc, json_root);
-            // SDK version
-            int sdk_version = (int) localsdk_get_version();
-            yyjson_mut_obj_add_int(json_doc, json_root, "sdk_version", sdk_version);
-            // FW version
-            char *fw_version = firmware_version();
-            yyjson_mut_obj_add_str(json_doc, json_root, "fw_version", fw_version);
-            // Startup timestamp
-            int startup = (int) -1;
-            struct stat proc_self;
-            if(stat("/proc/self", &proc_self) == 0) {
-                logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_INFO, "%s success.", "stat(\"/proc/self\")");
-                startup = (int) proc_self.st_ctime;
-            } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_WARNING, "%s error!", "stat(\"/proc/self\")");
-            yyjson_mut_obj_add_int(json_doc, json_root, "startup", startup);
-            // Current timestamp
-            int timestamp = (int) time(NULL);
-            yyjson_mut_obj_add_int(json_doc, json_root, "timestamp", timestamp);
-            // IP address
-            char *ip_address = "";
-            struct ifaddrs *if_list, *if_item;
-            if(getifaddrs(&if_list) == 0) {
-                logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_INFO, "%s success.", "getifaddrs()");
-                for(if_item = if_list; if_item != NULL; if_item = if_item->ifa_next) {
-                    if(if_item->ifa_addr == NULL) continue;
-                    if(strcmp(if_item->ifa_name, "wlan0") == 0) {
-                        struct sockaddr_in * ip_item;
-                        ip_item = (struct sockaddr_in *) if_item->ifa_addr;
-                        if(ip_item->sin_family == AF_INET) {
-                            ip_address = inet_ntoa(ip_item->sin_addr);
-                        }
+        // JSON Data
+        yyjson_mut_doc *json_doc = yyjson_mut_doc_new(NULL);
+        yyjson_mut_val *json_root = yyjson_mut_obj(json_doc);
+        yyjson_mut_doc_set_root(json_doc, json_root);
+        // SDK version
+        int sdk_version = (int) localsdk_get_version();
+        yyjson_mut_obj_add_int(json_doc, json_root, "sdk_version", sdk_version);
+        // FW version
+        char *fw_version = firmware_version();
+        yyjson_mut_obj_add_str(json_doc, json_root, "fw_version", fw_version);
+        // Startup timestamp
+        int startup = (int) -1;
+        struct stat proc_self;
+        if(stat("/proc/self", &proc_self) == 0) {
+            logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_INFO, "%s success.", "stat(\"/proc/self\")");
+            startup = (int) proc_self.st_ctime;
+        } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_WARNING, "%s error!", "stat(\"/proc/self\")");
+        yyjson_mut_obj_add_int(json_doc, json_root, "startup", startup);
+        // Current timestamp
+        int timestamp = (int) time(NULL);
+        yyjson_mut_obj_add_int(json_doc, json_root, "timestamp", timestamp);
+        // IP address
+        char *ip_address = "";
+        struct ifaddrs *if_list, *if_item;
+        if(getifaddrs(&if_list) == 0) {
+            logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_INFO, "%s success.", "getifaddrs()");
+            for(if_item = if_list; if_item != NULL; if_item = if_item->ifa_next) {
+                if(if_item->ifa_addr == NULL) continue;
+                if(strcmp(if_item->ifa_name, "wlan0") == 0) {
+                    struct sockaddr_in * ip_item;
+                    ip_item = (struct sockaddr_in *) if_item->ifa_addr;
+                    if(ip_item->sin_family == AF_INET) {
+                        ip_address = inet_ntoa(ip_item->sin_addr);
                     }
                 }
-                freeifaddrs(if_list);
-            } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_WARNING, "%s error!", "getifaddrs()");
-            yyjson_mut_obj_add_str(json_doc, json_root, "ip_address", ip_address);
-            // RAM
-            unsigned long total_ram = 0;
-            unsigned long free_ram = 0;
-            struct sysinfo ram_info;
-            if(sysinfo(&ram_info) == 0) {
-                logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_INFO, "%s success.", "sysinfo()");
-                total_ram = (unsigned long) ram_info.totalram;
-                free_ram = (unsigned long) ram_info.freeram;
-            } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_WARNING, "%s error!", "sysinfo()");
-            yyjson_mut_obj_add_uint(json_doc, json_root, "total_ram", total_ram);
-            yyjson_mut_obj_add_uint(json_doc, json_root, "free_ram", free_ram);
-            // SD-Card memory
-            unsigned long total_sdmem = 0;
-            unsigned long free_sdmem = 0;
-            struct statvfs stat_mmc;
-            if(statvfs("/mnt/mmc", &stat_mmc) == 0) {
-                logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_INFO, "%s success.", "statvfs(\"/mnt/mmc\")");
-                total_sdmem = (unsigned long) stat_mmc.f_frsize * stat_mmc.f_blocks;
-                free_sdmem = (unsigned long) stat_mmc.f_bsize * stat_mmc.f_bfree;
-            } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_WARNING, "%s error!", "statvfs(\"/mnt/mmc\")");
-            yyjson_mut_obj_add_uint(json_doc, json_root, "total_sdmem", total_sdmem);
-            yyjson_mut_obj_add_uint(json_doc, json_root, "free_sdmem", free_sdmem);
-            // Configs memory
-            unsigned long total_configs = 0;
-            unsigned long free_configs = 0;
-            struct statvfs stat_configs;
-            if(statvfs("/configs", &stat_configs) == 0) {
-                logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_INFO, "%s success.", "statvfs(\"/configs\")");
-                total_configs = (unsigned long) stat_configs.f_frsize * stat_configs.f_blocks;
-                free_configs = (unsigned long) stat_configs.f_bsize * stat_configs.f_bfree;
-            } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_WARNING, "%s error!", "statvfs(\"/configs\")");
-            yyjson_mut_obj_add_uint(json_doc, json_root, "total_configs", total_configs);
-            yyjson_mut_obj_add_uint(json_doc, json_root, "free_configs", free_configs);
-            // Volume level
-            int volume_level = speaker_get_volume();
-            yyjson_mut_obj_add_int(json_doc, json_root, "volume_level", volume_level);
-            // Media status
-            bool media_status = speaker_status_media();
-            yyjson_mut_obj_add_bool(json_doc, json_root, "media_status", media_status);
-            // Image URL
-            char *image_url = "";
-            if(ip_address && ip_address[0]) {
-                if(asprintf(&image_url, "http://%s/cgi/get_image.cgi", ip_address) > 0) {
-                    logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_INFO, "%s success.", "asprintf()");
-                } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_WARNING, "%s error!", "asprintf()");
-            } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_WARNING, "%s error!", "ip_address is null so image_url");
-            yyjson_mut_obj_add_str(json_doc, json_root, "image_url", image_url);
-            // Send it
-            const char *json = yyjson_mut_write(json_doc, 0, NULL);
-            if(json) {
-                logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_INFO, "%s success.", "yyjson_mut_write()");
-                if(mqtt_send(info_topic, (char *) json)) {
-                    logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_INFO, "%s success.", "mqtt_send()");
-                } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_ERROR, "%s error!", "mqtt_send()");
-                free((void *)json);
-            } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_ERROR, "%s error!", "yyjson_mut_write()");
-            // Free resources
-            yyjson_mut_doc_free(json_doc);
-            free(image_url);
-            free(fw_version);
-            free(info_topic);
-        } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_ERROR, "%s error!", "mqtt_fulltopic()");
+            }
+            freeifaddrs(if_list);
+        } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_WARNING, "%s error!", "getifaddrs()");
+        yyjson_mut_obj_add_str(json_doc, json_root, "ip_address", ip_address);
+        // RAM
+        unsigned long total_ram = 0;
+        unsigned long free_ram = 0;
+        struct sysinfo ram_info;
+        if(sysinfo(&ram_info) == 0) {
+            logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_INFO, "%s success.", "sysinfo()");
+            total_ram = (unsigned long) ram_info.totalram;
+            free_ram = (unsigned long) ram_info.freeram;
+        } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_WARNING, "%s error!", "sysinfo()");
+        yyjson_mut_obj_add_uint(json_doc, json_root, "total_ram", total_ram);
+        yyjson_mut_obj_add_uint(json_doc, json_root, "free_ram", free_ram);
+        // SD-Card memory
+        unsigned long total_sdmem = 0;
+        unsigned long free_sdmem = 0;
+        struct statvfs stat_mmc;
+        if(statvfs("/mnt/mmc", &stat_mmc) == 0) {
+            logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_INFO, "%s success.", "statvfs(\"/mnt/mmc\")");
+            total_sdmem = (unsigned long) stat_mmc.f_frsize * stat_mmc.f_blocks;
+            free_sdmem = (unsigned long) stat_mmc.f_bsize * stat_mmc.f_bfree;
+        } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_WARNING, "%s error!", "statvfs(\"/mnt/mmc\")");
+        yyjson_mut_obj_add_uint(json_doc, json_root, "total_sdmem", total_sdmem);
+        yyjson_mut_obj_add_uint(json_doc, json_root, "free_sdmem", free_sdmem);
+        // Configs memory
+        unsigned long total_configs = 0;
+        unsigned long free_configs = 0;
+        struct statvfs stat_configs;
+        if(statvfs("/configs", &stat_configs) == 0) {
+            logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_INFO, "%s success.", "statvfs(\"/configs\")");
+            total_configs = (unsigned long) stat_configs.f_frsize * stat_configs.f_blocks;
+            free_configs = (unsigned long) stat_configs.f_bsize * stat_configs.f_bfree;
+        } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_WARNING, "%s error!", "statvfs(\"/configs\")");
+        yyjson_mut_obj_add_uint(json_doc, json_root, "total_configs", total_configs);
+        yyjson_mut_obj_add_uint(json_doc, json_root, "free_configs", free_configs);
+        // Volume level
+        int volume_level = speaker_get_volume();
+        yyjson_mut_obj_add_int(json_doc, json_root, "volume_level", volume_level);
+        // Media status
+        bool media_status = speaker_status_media();
+        yyjson_mut_obj_add_bool(json_doc, json_root, "media_status", media_status);
+        // Image URL
+        char *image_url = "";
+        asprintf(&image_url, "http://%s/cgi/get_image.cgi", ip_address);
+        yyjson_mut_obj_add_str(json_doc, json_root, "image_url", image_url);
+        // Send it
+        const char *json = yyjson_mut_write(json_doc, 0, NULL);
+        if(json) {
+            logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_INFO, "%s success.", "yyjson_mut_write()");
+            if(mqtt_send(info_topic, (char *) json)) {
+                logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_INFO, "%s success.", "mqtt_send()");
+            } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_ERROR, "%s error!", "mqtt_send()");
+            free((void *)json);
+        } else logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_ERROR, "%s error!", "yyjson_mut_write()");
+        // Free resources
+        yyjson_mut_doc_free(json_doc);
+        free(image_url);
+        free(fw_version);
+        free(info_topic);
         // Sleep
         if(endless_cycle) {
             logger("mqtt", "mqtt_periodical", LOGGER_LEVEL_INFO, "Wait %d seconds until the next sending...", APP_CFG.mqtt.periodical_interval);
@@ -384,56 +370,58 @@ static bool mqtt_initialization(bool first_init) {
     logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_DEBUG, "Function is called...");
     if(mqtt_is_enabled()) { // If MQTT enabled
         // Get server address
-        char *server_address;
-        if(asprintf(&server_address, "tcp://%s:%d", APP_CFG.mqtt.server, APP_CFG.mqtt.port) > 0) {
-            // Create MQTT client
-            if(MQTTClient_create(&MQTTclient, server_address, MQTT_CLIENT_ID, MQTTCLIENT_PERSISTENCE_NONE, NULL) == MQTTCLIENT_SUCCESS) {
-                logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_INFO, "%s success.", "MQTTClient_create()");
-                // Set callbacks
-                if(MQTTClient_setCallbacks(MQTTclient, NULL, mqtt_disconnect_callback, mqtt_message_callback, mqtt_delivery_callback) == MQTTCLIENT_SUCCESS) {
-                    logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_INFO, "%s success.", "MQTTClient_setCallbacks()");
-                    // Connection options
-                    MQTTClient_connectOptions connect_options = MQTTClient_connectOptions_initializer;
-                    connect_options.connectTimeout = MQTT_TIMEOUT;
-                    // Get authorization data
-                    if(APP_CFG.mqtt.username && APP_CFG.mqtt.username[0]) {
-                        connect_options.username = APP_CFG.mqtt.username;
-                        logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_DEBUG, "Username: %s", connect_options.username);
-                        if(APP_CFG.mqtt.password && APP_CFG.mqtt.password[0]) {
-                            connect_options.password = APP_CFG.mqtt.password;
-                            logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_DEBUG, "Password: %s", "<hidden>");
-                        } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_DEBUG, "Password: %s", "<not_set> (shared connection)");
-                    } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_DEBUG, "Username: %s", "<not_set> (anonymous connection)");
-                    // LWT
-                    MQTTClient_willOptions lwt_options = MQTTClient_willOptions_initializer;
-                    lwt_options.topicName = mqtt_fulltopic(MQTT_STATUS_TOPIC);
-                    lwt_options.message = MQTT_STATUS_OFFLINE;
-                    lwt_options.retained = APP_CFG.mqtt.retain;
-                    lwt_options.qos = APP_CFG.mqtt.qos;
-                    connect_options.will = &lwt_options;
-                    // Connection to server
-                    if(MQTTClient_connect(MQTTclient, &connect_options) == MQTTCLIENT_SUCCESS) {
-                        logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_INFO, "%s success.", "MQTTClient_connect()");
-                        // Subscribe to topic
-                        char *command_topic = mqtt_fulltopic(MQTT_COMMAND_TOPIC);
-                        if(command_topic && command_topic[0]) {
-                            logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_INFO, "%s success.", "mqtt_fulltopic()");
-                            logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_DEBUG, "Command topic: %s", command_topic);
-                            if(MQTTClient_subscribe(MQTTclient, command_topic, true) == MQTTCLIENT_SUCCESS) {
-                                logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_INFO, "%s success.", "MQTTClient_subscribe()");
-                                // Periodic data sending
-                                if(pthread_create(&periodical_thread, NULL, mqtt_periodical, (void *) true) == 0) {
-                                    logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_INFO, "%s success.", "pthread_create(periodical_thread)");
-                                    result = true;
-                                } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_ERROR, "%s error!", "pthread_create(periodical_thread)");
-                            } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_ERROR, "%s error!", "MQTTClient_subscribe()");
-                            free(command_topic);
-                        } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_ERROR, "%s error!", "mqtt_fulltopic()");
-                    } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_ERROR, "%s error!", "MQTTClient_connect()");
-                } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_ERROR, "%s error!", "MQTTClient_setCallbacks()");
-            } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_ERROR, "%s error!", "MQTTClient_create()");
-            free(server_address);
-        } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_ERROR, "%s error!", "asprintf()");
+        char *server_address = "";
+        asprintf(&server_address, "tcp://%s:%d", APP_CFG.mqtt.server, APP_CFG.mqtt.port);
+        // Get client id
+        char *client_id = "";
+        char *device_name = mqtt_device_name();
+        asprintf(&client_id, "%s-%s-%d", "MJSXJ02HL", device_name, rand());
+        // Create MQTT client
+        if(MQTTClient_create(&MQTTclient, server_address, client_id, MQTTCLIENT_PERSISTENCE_NONE, NULL) == MQTTCLIENT_SUCCESS) {
+            logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_INFO, "%s success.", "MQTTClient_create()");
+            // Set callbacks
+            if(MQTTClient_setCallbacks(MQTTclient, NULL, mqtt_disconnect_callback, mqtt_message_callback, mqtt_delivery_callback) == MQTTCLIENT_SUCCESS) {
+                logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_INFO, "%s success.", "MQTTClient_setCallbacks()");
+                // Connection options
+                MQTTClient_connectOptions connect_options = MQTTClient_connectOptions_initializer;
+                connect_options.connectTimeout = MQTT_TIMEOUT;
+                // Get authorization data
+                if(APP_CFG.mqtt.username && APP_CFG.mqtt.username[0]) {
+                    connect_options.username = APP_CFG.mqtt.username;
+                    logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_DEBUG, "Username: %s", connect_options.username);
+                    if(APP_CFG.mqtt.password && APP_CFG.mqtt.password[0]) {
+                        connect_options.password = APP_CFG.mqtt.password;
+                        logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_DEBUG, "Password: %s", "<hidden>");
+                    } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_DEBUG, "Password: %s", "<not_set> (shared connection)");
+                } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_DEBUG, "Username: %s", "<not_set> (anonymous connection)");
+                // LWT
+                MQTTClient_willOptions lwt_options = MQTTClient_willOptions_initializer;
+                lwt_options.topicName = mqtt_fulltopic(MQTT_STATUS_TOPIC);
+                lwt_options.message = MQTT_STATUS_OFFLINE;
+                lwt_options.retained = APP_CFG.mqtt.retain;
+                lwt_options.qos = APP_CFG.mqtt.qos;
+                connect_options.will = &lwt_options;
+                // Connection to server
+                if(MQTTClient_connect(MQTTclient, &connect_options) == MQTTCLIENT_SUCCESS) {
+                    logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_INFO, "%s success.", "MQTTClient_connect()");
+                    // Subscribe to topic
+                    char *command_topic = mqtt_fulltopic(MQTT_COMMAND_TOPIC);
+                    logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_DEBUG, "Command topic: %s", command_topic);
+                    if(MQTTClient_subscribe(MQTTclient, command_topic, true) == MQTTCLIENT_SUCCESS) {
+                        logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_INFO, "%s success.", "MQTTClient_subscribe()");
+                        // Periodic data sending
+                        if(pthread_create(&periodical_thread, NULL, mqtt_periodical, (void *) true) == 0) {
+                            logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_INFO, "%s success.", "pthread_create(periodical_thread)");
+                            result = true;
+                        } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_ERROR, "%s error!", "pthread_create(periodical_thread)");
+                    } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_ERROR, "%s error!", "MQTTClient_subscribe()");
+                    free(command_topic);
+                } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_ERROR, "%s error!", "MQTTClient_connect()");
+            } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_ERROR, "%s error!", "MQTTClient_setCallbacks()");
+        } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_ERROR, "%s error!", "MQTTClient_create()");
+        free(client_id);
+        free(server_address);
+        free(device_name);
         // Reconnect (only for first init)
         if((result == false) && (first_init == true)) {
             if(pthread_create(&reconnection_thread, NULL, mqtt_reconnection, NULL) == 0) {
@@ -492,29 +480,20 @@ bool mqtt_free(bool force) {
         if(mqtt_is_connected()) {
             // Unsubscribe
             char *command_topic = mqtt_fulltopic(MQTT_COMMAND_TOPIC);
-            if(command_topic && command_topic[0]) {
-                logger("mqtt", "mqtt_free", LOGGER_LEVEL_INFO, "%s success.", "mqtt_fulltopic()");
-                if(MQTTClient_unsubscribe(MQTTclient, command_topic) == MQTTCLIENT_SUCCESS) {
-                    logger("mqtt", "mqtt_free", LOGGER_LEVEL_INFO, "%s success.", "MQTTClient_unsubscribe()");
-                } else {
-                    logger("mqtt", "mqtt_free", LOGGER_LEVEL_WARNING, "%s error!", "MQTTClient_unsubscribe()");
-                    result = false;
-                }
-                free(command_topic);
+            if(MQTTClient_unsubscribe(MQTTclient, command_topic) == MQTTCLIENT_SUCCESS) {
+                logger("mqtt", "mqtt_free", LOGGER_LEVEL_INFO, "%s success.", "MQTTClient_unsubscribe()");
             } else {
-                logger("mqtt", "mqtt_free", LOGGER_LEVEL_WARNING, "%s error!", "mqtt_fulltopic()");
+                logger("mqtt", "mqtt_free", LOGGER_LEVEL_WARNING, "%s error!", "MQTTClient_unsubscribe()");
                 result = false;
             }
+            free(command_topic);
             // Send offline status
             if(force) {
                 char *status_topic = mqtt_fulltopic(MQTT_STATUS_TOPIC);
-                if(status_topic && status_topic[0]) {
-                    logger("mqtt", "mqtt_free", LOGGER_LEVEL_INFO, "%s success.", "mqtt_fulltopic()");
-                    if(mqtt_send(status_topic, MQTT_STATUS_OFFLINE)) {
-                        logger("mqtt", "mqtt_free", LOGGER_LEVEL_INFO, "%s success.", "mqtt_send()");
-                    } else logger("mqtt", "mqtt_free", LOGGER_LEVEL_WARNING, "%s error!", "mqtt_send()");
-                    free(status_topic);
-                } else logger("mqtt", "mqtt_free", LOGGER_LEVEL_WARNING, "%s error!", "mqtt_fulltopic()");
+                if(mqtt_send(status_topic, MQTT_STATUS_OFFLINE)) {
+                    logger("mqtt", "mqtt_free", LOGGER_LEVEL_INFO, "%s success.", "mqtt_send()");
+                } else logger("mqtt", "mqtt_free", LOGGER_LEVEL_WARNING, "%s error!", "mqtt_send()");
+                free(status_topic);
             }
             // Disconnect
             if(MQTTClient_disconnect(MQTTclient, MQTT_TIMEOUT * 1000) == MQTTCLIENT_SUCCESS) {
