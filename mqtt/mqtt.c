@@ -26,24 +26,33 @@ static pthread_t periodical_thread;
 static pthread_t reconnection_thread;
 static pthread_t playmedia_thread;
 
+// Get device name
+static char* mqtt_device_name() {
+    logger("mqtt", "mqtt_device_name", LOGGER_LEVEL_DEBUG, "Function is called...");
+    // Device name
+    size_t j = 0;
+    size_t length = strlen(APP_CFG.general.name) + 1;
+    char *device_name = malloc(length);
+    memset(device_name, '\0', length);
+    for(size_t i = 0; APP_CFG.general.name[i] != '\0'; i++) {
+        char chr = tolower(APP_CFG.general.name[i]);
+        if(isspace(chr)) {
+            device_name[i-j] = '_';
+        } else if(isalnum(chr)) {
+            device_name[i-j] = chr;
+        } else j++;
+    }
+    // Results
+    logger("mqtt", "mqtt_device_name", LOGGER_LEVEL_DEBUG, "Function completed.");
+    return device_name;
+}
+
 // Get full topic
 char* mqtt_fulltopic(char *topic) {
     char *payload;
     logger("mqtt", "mqtt_fulltopic", LOGGER_LEVEL_DEBUG, "Function is called...");
-    // Get subtopic from device name
-    size_t j = 0;
-    size_t length = strlen(APP_CFG.general.name) + 1;
-    char *subtopic = malloc(length);
-    memset(subtopic, '\0', length);
-    for(size_t i = 0; APP_CFG.general.name[i] != '\0'; i++) {
-        char chr = tolower(APP_CFG.general.name[i]);
-        if(isspace(chr)) {
-            subtopic[i-j] = '_';
-        } else if(isalnum(chr)) {
-            subtopic[i-j] = chr;
-        } else j++;
-    }
     // Glue the parts into a full topic
+    char *subtopic = mqtt_device_name();
     if(asprintf(&payload, "%s/%s/%s", APP_CFG.mqtt.topic, subtopic, topic) > 0) {
         logger("mqtt", "mqtt_fulltopic", LOGGER_LEVEL_INFO, "%s success.", "asprintf()");
     } else logger("mqtt", "mqtt_fulltopic", LOGGER_LEVEL_ERROR, "%s error!", "asprintf()");
@@ -333,7 +342,7 @@ static int mqtt_message_callback(void *context, char *topicName, int topicLen, M
     MQTTClient_freeMessage(&message);
     MQTTClient_free(topicName);
     logger("mqtt", "mqtt_message_callback", LOGGER_LEVEL_DEBUG, "Function completed.");
-    return 1;
+    return true;
 }
 
 // Delivery confirmed
