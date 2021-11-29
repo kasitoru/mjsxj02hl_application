@@ -95,8 +95,6 @@ int main(int argc, char **argv) {
         } else if(strcmp(argv[1], "--factory-reset") == 0) { // Factory reset
             printf("Reset to factory settings...\n");
             system("rm -rf /configs/*");
-            system("touch /configs/mjsxj02hl.conf");
-            system("chmod 644 /configs/mjsxj02hl.conf");
             system("reboot");
             return EX_OK;
         } else if(strcmp(argv[1], "--get-image") == 0) { // Get image
