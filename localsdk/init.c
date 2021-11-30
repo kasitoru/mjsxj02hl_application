@@ -19,6 +19,32 @@
 #include "./../logger/logger.h"
 #include "./../configs/configs.h"
 
+// Read file into string
+static char *get_file_contents(char *filename) {
+    char *file_contents = "";
+    FILE *file_stream;
+    if(file_stream = fopen(filename, "r")) {
+        fseek(file_stream, 0, SEEK_END);
+        long contents_size = ftell(file_stream);
+        fseek(file_stream, 0, SEEK_SET);
+        file_contents = malloc(contents_size);
+        fread(file_contents, 1, contents_size, file_stream);
+        file_contents[strcspn(file_contents, "\r\n")] = 0;
+        fclose(file_stream);
+    }
+    return file_contents;
+}
+
+// Get firmware version
+char *firmware_version() {
+    return get_file_contents("/usr/app/share/.version");
+}
+
+// Get device id
+char *device_id() {
+    return get_file_contents("/usr/app/share/.device_id");
+}
+
 // Log printf function
 static int logprintf(const char *format, ...) {
     char *message = "";
@@ -29,38 +55,6 @@ static int logprintf(const char *format, ...) {
     free(message);
     va_end(params);
     return result;
-}
-
-// Get firmware version
-char *firmware_version() {
-    char *firmware_version = "Unknown";
-    FILE *version_file;
-    if(version_file = fopen("/usr/app/share/.version", "r")) {
-        fseek(version_file, 0, SEEK_END);
-        long version_size = ftell(version_file);
-        fseek(version_file, 0, SEEK_SET);
-        firmware_version = malloc(version_size);
-        fread(firmware_version, 1, version_size, version_file);
-        firmware_version[strcspn(firmware_version, "\r\n")] = 0;
-        fclose(version_file);
-    }
-    return firmware_version;
-}
-
-// Get device id
-char *device_id() {
-    char *device_id = "null";
-    FILE *devid_file;
-    if(devid_file = fopen("/usr/app/share/.device_id", "r")) {
-        fseek(devid_file, 0, SEEK_END);
-        long devid_size = ftell(devid_file);
-        fseek(devid_file, 0, SEEK_SET);
-        device_id = malloc(devid_size);
-        fread(device_id, 1, devid_size, devid_file);
-        device_id[strcspn(device_id, "\r\n")] = 0;
-        fclose(devid_file);
-    }
-    return device_id;
 }
 
 // Init all
