@@ -378,8 +378,10 @@ static bool mqtt_initialization(bool first_init) {
         asprintf(&server_address, "tcp://%s:%d", APP_CFG.mqtt.server, APP_CFG.mqtt.port);
         // Get client id
         char *client_id = "";
-        char *device_name = mqtt_prepare_string(APP_CFG.general.name);
-        asprintf(&client_id, "%s-%s-%d", "mjsxj02hl", device_name, (rand() % 90000000 + 10000000));
+        char *dev_topic = mqtt_prepare_string(APP_CFG.mqtt.topic);
+        char *dev_name = mqtt_prepare_string(APP_CFG.general.name);
+        char *dev_id = mqtt_prepare_string(device_id());
+        asprintf(&client_id, "%s-%s-%s", dev_topic, dev_name, dev_id);
         // Create MQTT client
         if(MQTTClient_create(&MQTTclient, server_address, client_id, MQTTCLIENT_PERSISTENCE_NONE, NULL) == MQTTCLIENT_SUCCESS) {
             logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_INFO, "%s success.", "MQTTClient_create()");
@@ -423,9 +425,11 @@ static bool mqtt_initialization(bool first_init) {
                 } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_ERROR, "%s error!", "MQTTClient_connect()");
             } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_ERROR, "%s error!", "MQTTClient_setCallbacks()");
         } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_ERROR, "%s error!", "MQTTClient_create()");
+        free(dev_id);
+        free(dev_name);
+        free(dev_topic);
         free(client_id);
         free(server_address);
-        free(device_name);
         // Reconnect (only for first init)
         if((result == false) && (first_init == true)) {
             if(pthread_create(&reconnection_thread, NULL, mqtt_reconnection, NULL) == 0) {
