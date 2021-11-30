@@ -155,7 +155,7 @@ Example: `rtsp://192.168.1.18:554/primary` or `rtsp://user:password@192.168.1.18
 
 ## MQTT
 
-***<root_topic>***: The value is set in the settings file (section: `mqtt`, name: `topic`). It is recommended not to change the default value.
+***<root_topic>***: The value is set in the settings file (section: `mqtt`, name: `topic`). It is recommended to use the same value for all devices.
 
 ***<device_name>***: Value based on a parameter in the settings file (section: `general`, name: `name`). It is converted to lowercase, all characters except letters and numbers are cut off, spaces are replaced with underscores.
 
