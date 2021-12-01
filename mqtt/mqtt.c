@@ -26,8 +26,8 @@ static pthread_t periodical_thread;
 static pthread_t reconnection_thread;
 static pthread_t playmedia_thread;
 
-// Get device name
-static char *mqtt_prepare_string(const char *string) {
+// Prepare string for use as MQTT paths/names
+char *mqtt_prepare_string(const char *string) {
     logger("mqtt", "mqtt_prepare_string", LOGGER_LEVEL_DEBUG, "Function is called...");
     // Device name
     size_t j = 0;

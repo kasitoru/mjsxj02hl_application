@@ -32,6 +32,9 @@ bool mqtt_free(bool force);
 // Get full topic
 char *mqtt_fulltopic(const char *topic);
 
+// Prepare string for use as MQTT paths/names
+char *mqtt_prepare_string(const char *string);
+
 // Send data
 bool mqtt_send(const char *topic, char *payload);
 
