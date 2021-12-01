@@ -18,8 +18,6 @@ static bool alarm_state_mqtt(bool motion, bool humanoid) {
     bool result = false;
     logger("alarm", "alarm_state_mqtt", LOGGER_LEVEL_DEBUG, "Function is called...");
     // Send alarm state info
-    char *topic = mqtt_fulltopic(MQTT_ALARM_TOPIC);
-    // JSON Data
     yyjson_mut_doc *json_doc = yyjson_mut_doc_new(NULL);
     yyjson_mut_val *json_root = yyjson_mut_obj(json_doc);
     yyjson_mut_doc_set_root(json_doc, json_root);
@@ -34,7 +32,7 @@ static bool alarm_state_mqtt(bool motion, bool humanoid) {
     const char *json = yyjson_mut_write(json_doc, 0, NULL);
     if(json) {
         logger("alarm", "alarm_state_mqtt", LOGGER_LEVEL_INFO, "%s success.", "yyjson_mut_write()");
-        if(mqtt_send(topic, (char *) json)) {
+        if(mqtt_send(mqtt_fulltopic(MQTT_ALARM_TOPIC), (char *) json)) {
             logger("alarm", "alarm_state_mqtt", LOGGER_LEVEL_INFO, "%s success.", "mqtt_send()");
             result = true;
         } else logger("alarm", "alarm_state_mqtt", LOGGER_LEVEL_ERROR, "%s error!", "mqtt_send()");
@@ -42,7 +40,6 @@ static bool alarm_state_mqtt(bool motion, bool humanoid) {
     } else logger("alarm", "alarm_state_mqtt", LOGGER_LEVEL_ERROR, "%s error!", "yyjson_mut_write()");
     // Free resources
     yyjson_mut_doc_free(json_doc);
-    free(topic);
     logger("alarm", "alarm_state_mqtt", LOGGER_LEVEL_DEBUG, "Function completed.");
     return result;
 }

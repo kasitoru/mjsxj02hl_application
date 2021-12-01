@@ -8,6 +8,7 @@
 #include <string.h>
 
 #include "./logger.h"
+#include "./../localsdk/init.h"
 #include "./../configs/configs.h"
 
 // Write message to log
@@ -31,13 +32,10 @@ static int logger_write(const int level, const char *format, ...) {
 }
 
 // Add message to log
-int logger(const char *module, const char *function, const int level, const char *format, ...) {
+int logger(const char *module, const char *function, const int level, char *format, ...) {
     char *message = "";
-    // Trim new line symbols
-    size_t frmt_size = strlen(format) + 1;
-    char *frmt_buffer = malloc(frmt_size);
-    strncpy(frmt_buffer, format, frmt_size);
-    frmt_buffer[strcspn(frmt_buffer, "\r\n")] = '\0';
+    // Trim non-printable symbols
+    char *frmt_buffer = prepare_string(format);
     // Date & Time
     time_t rawtime;
     time(&rawtime);

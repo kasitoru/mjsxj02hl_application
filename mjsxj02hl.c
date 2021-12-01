@@ -136,14 +136,10 @@ int main(int argc, char **argv) {
     }
     
     // Firmware version
-    char *fw_version = firmware_version();
-    logger("mjsxj02hl_application", "main", LOGGER_LEVEL_FORCED, "Firmware version: %s", fw_version);
-    free(fw_version);
+    logger("mjsxj02hl_application", "main", LOGGER_LEVEL_FORCED, "Firmware version: %s", firmware_version());
     
     // Device id
-    char *dev_id = device_id();
-    logger("mjsxj02hl_application", "main", LOGGER_LEVEL_FORCED, "Device ID: %s", dev_id);
-    free(dev_id);
+    logger("mjsxj02hl_application", "main", LOGGER_LEVEL_FORCED, "Device ID: %s", device_id());
     
     // Main thread
     if(configs_init(config_filename)) { // Init configs

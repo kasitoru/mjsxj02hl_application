@@ -37,7 +37,7 @@ static char *get_file_contents(char *filename) {
 }
 
 // Removes all non-printable characters from string
-static char *prepare_string(char *string) {
+char *prepare_string(char *string) {
     size_t j = 0;
     size_t length = strlen(string) + 1;
     char *prepared_string = malloc(length);
