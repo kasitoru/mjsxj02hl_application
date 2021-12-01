@@ -36,14 +36,28 @@ static char *get_file_contents(char *filename) {
     return file_contents;
 }
 
+// Removes all non-printable characters from string
+static char *prepare_string(char *string) {
+    size_t j = 0;
+    size_t length = strlen(string) + 1;
+    char *prepared_string = malloc(length);
+    memset(prepared_string, '\0', length);
+    for(size_t i = 0; i<length; i++) {
+        if(isprint(string[i])) {
+            prepared_string[i-j] = string[i];
+        } else j++;
+    }
+    return prepared_string;
+}
+
 // Get firmware version
 char *firmware_version() {
-    return get_file_contents("/usr/app/share/.version");
+    return prepare_string(get_file_contents("/usr/app/share/.version"));
 }
 
 // Get device id
 char *device_id() {
-    return get_file_contents("/usr/app/share/.device_id");
+    return prepare_string(get_file_contents("/usr/app/share/.device_id"));
 }
 
 // Log printf function
