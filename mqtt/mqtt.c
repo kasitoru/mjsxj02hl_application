@@ -51,7 +51,7 @@ char *mqtt_prepare_string(const char *string) {
 // Get clien id
 char *mqtt_client_id() {
     char *client_id = "";
-    asprintf(&client_id, "%s-%s-%s", mqtt_prepare_string(APP_CFG.mqtt.topic), mqtt_prepare_string(APP_CFG.general.name), mqtt_prepare_string(device_id()));
+    asprintf(&client_id, "%s_%s_%s", mqtt_prepare_string(APP_CFG.mqtt.topic), mqtt_prepare_string(APP_CFG.general.name), mqtt_prepare_string(device_id()));
     return client_id;
 }
 
