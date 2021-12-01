@@ -35,6 +35,9 @@ char *mqtt_fulltopic(const char *topic);
 // Prepare string for use as MQTT paths/names
 char *mqtt_prepare_string(const char *string);
 
+// Get clien id
+char *mqtt_client_id();
+
 // Send data
 bool mqtt_send(const char *topic, char *payload);
 

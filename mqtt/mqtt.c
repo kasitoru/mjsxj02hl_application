@@ -47,6 +47,13 @@ char *mqtt_prepare_string(const char *string) {
     return device_name;
 }
 
+// Get clien id
+char *mqtt_client_id() {
+    char *client_id = "";
+    asprintf(&client_id, "%s-%s-%s", mqtt_prepare_string(APP_CFG.mqtt.topic), mqtt_prepare_string(APP_CFG.general.name), mqtt_prepare_string(device_id()));
+    return client_id;
+}
+
 // Get full topic
 char *mqtt_fulltopic(const char *topic) {
     char *payload = "";
@@ -376,14 +383,8 @@ static bool mqtt_initialization(bool first_init) {
         // Get server address
         char *server_address = "";
         asprintf(&server_address, "tcp://%s:%d", APP_CFG.mqtt.server, APP_CFG.mqtt.port);
-        // Get client id
-        char *client_id = "";
-        char *dev_topic = mqtt_prepare_string(APP_CFG.mqtt.topic);
-        char *dev_name = mqtt_prepare_string(APP_CFG.general.name);
-        char *dev_id = mqtt_prepare_string(device_id());
-        asprintf(&client_id, "%s-%s-%s", dev_topic, dev_name, dev_id);
         // Create MQTT client
-        if(MQTTClient_create(&MQTTclient, server_address, client_id, MQTTCLIENT_PERSISTENCE_NONE, NULL) == MQTTCLIENT_SUCCESS) {
+        if(MQTTClient_create(&MQTTclient, server_address, mqtt_client_id(), MQTTCLIENT_PERSISTENCE_NONE, NULL) == MQTTCLIENT_SUCCESS) {
             logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_INFO, "%s success.", "MQTTClient_create()");
             // Set callbacks
             if(MQTTClient_setCallbacks(MQTTclient, NULL, mqtt_disconnect_callback, mqtt_message_callback, mqtt_delivery_callback) == MQTTCLIENT_SUCCESS) {
@@ -425,10 +426,6 @@ static bool mqtt_initialization(bool first_init) {
                 } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_ERROR, "%s error!", "MQTTClient_connect()");
             } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_ERROR, "%s error!", "MQTTClient_setCallbacks()");
         } else logger("mqtt", "mqtt_initialization", LOGGER_LEVEL_ERROR, "%s error!", "MQTTClient_create()");
-        free(dev_id);
-        free(dev_name);
-        free(dev_topic);
-        free(client_id);
         free(server_address);
         // Reconnect (only for first init)
         if((result == false) && (first_init == true)) {
