@@ -1,0 +1,4 @@
+#ifndef _MQTT_HOMEASSISTANT_H_
+#define _MQTT_HOMEASSISTANT_H_
+
+#endif
