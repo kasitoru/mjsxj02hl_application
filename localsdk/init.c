@@ -52,18 +52,12 @@ static char *prepare_string(char *string) {
 
 // Get firmware version
 char *firmware_version() {
-    char *file_contents = get_file_contents("/usr/app/share/.version");
-    char *fw_version = prepare_string(file_contents);
-    free(file_contents);
-    return fw_version;
+    return prepare_string(get_file_contents("/usr/app/share/.version"));
 }
 
 // Get device id
 char *device_id() {
-    char *file_contents = get_file_contents("/usr/app/share/.device_id");
-    char *dev_id = prepare_string(file_contents);
-    free(file_contents);
-    return dev_id;
+    return prepare_string(get_file_contents("/usr/app/share/.device_id"));
 }
 
 // Log printf function
