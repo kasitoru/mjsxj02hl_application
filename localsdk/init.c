@@ -7,6 +7,7 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "./init.h"
 #include "./localsdk.h"
@@ -25,11 +26,11 @@ static char *get_file_contents(char *filename) {
     FILE *file_stream;
     if(file_stream = fopen(filename, "r")) {
         fseek(file_stream, 0, SEEK_END);
-        long contents_size = ftell(file_stream);
+        long contents_size = ftell(file_stream) + 1;
         fseek(file_stream, 0, SEEK_SET);
         file_contents = malloc(contents_size);
+        memset(file_contents, '\0', contents_size);
         fread(file_contents, 1, contents_size, file_stream);
-        file_contents[strcspn(file_contents, "\r\n")] = 0;
         fclose(file_stream);
     }
     return file_contents;
