@@ -13,6 +13,7 @@
 #include <arpa/inet.h>
 
 #include "./mqtt.h"
+#include "./homeassistant.h"
 #include "./paho.mqtt.c/src/MQTTClient.h"
 #include "./../logger/logger.h"
 #include "./../localsdk/init.h"
