@@ -151,10 +151,6 @@ static void *mqtt_periodical(void *arg) {
         char *fw_version = firmware_version();
         if(yyjson_mut_obj_add_str(json_doc, json_root, "fw_version", fw_version)) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(fw_version)");
         else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(fw_version)");
-        // Device ID
-        char *dev_id = device_id();
-        if(yyjson_mut_obj_add_str(json_doc, json_root, "device_id", dev_id)) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(device_id)");
-        else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(device_id)");
         // IP address
         char *ip_address = "";
         struct ifaddrs *if_list, *if_item;

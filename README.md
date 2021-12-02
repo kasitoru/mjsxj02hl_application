@@ -187,7 +187,6 @@ This is a topic where general device state is published.
 Field | Description
 ----- | -----------
 `fw_version` | Version of the firmware.
-`device_id` | Unique device identifier.
 `ip_address` | IP address of the device.
 `total_ram` | The total size of RAM.
 `free_ram` | The size of the free RAM.
