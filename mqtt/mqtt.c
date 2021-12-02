@@ -38,7 +38,7 @@ char *mqtt_prepare_string(const char *string) {
     memset(device_name, '\0', length);
     for(size_t i = 0; string[i] != '\0'; i++) {
         char chr = tolower(string[i]);
-        if(isspace(chr)) {
+        if(isspace(chr) || (chr == '/')) {
             device_name[i-j] = '_';
         } else if(isalnum(chr)) {
             device_name[i-j] = chr;
@@ -56,10 +56,12 @@ char *mqtt_client_id() {
     
     char *mqtt_topic = mqtt_prepare_string(APP_CFG.mqtt.topic);
     char *general_name = mqtt_prepare_string(APP_CFG.general.name);
-    char *dev_id = mqtt_prepare_string(device_id());
-    if(asprintf(&client_id, "%s_%s_%s", mqtt_topic, general_name, dev_id) != -1) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(client_id)");
-    else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(client_id)");
+    char *dev_id = device_id();
+    char *prep_id = mqtt_prepare_string(dev_id);
     free(dev_id);
+    if(asprintf(&client_id, "%s_%s_%s", mqtt_topic, general_name, prep_id) != -1) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(client_id)");
+    else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(client_id)");
+    free(prep_id);
     free(general_name);
     free(mqtt_topic);
     
