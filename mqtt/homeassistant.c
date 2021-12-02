@@ -176,60 +176,64 @@ bool mqtt_homeassistant_discovery(int type, char *topic_name, char *json_field, 
     LOGGER(LOGGER_LEVEL_DEBUG, "Function is called...");
     bool result = true;
 
-    // JSON Data
-    yyjson_mut_doc *json_doc = yyjson_mut_doc_new(NULL);
-    yyjson_mut_val *json_root = yyjson_mut_obj(json_doc);
-    yyjson_mut_doc_set_root(json_doc, json_root);
+    if(APP_CFG.mqtt.discovery && APP_CFG.mqtt.discovery[0]) {
+
+        // JSON Data
+        yyjson_mut_doc *json_doc = yyjson_mut_doc_new(NULL);
+        yyjson_mut_val *json_root = yyjson_mut_obj(json_doc);
+        yyjson_mut_doc_set_root(json_doc, json_root);
+        
+        // Device info
+        if(result &= mqtt_homeassistant_json_device(json_doc, json_root)) {
+            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_json_device()");
+            
+            // Select sensor by type
+            char *sensor_type = "";
+            switch(type) {
+                case MQTT_HOMEASSISTANT_SENSOR:
+                    sensor_type = "sensor";
+                    if(result &= mqtt_homeassistant_json_sensor(json_doc, json_root, topic_name, json_field, device_class, enabled)) {
+                        LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_json_sensor()");
+                    } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_json_sensor()");
+                    break;
+                case MQTT_HOMEASSISTANT_BINARY_SENSOR:
+                    sensor_type = "binary_sensor";
+                    if(result &= mqtt_homeassistant_json_binary_sensor(json_doc, json_root, topic_name, json_field, device_class, enabled)) {
+                        LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_json_binary_sensor()");
+                    } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_json_binary_sensor()");
+                    break;
+                default: result &= false;
+            }
+            
+            // Payload
+            if(result) {
+                const char *json = yyjson_mut_write(json_doc, 0, NULL);
+                if(result &= !!json) {
+                    LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_write()");
+                    char *object_id = "";
+                    if(result &= (asprintf(&object_id, "%s_%s", topic_name, json_field) != -1)) {
+                        LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(object_id)");
+                        char *discovery_topic = "";
+                        char *client_id = mqtt_client_id();
+                        if(result &= (asprintf(&discovery_topic, "%s/%s/%s/%s/config", APP_CFG.mqtt.discovery, sensor_type, client_id, object_id) != -1)) {
+                            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(discovery_topic)");
+                            
+                            // Send
+                            if(result &= mqtt_send(discovery_topic, (char *) json)) {
+                                LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_send(MQTT_HOMEASSISTANT_DISCOVERY)");
+                            } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_send(MQTT_HOMEASSISTANT_DISCOVERY)");
+                            
+                            free(discovery_topic);
+                        } LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(discovery_topic)");
+                        free(client_id);
+                        free(object_id);
+                    } LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(object_id)");
+                    free((void *)json);
+                } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_write()");
+            }
+        } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_json_device()");
     
-    // Device info
-    if(result &= mqtt_homeassistant_json_device(json_doc, json_root)) {
-        LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_json_device()");
-        
-        // Select sensor by type
-        char *sensor_type = "";
-        switch(type) {
-            case MQTT_HOMEASSISTANT_SENSOR:
-                sensor_type = "sensor";
-                if(result &= mqtt_homeassistant_json_sensor(json_doc, json_root, topic_name, json_field, device_class, enabled)) {
-                    LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_json_sensor()");
-                } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_json_sensor()");
-                break;
-            case MQTT_HOMEASSISTANT_BINARY_SENSOR:
-                sensor_type = "binary_sensor";
-                if(result &= mqtt_homeassistant_json_binary_sensor(json_doc, json_root, topic_name, json_field, device_class, enabled)) {
-                    LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_json_binary_sensor()");
-                } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_json_binary_sensor()");
-                break;
-            default: result &= false;
-        }
-        
-        // Payload
-        if(result) {
-            const char *json = yyjson_mut_write(json_doc, 0, NULL);
-            if(result &= !!json) {
-                LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_write()");
-                char *object_id = "";
-                if(result &= (asprintf(&object_id, "%s_%s", topic_name, json_field) != -1)) {
-                    LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(object_id)");
-                    char *discovery_topic = "";
-                    char *client_id = mqtt_client_id();
-                    if(result &= (asprintf(&discovery_topic, "%s/%s/%s/%s/config", APP_CFG.mqtt.discovery, sensor_type, client_id, object_id) != -1)) {
-                        LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(discovery_topic)");
-                        
-                        // Send
-                        if(result &= mqtt_send(discovery_topic, (char *) json)) {
-                            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_send(MQTT_HOMEASSISTANT_DISCOVERY)");
-                        } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_send(MQTT_HOMEASSISTANT_DISCOVERY)");
-                        
-                        free(discovery_topic);
-                    } LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(discovery_topic)");
-                    free(client_id);
-                    free(object_id);
-                } LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(object_id)");
-                free((void *)json);
-            } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_write()");
-        }
-    } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_json_device()");
+    } else LOGGER(LOGGER_LEVEL_INFO, "Home Assistant Discovery is disabled in the settings or discovery prefix not set.");
     
     LOGGER(LOGGER_LEVEL_DEBUG, "Function completed (result = %s).", (result ? "true" : "false"));
     return result;
