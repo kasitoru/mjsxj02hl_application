@@ -125,6 +125,7 @@ qos = 1                        ; Quality of Service (0, 1 or 2)
 retain = true                  ; Retained messages
 reconnection_interval = 60     ; Reconnection interval (in seconds)
 periodical_interval = 60       ; Interval of periodic message (in seconds)
+discovery = homeassistant      ; Discovery prefix (https://www.home-assistant.io/docs/mqtt/discovery/#discovery-topic)
 
 [night]
 mode = 2                       ; Night mode (0 = off, 1 = on, 2 = auto)

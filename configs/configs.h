@@ -97,6 +97,7 @@ typedef struct {
         bool retain;
         int reconnection_interval;
         int periodical_interval;
+        char *discovery;
     } mqtt;
     
     // [night]

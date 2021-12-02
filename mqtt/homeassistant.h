@@ -3,7 +3,6 @@
 
 #include <stdbool.h>
 
-#define MQTT_HOMEASSISTANT_DISCOVERY     "homeassistant"
 #define MQTT_HOMEASSISTANT_MANUFACTURER  "Xiaomi"
 #define MQTT_HOMEASSISTANT_MODEL         "Mi Home Security Camera 1080P (MJSXJ02HL)"
 

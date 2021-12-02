@@ -82,6 +82,7 @@ APPLICATION_CONFIGURATION APP_CFG = {
     .mqtt.retain                  = true,                                   // Retained messages
     .mqtt.reconnection_interval   = 60,                                     // Reconnection interval (in seconds)
     .mqtt.periodical_interval     = 60,                                     // Interval of periodic message (in seconds)
+    .mqtt.discovery               = "homeassistant",                        // Discovery prefix (https://www.home-assistant.io/docs/mqtt/discovery/#discovery-topic)
     
     // [night]
     .night.mode                   = 2,                                      // Night mode (0 = off, 1 = on, 2 = auto)
@@ -227,6 +228,8 @@ static int parser_handler(void* cfg, const char *section, const char *name, cons
         config->mqtt.reconnection_interval = atoi(value);
     } else if(MATCH("mqtt", "periodical_interval")) {
         config->mqtt.periodical_interval = atoi(value);
+    } else if(MATCH("mqtt", "discovery")) {
+        config->mqtt.discovery = strdup(value);
 
     // [night]
     } else if(MATCH("night", "mode")) {

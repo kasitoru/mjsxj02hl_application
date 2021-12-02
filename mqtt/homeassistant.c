@@ -213,7 +213,7 @@ bool mqtt_homeassistant_discovery(int type, char *topic_name, char *json_field, 
                     LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(object_id)");
                     char *discovery_topic = "";
                     char *client_id = mqtt_client_id();
-                    if(result &= (asprintf(&discovery_topic, "%s/%s/%s/%s/config", MQTT_HOMEASSISTANT_DISCOVERY, sensor_type, client_id, object_id) != -1)) {
+                    if(result &= (asprintf(&discovery_topic, "%s/%s/%s/%s/config", APP_CFG.mqtt.discovery, sensor_type, client_id, object_id) != -1)) {
                         LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(discovery_topic)");
                         
                         // Send
