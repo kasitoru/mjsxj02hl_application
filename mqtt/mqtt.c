@@ -236,7 +236,6 @@ static void *mqtt_periodical(void *arg) {
         // Free resources
         yyjson_mut_doc_free(json_doc);
         free(image_url);
-        free(dev_id);
         free(fw_version);
         // Sleep
         if(endless_cycle) {
