@@ -235,42 +235,37 @@ static int parser_handler(void* cfg, const char *section, const char *name, cons
         config->night.gray = atoi(value);
 
     // unknown
-    } else result = false;
+    } else result &= false;
 
-    if(result) {
-        logger("configs", "configs_init", LOGGER_LEVEL_FORCED, "%s success. Section: %s, name: %s, value: %s", "parser_handler()", section, name, value);
-    } else {
-        logger("configs", "configs_init", LOGGER_LEVEL_WARNING, "%s error! Section: %s, name: %s, value: %s", "parser_handler()", section, name, value);
-    }
+    if(result) LOGGER(LOGGER_LEVEL_INFO, "Parse success. Section: %s, name: %s, value: %s", section, name, value);
+    else LOGGER(LOGGER_LEVEL_WARNING, "Parse error! Section: %s, name: %s, value: %s", section, name, value);
     
     return result;
 }
 
 // Init application configs
 bool configs_init(char *filename) {
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function is called...");
     bool result = true;
-    logger("configs", "configs_init", LOGGER_LEVEL_DEBUG, "Function is called...");
-    logger("configs", "configs_init", LOGGER_LEVEL_DEBUG, "Filename: %s", filename);
-
+    
     // Read values from config file
-    if(ini_parse(filename, parser_handler, &APP_CFG) >= 0) {
-        logger("configs", "configs_init", LOGGER_LEVEL_INFO, "%s success.", "ini_parse()");
-    } else {
-        logger("configs", "configs_init", LOGGER_LEVEL_ERROR, "%s error!", "ini_parse()");
-        logger("configs", "configs_init", LOGGER_LEVEL_ERROR, "Configs filename: %s", filename);
-        if(configs_free()) {
-            logger("configs", "configs_init", LOGGER_LEVEL_INFO, "%s success.", "configs_free()");
-        } else logger("configs", "configs_init", LOGGER_LEVEL_WARNING, "%s error!", "configs_free()");
-        result = false;
+    LOGGER(LOGGER_LEVEL_INFO, "Filename: %s", filename);
+    if(result &= (ini_parse(filename, parser_handler, &APP_CFG) >= 0)) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "ini_parse()");
+    else {
+        LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "ini_parse()");
+        if(result &= configs_free()) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "configs_free()");
+        else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "configs_free()");
     }
     
-    logger("configs", "configs_init", LOGGER_LEVEL_DEBUG, "Function completed.");
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function completed (result = %s).", (result ? "true" : "false"));
     return result;
 }
 
 // Free application configs
 bool configs_free() {
-    logger("configs", "configs_free", LOGGER_LEVEL_DEBUG, "Function is called...");
-    logger("configs", "configs_free", LOGGER_LEVEL_DEBUG, "Function completed.");
-    return true;
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function is called...");
+    bool result = true;
+    LOGGER(LOGGER_LEVEL_DEBUG, "This function is a stub.");
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function completed (result = %s).", (result ? "true" : "false"));
+    return result;
 }

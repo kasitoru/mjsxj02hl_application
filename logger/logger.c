@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
+#include <time.h>
 
 #include "./logger.h"
 #include "./../localsdk/init.h"
@@ -32,27 +33,34 @@ static int logger_write(const int level, const char *format, ...) {
 }
 
 // Add message to log
-int logger(const char *module, const char *function, const int level, char *format, ...) {
-    char *message = "";
+int logger(const char *file, const int line, const char *function, const int level, char *format, ...) {
+    int result = 0;
     // Trim non-printable symbols
     char *frmt_buffer = prepare_string(format);
     // Date & Time
     time_t rawtime;
-    time(&rawtime);
-    struct tm *timeinfo = localtime(&rawtime); 
     char datetime[18];
-    strftime(datetime, sizeof(datetime), "%x %X", timeinfo);
+    memset(datetime, '\0', sizeof(datetime));
+    if(time(&rawtime) != -1) {
+        struct tm *timeinfo;
+        if(timeinfo = localtime(&rawtime)) {
+            strftime(datetime, sizeof(datetime), "%x %X", timeinfo);
+        }
+    }
     // Nanoseconds
     struct timespec spec;
     clock_gettime(CLOCK_REALTIME, &spec);
     // Print message
     va_list params;
     va_start(params, format);
-    vasprintf(&message, frmt_buffer, params);
-    free(frmt_buffer);
-    int result = logger_write(level, "[%s.%09d] [%s][%s]: %s\n", datetime, spec.tv_nsec, module, function, message);
+    char *message = "";
+    if(vasprintf(&message, frmt_buffer, params) != -1) {
+        result = logger_write(level, "[%s.%09d] [%s:%d][%s]: %s\n", datetime, spec.tv_nsec, file, line, function, message);
+        free(frmt_buffer);
+        free(message);
+    }
     va_end(params);
-    free(message);
+    
     return result;
 }
 

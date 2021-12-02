@@ -16,9 +16,12 @@ int playback_status = SPEAKER_MEDIA_STOPPED;
 
 // Init speaker
 bool speaker_init() {
-    logger("speaker", "speaker_init", LOGGER_LEVEL_DEBUG, "Function is called...");
-    if(local_sdk_speaker_init() == LOCALSDK_OK) {
-        logger("speaker", "speaker_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_speaker_init()");
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function is called...");
+    bool result = true;
+    
+    if(result &= (local_sdk_speaker_init() == LOCALSDK_OK)) {
+        LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "local_sdk_speaker_init()");
+        
         LOCALSDK_SPEAKER_OPTIONS speaker_options = {
             .sample_rate = LOCALSDK_SPEAKER_SAMPLE_RATE,
             .bit_depth   = LOCALSDK_SPEAKER_BIT_DEPTH,
@@ -29,62 +32,67 @@ bool speaker_init() {
             .buffer_size = LOCALSDK_AUDIO_PCM_BUFFER_SIZE,
             .unknown_7   = 1, // FIXME: what is it?
         };
-        if(local_sdk_speaker_set_parameters(&speaker_options) == LOCALSDK_OK) {
-            logger("speaker", "speaker_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_speaker_set_parameters()");
-            if(local_sdk_speaker_start() == LOCALSDK_OK) {
-                logger("speaker", "speaker_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_speaker_start()");
-                
-                logger("speaker", "speaker_init", LOGGER_LEVEL_DEBUG, "Function completed.");
-                return true;
-            } else logger("speaker", "speaker_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_speaker_start()");
-        } else logger("speaker", "speaker_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_speaker_set_parameters()");
-    } else logger("speaker", "speaker_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_speaker_init()");
-    if(speaker_free()) {
-        logger("speaker", "speaker_init", LOGGER_LEVEL_INFO, "%s success.", "speaker_free()");
-    } else logger("speaker", "speaker_init", LOGGER_LEVEL_WARNING, "%s error!", "speaker_free()");
-    logger("speaker", "speaker_init", LOGGER_LEVEL_DEBUG, "Function completed.");
-    return false;
+        
+        if(result &= (local_sdk_speaker_set_parameters(&speaker_options) == LOCALSDK_OK)) {
+            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "local_sdk_speaker_set_parameters()");
+            if(result &= (local_sdk_speaker_start() == LOCALSDK_OK)) {
+                LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "local_sdk_speaker_start()");
+            } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_speaker_start()");
+        } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_speaker_set_parameters()");
+    } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_speaker_init()");
+    
+    // Free speaker if error occurred
+    if(!result) {
+        if(result &= speaker_free()) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "speaker_free()");
+        else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "speaker_free()");
+    }
+    
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function completed (result = %s).", (result ? "true" : "false"));
+    return result;
 }
 
 // Free speaker
 bool speaker_free() {
-    logger("speaker", "speaker_free", LOGGER_LEVEL_DEBUG, "Function is called...");
-    logger("speaker", "speaker_free", LOGGER_LEVEL_DEBUG, "Function completed.");
-    return true;
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function is called...");
+    bool result = true;
+    LOGGER(LOGGER_LEVEL_DEBUG, "This function is a stub.");
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function completed (result = %s).", (result ? "true" : "false"));
+    return result;
 }
 
 // Play media (WAV, 8000 hz, 16-bit, mono)
 bool speaker_play_media(char *filename, int type) {
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function is called...");
     bool result = true;
-    logger("speaker", "speaker_play_media", LOGGER_LEVEL_DEBUG, "Function is called...");
-    logger("speaker", "speaker_play_media", LOGGER_LEVEL_DEBUG, "Filename: %s", filename);
-    logger("speaker", "speaker_play_media", LOGGER_LEVEL_DEBUG, "Type: %d", type);
+    
+    LOGGER(LOGGER_LEVEL_INFO, "Filename: %s", filename);
+    LOGGER(LOGGER_LEVEL_INFO, "Type: %d", type);
     
     // Stop current playing
     if(speaker_status_media() != SPEAKER_MEDIA_STOPPED) {
         if(speaker_stop_media()) {
-            logger("speaker", "speaker_play_media", LOGGER_LEVEL_INFO, "%s success.", "speaker_stop_media()");
-            while(speaker_status_media() != SPEAKER_MEDIA_STOPPED) { usleep(98000); }
+            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "speaker_stop_media()");
+            while(speaker_status_media() != SPEAKER_MEDIA_STOPPED) { usleep(100000); }
         }
     }
     playback_status = SPEAKER_MEDIA_PLAYING;
     
     // Feed file data
     FILE *media = fopen(filename, "rb");
-    if(media != NULL) {
-        int error_counter = 0;
-        logger("speaker", "speaker_play_media", LOGGER_LEVEL_INFO, "%s success.", "fopen()");
+    if(result &= (media != NULL)) {
+        LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "fopen()");
+        
         if(type != LOCALSDK_SPEAKER_G711_TYPE) {
             fseek(media, 44, SEEK_SET); // Skip head
         }
-        if(local_sdk_speaker_clean_buf_data() == LOCALSDK_OK) {
-            logger("speaker", "speaker_play_media", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_speaker_clean_buf_data()");
-        } else {
-            logger("speaker", "speaker_play_media", LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_speaker_clean_buf_data()");
-            result = false;
-        }
+        
+        if(result &= (local_sdk_speaker_clean_buf_data() == LOCALSDK_OK)) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "local_sdk_speaker_clean_buf_data()");
+        else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_speaker_clean_buf_data()");
+        
+        int error_counter = 0;
         int buffer_size = LOCALSDK_AUDIO_PCM_BUFFER_SIZE;
         if(type == LOCALSDK_SPEAKER_G711_TYPE) { buffer_size = LOCALSDK_AUDIO_G711_BUFFER_SIZE; }
+        
         while(!feof(media)) {
             error_counter = 0;
             char *buffer = (char *) malloc(buffer_size);
@@ -95,7 +103,7 @@ bool speaker_play_media(char *filename, int type) {
                 } else {
                     if(local_sdk_speaker_feed_pcm_data(buffer, length) == LOCALSDK_OK || (error_counter >= 300)) break;
                 }
-                usleep(98000);
+                usleep(100000);
                 error_counter++;
                 if(speaker_status_media() == SPEAKER_MEDIA_STOPPED) playback_status = SPEAKER_MEDIA_STOPPING;
                 if(speaker_status_media() == SPEAKER_MEDIA_STOPPING) break;
@@ -105,23 +113,16 @@ bool speaker_play_media(char *filename, int type) {
             if(speaker_status_media() == SPEAKER_MEDIA_STOPPING) break;
         }
         if(error_counter >= 300) {
-            logger("speaker", "speaker_play_media", LOGGER_LEVEL_WARNING, "%s error!", "error_counter (>= 300)");
-            result = false;
+            LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "error_counter (>= 300)");
+            result &= false;
         }
-        if(local_sdk_speaker_finish_buf_data() == LOCALSDK_OK) {
-            logger("speaker", "speaker_play_media", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_speaker_finish_buf_data()");
-        } else {
-            logger("speaker", "speaker_play_media", LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_speaker_finish_buf_data()");
-            result = false;
-        }
+        if(result &= (local_sdk_speaker_finish_buf_data() == LOCALSDK_OK)) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "local_sdk_speaker_finish_buf_data()");
+        else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_speaker_finish_buf_data()");
         fclose(media);
-    } else {
-        logger("speaker", "speaker_play_media", LOGGER_LEVEL_ERROR, "%s error!", "fopen()");
-        result = false;
-    }
-
-    logger("speaker", "speaker_play_media", LOGGER_LEVEL_DEBUG, "Function completed.");
+    } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "fopen()");
+    
     playback_status = SPEAKER_MEDIA_STOPPED;
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function completed (result = %s).", (result ? "true" : "false"));
     return result;
 }
 
@@ -132,38 +133,36 @@ int speaker_status_media() {
 
 // Stop playback
 bool speaker_stop_media() {
-    bool result = false;
-    logger("speaker", "speaker_stop_media", LOGGER_LEVEL_DEBUG, "Function is called...");
-    if(speaker_status_media() != SPEAKER_MEDIA_STOPPED) {
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function is called...");
+    bool result = true;
+    
+    if(result &= (speaker_status_media() != SPEAKER_MEDIA_STOPPED)) {
         playback_status = SPEAKER_MEDIA_STOPPING;
-        result = true;
     }
-    logger("speaker", "speaker_stop_media", LOGGER_LEVEL_DEBUG, "Function completed.");
+    
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function completed (result = %s).", (result ? "true" : "false"));
     return result;
 }
 
 // Set volume
 bool speaker_set_volume(int value) {
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function is called...");
     bool result = true;
-    logger("speaker", "speaker_set_volume", LOGGER_LEVEL_DEBUG, "Function is called...");
-    logger("speaker", "speaker_set_volume", LOGGER_LEVEL_DEBUG, "Volume: %d", value);
     
-    if(local_sdk_speaker_set_volume(value) == LOCALSDK_OK) {
-        logger("speaker", "speaker_set_volume", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_speaker_set_volume()");
+    LOGGER(LOGGER_LEVEL_INFO, "Volume: %d", value);
+    if(result &= (local_sdk_speaker_set_volume(value) == LOCALSDK_OK)) {
+        LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "local_sdk_speaker_set_volume()");
         APP_CFG.speaker.volume = value;
-    } else {
-        logger("speaker", "speaker_set_volume", LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_speaker_set_volume()");
-        result = false;
-    }
+    } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_speaker_set_volume()");
     
-    logger("speaker", "speaker_set_volume", LOGGER_LEVEL_DEBUG, "Function completed.");
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function completed (result = %s).", (result ? "true" : "false"));
     return result;
 }
 
 // Get volume
 int speaker_get_volume() {
-    logger("speaker", "speaker_get_volume", LOGGER_LEVEL_DEBUG, "Function is called...");
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function is called...");
     int value = APP_CFG.speaker.volume;
-    logger("speaker", "speaker_get_volume", LOGGER_LEVEL_DEBUG, "Function completed.");
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function completed (volume = %d).", value);
     return value;
 }

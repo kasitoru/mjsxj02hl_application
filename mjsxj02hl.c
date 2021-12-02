@@ -19,70 +19,67 @@
 
 // Signal callback
 void signal_callback(int signal) {
-    logger("mjsxj02hl_application", "signal_callback", LOGGER_LEVEL_DEBUG, "Function is called...");
-
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function is called...");
+    
     // Enable orange LED
     if(APP_CFG.general.led) {
-        if(local_sdk_indicator_led_option(true, false) == LOCALSDK_OK) {
-            logger("mjsxj02hl_application", "signal_callback", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_indicator_led_option(true, false)");
-        } else {
-            logger("mjsxj02hl_application", "signal_callback", LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_indicator_led_option(true, false)");
+        if(local_sdk_indicator_led_option(true, false) == LOCALSDK_OK) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "local_sdk_indicator_led_option(true, false)");
+        else {
+            LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_indicator_led_option(true, false)");
             signal = EX_SOFTWARE;
         }
     }
-
+    
     // MQTT free
-    if(mqtt_free(true)) {
-        logger("mjsxj02hl_application", "signal_callback", LOGGER_LEVEL_INFO, "%s success.", "mqtt_free(true)");
-    } else {
-        logger("mjsxj02hl_application", "signal_callback", LOGGER_LEVEL_WARNING, "%s error!", "mqtt_free(true)");
+    if(mqtt_free(true)) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_free(true)");
+    else {
+        LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "mqtt_free(true)");
         signal = EX_SOFTWARE;
     }
-
+    
     // RTSP free
-    if(rtsp_free()) {
-        logger("mjsxj02hl_application", "signal_callback", LOGGER_LEVEL_INFO, "%s success.", "rtsp_free()");
-    } else {
-        logger("mjsxj02hl_application", "signal_callback", LOGGER_LEVEL_WARNING, "%s error!", "rtsp_free()");
+    if(rtsp_free()) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "rtsp_free()");
+    else {
+        LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "rtsp_free()");
         signal = EX_SOFTWARE;
     }
-
+    
     // All free
-    if(all_free()) {
-        logger("mjsxj02hl_application", "signal_callback", LOGGER_LEVEL_INFO, "%s success.", "all_free()");
-    } else {
-        logger("mjsxj02hl_application", "signal_callback", LOGGER_LEVEL_WARNING, "%s error!", "all_free()");
+    if(all_free()) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "all_free()");
+    else {
+        LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "all_free()");
         signal = EX_SOFTWARE;
     }
-
-    // Exit
-    logger("mjsxj02hl_application", "signal_callback", LOGGER_LEVEL_DEBUG, "Function completed.");
+    
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function completed (signal = %d).", signal);
     exit(signal);
 }
 
 // Factory reset callback
 int factory_reset_callback() {
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function is called...");
     int result = LOCALSDK_OK;
-    logger("mjsxj02hl_application", "factory_reset_callback", LOGGER_LEVEL_DEBUG, "Function is called...");
     
-    if(system("mjsxj02hl --factory-reset") == EX_OK) {
-        logger("mjsxj02hl_application", "factory_reset_callback", LOGGER_LEVEL_INFO, "%s success.", "system(\"mjsxj02hl --factory-reset\")");
-    } else logger("mjsxj02hl_application", "factory_reset_callback", LOGGER_LEVEL_ERROR, "%s error!", "system(\"mjsxj02hl --factory-reset\")");
+    if(system("mjsxj02hl --factory-reset") == EX_OK) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "system(mjsxj02hl --factory-reset)");
+    else {
+        LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "system(mjsxj02hl --factory-reset)");
+        result = LOCALSDK_ERROR;
+    }
     
-    logger("mjsxj02hl_application", "factory_reset_callback", LOGGER_LEVEL_DEBUG, "Function completed.");
-    return LOCALSDK_ERROR;
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function completed (result = %s).", (result == LOCALSDK_OK ? "LOCALSDK_OK" : "LOCALSDK_ERROR"));
+    return result;
 }
 
 // Main function
 int main(int argc, char **argv) {
-    logger("mjsxj02hl_application", "main", LOGGER_LEVEL_DEBUG, "Function is called...");
-
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function is called...");
+    
     // Initialize pseudo-random number generator
     srand(time(NULL));
-
+    
     // Default path of config file
     char *config_filename = "/usr/app/share/mjsxj02hl.conf";
-
+    
     // Running with arguments
     if(argc > 1) {
         if(strcmp(argv[1], "--config") == 0) { // Set config path
@@ -136,53 +133,51 @@ int main(int argc, char **argv) {
     }
     
     // Firmware version
-    logger("mjsxj02hl_application", "main", LOGGER_LEVEL_FORCED, "Firmware version: %s", firmware_version());
+    char *fw_ver = firmware_version();
+    LOGGER(LOGGER_LEVEL_FORCED, "Firmware version: %s", fw_ver);
+    free(fw_ver);
     
     // Device id
-    logger("mjsxj02hl_application", "main", LOGGER_LEVEL_FORCED, "Device ID: %s", device_id());
+    char *dev_id = device_id();
+    LOGGER(LOGGER_LEVEL_FORCED, "Device ID: %s", dev_id);
+    free(dev_id);
     
     // Main thread
     if(configs_init(config_filename)) { // Init configs
-        logger("mjsxj02hl_application", "main", LOGGER_LEVEL_INFO, "%s success.", "configs_init()");
+        LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "configs_init()");
         if(all_init()) { // Init all systems
-            logger("mjsxj02hl_application", "main", LOGGER_LEVEL_INFO, "%s success.", "all_init()");
-
+            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "all_init()");
+            
             // Register signals
-            if(signal(SIGINT, signal_callback) != SIG_ERR) {
-                logger("mjsxj02hl_application", "main", LOGGER_LEVEL_INFO, "%s success.", "signal(SIGINT)");
-            } else logger("mjsxj02hl_application", "main", LOGGER_LEVEL_WARNING, "%s error!", "signal(SIGINT)");
-            if(signal(SIGABRT, signal_callback) != SIG_ERR) {
-                logger("mjsxj02hl_application", "main", LOGGER_LEVEL_INFO, "%s success.", "signal(SIGABRT)");
-            } else logger("mjsxj02hl_application", "main", LOGGER_LEVEL_WARNING, "%s error!", "signal(SIGABRT)");
-            if(signal(SIGTERM, signal_callback) != SIG_ERR) {
-                logger("mjsxj02hl_application", "main", LOGGER_LEVEL_INFO, "%s success.", "signal(SIGTERM)");
-            } else logger("mjsxj02hl_application", "main", LOGGER_LEVEL_WARNING, "%s error!", "signal(SIGTERM)");
+            if(signal(SIGINT, signal_callback) != SIG_ERR) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "signal(SIGINT)"); // SIGINT
+            else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "signal(SIGINT)");
+            
+            if(signal(SIGABRT, signal_callback) != SIG_ERR) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "signal(SIGABRT)"); // SIGABRT
+            else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "signal(SIGABRT)");
+            
+            if(signal(SIGTERM, signal_callback) != SIG_ERR) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "signal(SIGTERM)"); // SIGTERM
+            else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "signal(SIGTERM)");
             
             // Onboard LED indicator
             if(APP_CFG.general.led) { // Enable blue LED
-                if(local_sdk_indicator_led_option(false, true) == LOCALSDK_OK) {
-                    logger("mjsxj02hl_application", "main", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_indicator_led_option(false, true)");
-                } else logger("mjsxj02hl_application", "main", LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_indicator_led_option(false, true)");
+                if(local_sdk_indicator_led_option(false, true) == LOCALSDK_OK) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "local_sdk_indicator_led_option(false, true)");
+                else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_indicator_led_option()");
             } else { // Disable LEDs
-                if(local_sdk_indicator_led_option(false, false) == LOCALSDK_OK) {
-                    logger("mjsxj02hl_application", "main", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_indicator_led_option(false, false)");
-                } else logger("mjsxj02hl_application", "main", LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_indicator_led_option(false, false)");
+                if(local_sdk_indicator_led_option(false, false) == LOCALSDK_OK) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "local_sdk_indicator_led_option(false, false)");
+                else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_indicator_led_option()");
             }
             
-            // Factory reset
-            if(local_sdk_setup_keydown_set_callback(3000, factory_reset_callback) == LOCALSDK_OK) {
-                logger("mjsxj02hl_application", "main", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_setup_keydown_set_callback()");
-            } else logger("mjsxj02hl_application", "main", LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_setup_keydown_set_callback()");
+            // Factory reset callback
+            if(local_sdk_setup_keydown_set_callback(3000, factory_reset_callback) == LOCALSDK_OK) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "local_sdk_setup_keydown_set_callback()");
+            else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_setup_keydown_set_callback()");
             
-            // RTSP
-            if(rtsp_init()) {
-                logger("mjsxj02hl_application", "main", LOGGER_LEVEL_INFO, "%s success.", "rtsp_init()");
-            } else logger("mjsxj02hl_application", "main", LOGGER_LEVEL_WARNING, "%s error!", "rtsp_init()");
+            // RTSP server
+            if(rtsp_init()) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "rtsp_init()");
+            else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "rtsp_init()");
             
-            // MQTT
-            if(mqtt_init()) {
-                logger("mjsxj02hl_application", "main", LOGGER_LEVEL_INFO, "%s success.", "mqtt_init()");
-            } else logger("mjsxj02hl_application", "main", LOGGER_LEVEL_WARNING, "%s error!", "mqtt_init()");
+            // MQTT client
+            if(mqtt_init()) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_init()");
+            else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_init()");
             
             // Endless waiting
             while(true) {
@@ -190,13 +185,14 @@ int main(int argc, char **argv) {
             }
             
         } else {
-            logger("mjsxj02hl_application", "main", LOGGER_LEVEL_ERROR, "%s error!", "all_init()");
+            LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "all_init()");
             return EX_SOFTWARE;
         }
     } else {
-        logger("mjsxj02hl_application", "main", LOGGER_LEVEL_ERROR, "%s error!", "configs_init()");
+        LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "configs_init()");
         return EX_CONFIG;
     }
-    logger("mjsxj02hl_application", "main", LOGGER_LEVEL_DEBUG, "Function completed.");
+    
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function completed (signal = %d).", EX__BASE);
     return EX__BASE;
 }

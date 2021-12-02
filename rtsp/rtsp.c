@@ -19,24 +19,27 @@ static uint32_t secondary_session = 0;
 
 // Logger function for libRtspServer
 static int librtspserver_logger(const char *format, ...) {
-    char *message = "";
+    int result = 0;
     va_list params;
     va_start(params, format);
-    vasprintf(&message, format, params);
-    int result = logger("rtsp", "rtspserver", LOGGER_LEVEL_INFO, message);
-    free(message);
+    char *message = "";
+    if(vasprintf(&message, format, params) != -1) {
+        result = LOGGER(LOGGER_LEVEL_INFO, message);
+        free(message);
+    } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "vasprintf(message)");
     va_end(params);
     return result;
 }
 
 // Connected callback function for libRtspServer
 static void librtspserver_connected(uint32_t session_id, const char *peer_ip, uint16_t peer_port) {
-    logger("rtsp", "librtspserver_connected", LOGGER_LEVEL_DEBUG, "Function is called...");
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function is called...");
+    
     int channel = (session_id == secondary_session ? LOCALSDK_VIDEO_SECONDARY_CHANNEL : LOCALSDK_VIDEO_PRIMARY_CHANNEL);
-    if(local_sdk_video_force_I_frame(channel) == LOCALSDK_OK) {
-        logger("rtsp", "librtspserver_connected", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_video_force_I_frame()");
-    } else logger("rtsp", "librtspserver_connected", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_video_force_I_frame()");
-    logger("rtsp", "librtspserver_connected", LOGGER_LEVEL_DEBUG, "Function completed.");
+    if(local_sdk_video_force_I_frame(channel) == LOCALSDK_OK) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "local_sdk_video_force_I_frame()");
+    else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_video_force_I_frame()");
+    
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function completed.");
 }
 
 // LocalSDK video type to libRtspServer type
@@ -72,15 +75,17 @@ bool rtsp_is_enabled(int channel) {
 
 // Init RTSP
 bool rtsp_init() {
-    bool result = false;
-    logger("rtsp", "rtsp_init", LOGGER_LEVEL_DEBUG, "Function is called...");
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function is called...");
+    bool result = true;
+    
     if(rtsp_is_enabled(-1)) { // If RTSP enabled
-        if(rtspserver_logprintf(librtspserver_logger)) {
-            logger("rtsp", "rtsp_init", LOGGER_LEVEL_INFO, "%s success.", "rtspserver_logprintf()");
-            if(rtspserver_create(APP_CFG.rtsp.port, APP_CFG.rtsp.username, APP_CFG.rtsp.password)) {
-                logger("rtsp", "rtsp_init", LOGGER_LEVEL_INFO, "%s success.", "rtspserver_create()");
-                if(rtspserver_connected(librtspserver_connected)) {
-                    logger("rtsp", "rtsp_init", LOGGER_LEVEL_INFO, "%s success.", "rtspserver_connected()");
+        if(result &= rtspserver_logprintf(librtspserver_logger)) {
+            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "rtspserver_logprintf()");
+            if(result &= rtspserver_create(APP_CFG.rtsp.port, APP_CFG.rtsp.username, APP_CFG.rtsp.password)) {
+                LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "rtspserver_create()");
+                if(result &= rtspserver_connected(librtspserver_connected)) {
+                    LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "rtspserver_connected()");
+                    
                     // Primary channel
                     bool primary_result = false;
                     if(rtsp_is_enabled(LOCALSDK_VIDEO_PRIMARY_CHANNEL)) {
@@ -89,10 +94,11 @@ bool rtsp_init() {
                         uint8_t primary_video_type = librtspserver_video_type(APP_CFG.video.primary_type);
                         uint8_t primary_audio_type = (audio_is_enabled(LOCALSDK_VIDEO_PRIMARY_CHANNEL) ? LIBRTSPSERVER_TYPE_G711A : LIBRTSPSERVER_TYPE_NONE);
                         if(primary_session = rtspserver_session(primary_name, primary_multicast, primary_video_type, LOCALSDK_VIDEO_FRAMERATE, primary_audio_type, 0, 0, false)) {
-                            logger("rtsp", "rtsp_init", LOGGER_LEVEL_INFO, "%s success.", "rtspserver_session(primary)");
+                            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "rtspserver_session(primary)");
                             primary_result = true;
-                        } else logger("rtsp", "rtsp_init", LOGGER_LEVEL_ERROR, "%s error!", "rtspserver_session(primary)");
-                    } else logger("rtsp", "rtsp_init", LOGGER_LEVEL_WARNING, "%s channel is disabled in the settings or its name is not set.", "Primary");
+                        } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "rtspserver_session(primary)");
+                    } else LOGGER(LOGGER_LEVEL_INFO, "%s channel is disabled in the settings or its name is not set.", "Primary");
+                    
                     // Secondary channel
                     bool secondary_result = false;
                     if(rtsp_is_enabled(LOCALSDK_VIDEO_SECONDARY_CHANNEL)) {
@@ -101,30 +107,33 @@ bool rtsp_init() {
                         uint8_t secondary_video_type = librtspserver_video_type(APP_CFG.video.secondary_type);
                         uint8_t secondary_audio_type = (audio_is_enabled(LOCALSDK_VIDEO_SECONDARY_CHANNEL) ? LIBRTSPSERVER_TYPE_G711A : LIBRTSPSERVER_TYPE_NONE);
                         if(secondary_session = rtspserver_session(secondary_name, secondary_multicast, secondary_video_type, LOCALSDK_VIDEO_FRAMERATE, secondary_audio_type, 0, 0, false)) {
-                            logger("rtsp", "rtsp_init", LOGGER_LEVEL_INFO, "%s success.", "rtspserver_session(secondary)");
+                            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "rtspserver_session(secondary)");
                             secondary_result = true;
-                        } else logger("rtsp", "rtsp_init", LOGGER_LEVEL_ERROR, "%s error!", "rtspserver_session(secondary)");
-                    } else logger("rtsp", "rtsp_init", LOGGER_LEVEL_WARNING, "%s channel is disabled in the settings or its name is not set.", "Secondary");
+                        } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "rtspserver_session(secondary)");
+                    } else LOGGER(LOGGER_LEVEL_INFO, "%s channel is disabled in the settings or its name is not set.", "Secondary");
+                    
                     // Results
-                    result = (primary_result || secondary_result);
-                } else logger("rtsp", "rtsp_init", LOGGER_LEVEL_ERROR, "%s error!", "rtspserver_connected()");
-            } else logger("rtsp", "rtsp_init", LOGGER_LEVEL_ERROR, "%s error!", "rtspserver_create()");
-        } else logger("rtsp", "rtsp_init", LOGGER_LEVEL_ERROR, "%s error!", "rtspserver_logprintf()");
-    } else logger("rtsp", "rtsp_init", LOGGER_LEVEL_WARNING, "RTSP server is disabled in the settings.");
-    logger("rtsp", "rtsp_init", LOGGER_LEVEL_DEBUG, "Function completed.");
+                    result &= (primary_result || secondary_result);
+                } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "rtspserver_connected()");
+            } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "rtspserver_create()");
+        } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "rtspserver_logprintf()");
+    } else LOGGER(LOGGER_LEVEL_INFO, "RTSP server is disabled in the settings.");
+    
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function completed (result = %s).", (result ? "true" : "false"));
     return result;
 }
 
 // Free RTSP
 bool rtsp_free() {
-    bool result = false;
-    logger("rtsp", "rtsp_free", LOGGER_LEVEL_DEBUG, "Function is called...");
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function is called...");
+    bool result = true;
+    
     if(rtsp_is_enabled(-1)) { // If RTSP enabled
-        if(result = rtspserver_free(2, primary_session, secondary_session)) {
-            logger("rtsp", "rtsp_free", LOGGER_LEVEL_INFO, "%s success.", "rtspserver_free()");
-        } else logger("rtsp", "rtsp_free", LOGGER_LEVEL_ERROR, "%s error!", "rtspserver_free()");
-    } else result = true;
-    logger("rtsp", "rtsp_free", LOGGER_LEVEL_DEBUG, "Function completed.");
+        if(result &= rtspserver_free(2, primary_session, secondary_session)) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "rtspserver_free()");
+        else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "rtspserver_free()");
+    }
+    
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function completed (result = %s).", (result ? "true" : "false"));
     return result;
 }
 
