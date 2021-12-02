@@ -25,10 +25,6 @@ static bool night_state_mqtt(bool night, bool gray) {
     // Humanoid state
     yyjson_mut_obj_add_bool(json_doc, json_root, "gray", gray);
     
-    // Current timestamp
-    int timestamp = (int) time(NULL);
-    yyjson_mut_obj_add_int(json_doc, json_root, "timestamp", timestamp);
-    
     // Send it
     const char *json = yyjson_mut_write(json_doc, 0, NULL);
     if(result &= !!json) {

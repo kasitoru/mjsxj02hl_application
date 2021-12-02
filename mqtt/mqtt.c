@@ -157,19 +157,6 @@ static void *mqtt_periodical(void *arg) {
         char *dev_id = device_id();
         if(yyjson_mut_obj_add_str(json_doc, json_root, "device_id", dev_id)) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(device_id)");
         else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(device_id)");
-        // Startup timestamp
-        int startup = (int) -1;
-        struct stat proc_self;
-        if(stat("/proc/self", &proc_self) == 0) {
-            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "stat(\"/proc/self\")");
-            startup = (int) proc_self.st_ctime;
-        } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "stat(\"/proc/self\")");
-        if(yyjson_mut_obj_add_int(json_doc, json_root, "startup", startup)) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_int(startup)");
-        else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_int(startup)");
-        // Current timestamp
-        int timestamp = (int) time(NULL);
-        if(yyjson_mut_obj_add_int(json_doc, json_root, "timestamp", timestamp)) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_int(timestamp)");
-        else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_int(timestamp)");
         // IP address
         char *ip_address = "";
         struct ifaddrs *if_list, *if_item;

@@ -31,11 +31,6 @@ static bool alarm_state_mqtt(bool motion, bool humanoid) {
     if(yyjson_mut_obj_add_bool(json_doc, json_root, "humanoid", humanoid)) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_bool(humanoid)");
     else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_bool()");
     
-    // Current timestamp
-    int timestamp = (int) time(NULL);
-    if(yyjson_mut_obj_add_int(json_doc, json_root, "timestamp", timestamp)) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_int(timestamp)");
-    else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_int()");
-    
     // Send it
     const char *json = yyjson_mut_write(json_doc, 0, NULL);
     if(result &= !!json) {

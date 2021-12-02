@@ -189,8 +189,6 @@ Field | Description
 `sdk_version` | Version of localsdk library.
 `fw_version` | Version of the firmware.
 `device_id` | Unique device identifier.
-`startup` | Application startup timestamp.
-`timestamp` | Current timestamp.
 `ip_address` | IP address of the device.
 `total_ram` | The total size of RAM.
 `free_ram` | The size of the free RAM.
@@ -210,7 +208,6 @@ Field | Description
 ----- | -----------
 `motion` | Motion detection state.
 `humanoid` | Humanoid detection state.
-`timestamp` | Current timestamp.
 
 **Topic: <root_topic>/<device_name>/night**
 
@@ -220,7 +217,6 @@ Field | Description
 ----- | -----------
 `state` | Night mode state.
 `gray` | Grayscale state.
-`timestamp` | Current timestamp.
 
 ## Third-party libraries
 
