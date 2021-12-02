@@ -145,10 +145,6 @@ static void *mqtt_periodical(void *arg) {
         yyjson_mut_doc *json_doc = yyjson_mut_doc_new(NULL);
         yyjson_mut_val *json_root = yyjson_mut_obj(json_doc);
         yyjson_mut_doc_set_root(json_doc, json_root);
-        // SDK version
-        int sdk_version = (int) localsdk_get_version();
-        if(yyjson_mut_obj_add_int(json_doc, json_root, "sdk_version", sdk_version)) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_int(sdk_version)");
-        else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_int(sdk_version)");
         // FW version
         char *fw_version = firmware_version();
         if(yyjson_mut_obj_add_str(json_doc, json_root, "fw_version", fw_version)) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(fw_version)");

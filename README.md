@@ -186,7 +186,6 @@ This is a topic where general device state is published.
 
 Field | Description
 ----- | -----------
-`sdk_version` | Version of localsdk library.
 `fw_version` | Version of the firmware.
 `device_id` | Unique device identifier.
 `ip_address` | IP address of the device.
