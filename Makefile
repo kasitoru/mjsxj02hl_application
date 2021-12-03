@@ -25,13 +25,13 @@ mjsxj02hl: ./mjsxj02hl.c external-libs objects
 # PVS-STUDIO #
 ##############
 
-PVS_ANALYZER = GA:1,2
+PVS_ANALYZER = GA:1,2,3
 PVS_TYPE  = html
 
 analyze:
 	pvs-studio-analyzer trace -- make SKIP_EXTERNAL_LIBS=$(SKIP_EXTERNAL_LIBS)
 	pvs-studio-analyzer analyze --compiler $(CC) --compiler $(CXX) -e /opt -e /usr -e configs/inih -e mqtt/paho.mqtt.c -e rtsp/RtspServer -e yyjson
-	plog-converter -a $(PVS_ANALYZER) -t $(PVS_TYPE) -o PVS-Studio.$(PVS_TYPE) PVS-Studio.log
+	plog-converter -a $(PVS_ANALYZER) -t $(PVS_TYPE) -d V1019 -o PVS-Studio.$(PVS_TYPE) PVS-Studio.log
 
 #################
 # EXTERNAL LIBS #
