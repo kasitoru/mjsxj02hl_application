@@ -69,7 +69,7 @@ static bool mqtt_homeassistant_json_device(yyjson_mut_doc *json_doc, yyjson_mut_
 }
 
 // Sensor (MQTT_HOMEASSISTANT_SENSOR)
-static bool mqtt_homeassistant_json_sensor(yyjson_mut_doc *json_doc, yyjson_mut_val *json_root, char *topic_name, char *json_field, char *device_class, bool enabled) {
+static bool mqtt_homeassistant_json_sensor(yyjson_mut_doc *json_doc, yyjson_mut_val *json_root, char *topic_name, char *json_field, char *device_class, char *unit_of_measurement, bool enabled) {
     LOGGER(LOGGER_LEVEL_DEBUG, "Function is called...");
     bool result = true;
     
@@ -90,6 +90,12 @@ static bool mqtt_homeassistant_json_sensor(yyjson_mut_doc *json_doc, yyjson_mut_
                         if(result &= yyjson_mut_obj_add_str(json_doc, json_root, "device_class", device_class)) {
                             LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(device_class)");
                         } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(device_class)");
+                    }
+                    // Units of measurement
+                    if(unit_of_measurement != NULL) {
+                        if(result &= yyjson_mut_obj_add_str(json_doc, json_root, "unit_of_measurement", unit_of_measurement)) {
+                            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(unit_of_measurement)");
+                        } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(unit_of_measurement)");
                     }
                     // Enable by default
                     if(result &= yyjson_mut_obj_add_bool(json_doc, json_root, "enabled_by_default", enabled)) {
@@ -172,7 +178,7 @@ static bool mqtt_homeassistant_json_binary_sensor(yyjson_mut_doc *json_doc, yyjs
 }
 
 // Add device to Home Assistant over discovery protocol
-bool mqtt_homeassistant_discovery(int type, char *topic_name, char *json_field, char *device_class, bool enabled) {
+bool mqtt_homeassistant_discovery(int type, char *topic_name, char *json_field, char *device_class, char *unit_of_measurement, bool enabled) {
     LOGGER(LOGGER_LEVEL_DEBUG, "Function is called...");
     bool result = true;
 
@@ -192,7 +198,7 @@ bool mqtt_homeassistant_discovery(int type, char *topic_name, char *json_field, 
             switch(type) {
                 case MQTT_HOMEASSISTANT_SENSOR:
                     sensor_type = "sensor";
-                    if(result &= mqtt_homeassistant_json_sensor(json_doc, json_root, topic_name, json_field, device_class, enabled)) {
+                    if(result &= mqtt_homeassistant_json_sensor(json_doc, json_root, topic_name, json_field, device_class, unit_of_measurement, enabled)) {
                         LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_json_sensor()");
                     } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_json_sensor()");
                     break;
