@@ -6,3 +6,4 @@
 strace_out
 PVS-Studio.log
 PVS-Studio.html
+/PVS-Studio.fullhtml
