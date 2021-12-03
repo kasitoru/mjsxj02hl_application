@@ -2,3 +2,7 @@
 /bin
 /lib
 
+# PVS-Studio
+strace_out
+PVS-Studio.log
+PVS-Studio.html
