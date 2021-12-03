@@ -1,3 +1,5 @@
+SKIP_EXTERNAL_LIBS = OFF
+
 CROSS_COMPILE = arm-himix100-linux-
 CCFLAGS = -march=armv7-a -mfpu=neon-vfpv4 -funsafe-math-optimizations
 LDPATH = /opt/hisi-linux/x86-arm/arm-himix100-linux/target/usr/app/lib
@@ -23,7 +25,7 @@ mjsxj02hl: ./mjsxj02hl.c external-libs objects
 # EXTERNAL LIBS #
 #################
 
-ifndef SKIP_EXTERNAL_LIBS
+ifeq ($(SKIP_EXTERNAL_LIBS), OFF)
 external-libs: clean-libs mkdir-libs build-libs install-libs
 else
 external-libs:
