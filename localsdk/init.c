@@ -79,7 +79,7 @@ static int logprintf(const char *format, ...) {
     va_start(params, format);
     char *message = "";
     if(vasprintf(&message, format, params) != -1) {
-        int result = LOGGER(LOGGER_LEVEL_DEBUG, message);
+        result = LOGGER(LOGGER_LEVEL_DEBUG, message);
         free(message);
     } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "vasprintf(message)");
     va_end(params);
@@ -124,7 +124,7 @@ bool all_init() {
     
     // Free all if error occurred
     if(!result) {
-        if(result &= all_free()) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "all_free()");
+        if(all_free()) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "all_free()");
         else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "all_free()");
     }
     

@@ -217,7 +217,7 @@ bool alarm_init() {
     
     // Free alarm if error occurred
     if(!result) {
-        if(result &= alarm_free()) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "alarm_free()");
+        if(alarm_free()) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "alarm_free()");
         else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "alarm_free()");
     }
     

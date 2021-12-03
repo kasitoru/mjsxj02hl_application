@@ -256,7 +256,7 @@ bool configs_init(char *filename) {
     if(result &= (ini_parse(filename, parser_handler, &APP_CFG) >= 0)) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "ini_parse()");
     else {
         LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "ini_parse()");
-        if(result &= configs_free()) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "configs_free()");
+        if(configs_free()) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "configs_free()");
         else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "configs_free()");
     }
     
@@ -267,8 +267,7 @@ bool configs_init(char *filename) {
 // Free application configs
 bool configs_free() {
     LOGGER(LOGGER_LEVEL_DEBUG, "Function is called...");
-    bool result = true;
     LOGGER(LOGGER_LEVEL_DEBUG, "This function is a stub.");
-    LOGGER(LOGGER_LEVEL_DEBUG, "Function completed (result = %s).", (result ? "true" : "false"));
-    return result;
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function completed (result = %s).", "true");
+    return true;
 }

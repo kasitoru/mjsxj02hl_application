@@ -43,7 +43,7 @@ bool speaker_init() {
     
     // Free speaker if error occurred
     if(!result) {
-        if(result &= speaker_free()) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "speaker_free()");
+        if(speaker_free()) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "speaker_free()");
         else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "speaker_free()");
     }
     
@@ -54,10 +54,9 @@ bool speaker_init() {
 // Free speaker
 bool speaker_free() {
     LOGGER(LOGGER_LEVEL_DEBUG, "Function is called...");
-    bool result = true;
     LOGGER(LOGGER_LEVEL_DEBUG, "This function is a stub.");
-    LOGGER(LOGGER_LEVEL_DEBUG, "Function completed (result = %s).", (result ? "true" : "false"));
-    return result;
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function completed (result = %s).", "true");
+    return true;
 }
 
 // Play media (WAV, 8000 hz, 16-bit, mono)
@@ -95,20 +94,22 @@ bool speaker_play_media(char *filename, int type) {
         
         while(!feof(media)) {
             error_counter = 0;
-            char *buffer = (char *) malloc(buffer_size);
-            size_t length = fread(buffer, 1, buffer_size, media);
-            while(true) {
-                if(type == LOCALSDK_SPEAKER_G711_TYPE) {
-                    if(local_sdk_speaker_feed_g711_data(buffer, length) == LOCALSDK_OK || (error_counter >= 300)) break;
-                } else {
-                    if(local_sdk_speaker_feed_pcm_data(buffer, length) == LOCALSDK_OK || (error_counter >= 300)) break;
+            char *buffer = malloc(buffer_size);
+            if(buffer != NULL) {
+                size_t length = fread(buffer, 1, buffer_size, media);
+                while(true) {
+                    if(type == LOCALSDK_SPEAKER_G711_TYPE) {
+                        if(local_sdk_speaker_feed_g711_data(buffer, length) == LOCALSDK_OK || (error_counter >= 300)) break;
+                    } else {
+                        if(local_sdk_speaker_feed_pcm_data(buffer, length) == LOCALSDK_OK || (error_counter >= 300)) break;
+                    }
+                    usleep(100000);
+                    error_counter++;
+                    if(speaker_status_media() == SPEAKER_MEDIA_STOPPED) playback_status = SPEAKER_MEDIA_STOPPING;
+                    if(speaker_status_media() == SPEAKER_MEDIA_STOPPING) break;
                 }
-                usleep(100000);
-                error_counter++;
-                if(speaker_status_media() == SPEAKER_MEDIA_STOPPED) playback_status = SPEAKER_MEDIA_STOPPING;
-                if(speaker_status_media() == SPEAKER_MEDIA_STOPPING) break;
-            }
-            free(buffer);
+                free(buffer);
+            } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "malloc(buffer_size)");
             if(speaker_status_media() == SPEAKER_MEDIA_STOPPED) playback_status = SPEAKER_MEDIA_STOPPING;
             if(speaker_status_media() == SPEAKER_MEDIA_STOPPING) break;
         }

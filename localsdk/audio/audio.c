@@ -88,7 +88,7 @@ bool audio_init() {
     
     // Free alarm if error occurred
     if(!result) {
-        if(result &= audio_free()) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "audio_free()");
+        if(audio_free()) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "audio_free()");
         else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "audio_free()");
     }
     
