@@ -528,7 +528,7 @@ static bool mqtt_initialization(bool first_init) {
                         if(result &= (MQTTClient_subscribe(MQTTclient, command_topic, true) == MQTTCLIENT_SUCCESS)) {
                             LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "MQTTClient_subscribe(MQTT_COMMAND_TOPIC)");
                             // Periodic data sending
-                            if(result &= (pthread_create(&periodical_thread, NULL, mqtt_periodical, (void *) true) == 0)) {
+                            if(result &= (pthread_create(&periodical_thread, NULL, mqtt_periodical, (void *) true) == 0)) { //-V566
                                 LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "pthread_create(periodical_thread)");
                             } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "pthread_create(periodical_thread)");
                         } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "MQTTClient_subscribe(MQTT_COMMAND_TOPIC)");

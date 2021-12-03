@@ -43,16 +43,18 @@ static char *get_file_contents(char *filename) {
 // Removes all non-printable characters from string
 char *prepare_string(char *string) {
     char *prepared_string = "";
-    size_t length = strlen(string) + 1;
-    if(prepared_string = malloc(length)) {
-        memset(prepared_string, '\0', length);
-        size_t j = 0;
-        for(size_t i = 0; i<length; i++) {
-            if(isprint(string[i])) {
-                prepared_string[i-j] = string[i];
-            } else j++;
-        }
-    } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "malloc()");
+    if(string != NULL) {
+        size_t length = strlen(string) + 1;
+        if(prepared_string = malloc(length)) {
+            memset(prepared_string, '\0', length);
+            size_t j = 0;
+            for(size_t i = 0; i<length; i++) {
+                if(isprint(string[i])) {
+                    prepared_string[i-j] = string[i];
+                } else j++;
+            }
+        } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "malloc()");
+    }
     return prepared_string;
 }
 

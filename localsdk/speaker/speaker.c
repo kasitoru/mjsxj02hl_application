@@ -81,8 +81,8 @@ bool speaker_play_media(char *filename, int type) {
     if(result &= (media != NULL)) {
         LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "fopen()");
         
-        if(type != LOCALSDK_SPEAKER_G711_TYPE) {
-            fseek(media, 44, SEEK_SET); // Skip head
+        if(type != LOCALSDK_SPEAKER_G711_TYPE) { // Skip head
+            fseek(media, 44, SEEK_SET); //-V575
         }
         
         if(result &= (local_sdk_speaker_clean_buf_data() == LOCALSDK_OK)) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "local_sdk_speaker_clean_buf_data()");
