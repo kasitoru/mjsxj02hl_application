@@ -45,12 +45,14 @@ bool audio_is_enabled(int channel) {
 
 // Init audio
 bool audio_init() {
-    logger("audio", "audio_init", LOGGER_LEVEL_DEBUG, "Function is called...");
-    if(local_sdk_audio_init() == LOCALSDK_OK) {
-        logger("audio", "audio_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_audio_init()");
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function is called...");
+    bool result = true;
+    
+    if(result &= (local_sdk_audio_init() == LOCALSDK_OK)) {
+        LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "local_sdk_audio_init()");
         // Init channel 0
-        if(local_sdk_audio_create(LOCALSDK_AUDIO_CHANNEL) == LOCALSDK_OK) {
-            logger("audio", "audio_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_audio_create()");
+        if(result &= (local_sdk_audio_create(LOCALSDK_AUDIO_CHANNEL) == LOCALSDK_OK)) {
+            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "local_sdk_audio_create()");
             LOCALSDK_AUDIO_OPTIONS audio_options = {
                 .sample_rate      = LOCALSDK_AUDIO_SAMPLE_RATE,
                 .bit_depth        = LOCALSDK_AUDIO_BIT_DEPTH,
@@ -66,58 +68,51 @@ bool audio_init() {
                 .pcm_buffer_size  = LOCALSDK_AUDIO_PCM_BUFFER_SIZE,
                 .g711_buffer_size = LOCALSDK_AUDIO_G711_BUFFER_SIZE,
             };
-            if(local_sdk_audio_set_parameters(LOCALSDK_AUDIO_CHANNEL, &audio_options) == LOCALSDK_OK) {
-                logger("audio", "audio_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_audio_set_parameters()");
-                if(local_sdk_audio_set_encode_frame_callback(LOCALSDK_AUDIO_CHANNEL, g711_capture_primary_channel) == LOCALSDK_OK) {
-                    logger("audio", "audio_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_audio_set_encode_frame_callback(LOCALSDK_VIDEO_PRIMARY_CHANNEL)");
-                    if(local_sdk_audio_set_encode_frame_callback(LOCALSDK_AUDIO_CHANNEL, g711_capture_secondary_channel) == LOCALSDK_OK) {
-                        logger("audio", "audio_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_audio_set_encode_frame_callback(LOCALSDK_VIDEO_SECONDARY_CHANNEL)");
-                        if(local_sdk_audio_start() == LOCALSDK_OK) {
-                            logger("audio", "audio_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_audio_start()");
-                            if(local_sdk_audio_run() == LOCALSDK_OK) {
-                                logger("audio", "audio_init", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_audio_run()");
-                                
-                                logger("audio", "audio_init", LOGGER_LEVEL_DEBUG, "Function completed.");
-                                return true;
-                            } else logger("audio", "audio_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_audio_run()");
-                        } else logger("audio", "audio_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_audio_start()");
-                    } else logger("audio", "audio_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_audio_set_encode_frame_callback(LOCALSDK_VIDEO_SECONDARY_CHANNEL)");
-                } else logger("audio", "audio_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_audio_set_encode_frame_callback(LOCALSDK_VIDEO_PRIMARY_CHANNEL)");
-            } else logger("audio", "audio_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_audio_set_parameters()");
-        } else logger("audio", "audio_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_audio_create()");
-    } else logger("audio", "audio_init", LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_audio_init()");
-    if(audio_free()) {
-        logger("audio", "audio_init", LOGGER_LEVEL_INFO, "%s success.", "audio_free()");
-    } else logger("audio", "audio_init", LOGGER_LEVEL_WARNING, "%s error!", "audio_free()");
-    logger("audio", "audio_init", LOGGER_LEVEL_DEBUG, "Function completed.");
-    return false;
+            if(result &= (local_sdk_audio_set_parameters(LOCALSDK_AUDIO_CHANNEL, &audio_options) == LOCALSDK_OK)) {
+                LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "local_sdk_audio_set_parameters()");
+                if(result &= (local_sdk_audio_set_encode_frame_callback(LOCALSDK_AUDIO_CHANNEL, g711_capture_primary_channel) == LOCALSDK_OK)) {
+                    LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "local_sdk_audio_set_encode_frame_callback(g711_capture_primary_channel)");
+                    if(result &= (local_sdk_audio_set_encode_frame_callback(LOCALSDK_AUDIO_CHANNEL, g711_capture_secondary_channel) == LOCALSDK_OK)) {
+                        LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "local_sdk_audio_set_encode_frame_callback(g711_capture_secondary_channel)");
+                        if(result &= (local_sdk_audio_start() == LOCALSDK_OK)) {
+                            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "local_sdk_audio_start()");
+                            if(result &= (local_sdk_audio_run() == LOCALSDK_OK)) {
+                                LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "local_sdk_audio_run()");
+                            } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_audio_run()");
+                        } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_audio_start()");
+                    } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_audio_set_encode_frame_callback(g711_capture_secondary_channel)");
+                } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_audio_set_encode_frame_callback(g711_capture_primary_channel)");
+            } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_audio_set_parameters()");
+        } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_audio_create()");
+    } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_audio_init()");
+    
+    // Free alarm if error occurred
+    if(!result) {
+        if(result &= audio_free()) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "audio_free()");
+        else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "audio_free()");
+    }
+    
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function completed (result = %s).", (result ? "true" : "false"));
+    return result;
 }
 
 // Free audio
 bool audio_free() {
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function is called...");
     bool result = true;
-    logger("audio", "audio_free", LOGGER_LEVEL_DEBUG, "Function is called...");
+    
     // Stop audio
-    if(local_sdk_audio_stop() == LOCALSDK_OK) {
-        logger("audio", "audio_free", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_audio_stop()");
-    } else {
-        logger("audio", "audio_free", LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_audio_stop()");
-        result = false;
-    }
+    if(result &= (local_sdk_audio_stop() == LOCALSDK_OK)) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "local_sdk_audio_stop()");
+    else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_audio_stop()");
+    
     // End audio
-    if(local_sdk_audio_end() == LOCALSDK_OK) {
-        logger("audio", "audio_free", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_audio_end()");
-    } else {
-        logger("audio", "audio_free", LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_audio_end()");
-        result = false;
-    }
+    if(result &= (local_sdk_audio_end() == LOCALSDK_OK)) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "local_sdk_audio_end()");
+    else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_audio_end()");
+    
     // Destory audio
-    if(local_sdk_audio_destory() == LOCALSDK_OK) {
-        logger("audio", "audio_free", LOGGER_LEVEL_INFO, "%s success.", "local_sdk_audio_destory()");
-    } else {
-        logger("audio", "audio_free", LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_audio_destory()");
-        result = false;
-    }
-    logger("audio", "audio_free", LOGGER_LEVEL_DEBUG, "Function completed.");
+    if(result &= (local_sdk_audio_destory() == LOCALSDK_OK)) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "local_sdk_audio_destory()");
+    else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_audio_destory()");
+    
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function completed (result = %s).", (result ? "true" : "false"));
     return result;
 }

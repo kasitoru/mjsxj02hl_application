@@ -19,7 +19,7 @@ extern "C"{
 #endif
 
 // Set log printf function
-bool rtspserver_logprintf(int (*function)(const char*, ...));
+bool rtspserver_logprintf(int (*function)(const char *, ...));
 
 // Set connected callback function
 bool rtspserver_connected(void (*function)(uint32_t session_id, const char *peer_ip, uint16_t peer_port));

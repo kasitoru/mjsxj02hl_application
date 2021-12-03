@@ -8,13 +8,14 @@ typedef struct {
 
     // [general]
     struct {
+        char *name;
         bool led;
     } general;
 
     // [logger]
     struct {
         int level;
-        char* file;
+        char *file;
     } logger;
 
     // [osd]
@@ -37,8 +38,6 @@ typedef struct {
         int gop;
         bool flip;
         bool mirror;
-        bool primary_enable;
-        bool secondary_enable;
         int primary_type;
         int secondary_type;
         int primary_bitrate;
@@ -66,20 +65,20 @@ typedef struct {
         int humanoid_sens;
         int motion_timeout;
         int humanoid_timeout;
-        char* motion_detect_exec;
-        char* humanoid_detect_exec;
-        char* motion_lost_exec;
-        char* humanoid_lost_exec;
+        char *motion_detect_exec;
+        char *humanoid_detect_exec;
+        char *motion_lost_exec;
+        char *humanoid_lost_exec;
     } alarm;
     
     // [rtsp]
     struct {
         bool enable;
         int port;
-        char* username;
-        char* password;
-        char* primary_name;
-        char* secondary_name;
+        char *username;
+        char *password;
+        char *primary_name;
+        char *secondary_name;
         bool primary_multicast;
         bool secondary_multicast;
         bool primary_split_vframes;
@@ -89,13 +88,16 @@ typedef struct {
     // [mqtt]
     struct {
         bool enable;
-        char* server;
+        char *server;
         int port;
-        char* username;
-        char* password;
-        char* topic;
+        char *username;
+        char *password;
+        char *topic;
         int qos;
         bool retain;
+        int reconnection_interval;
+        int periodical_interval;
+        char *discovery;
     } mqtt;
     
     // [night]
@@ -110,7 +112,7 @@ typedef struct {
 extern APPLICATION_CONFIGURATION APP_CFG;
 
 // Init application configs
-bool configs_init(char* filename);
+bool configs_init(char *filename);
 
 // Free application configs
 bool configs_free();

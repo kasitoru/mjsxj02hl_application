@@ -9,6 +9,7 @@
 // Default values
 APPLICATION_CONFIGURATION APP_CFG = {
     // [general]
+    .general.name                 = "My Camera",                            // Device name
     .general.led                  = true,                                   // Enable onboard LED indicator
 
     // [logger]
@@ -32,8 +33,6 @@ APPLICATION_CONFIGURATION APP_CFG = {
     .video.gop                    = 1,                                      // Group of pictures (GOP) every N*FPS (20)
     .video.flip                   = false,                                  // Flip image (all channels)
     .video.mirror                 = false,                                  // Mirror image (all channels)
-    .video.primary_enable         = true,                                   // Enable video for primary channel
-    .video.secondary_enable       = true,                                   // Enable video for secondary channel
     .video.primary_type           = LOCALSDK_VIDEO_PAYLOAD_H264,            // Video compression standard for primary channel
     .video.secondary_type         = LOCALSDK_VIDEO_PAYLOAD_H264,            // Video compression standard for secondary channel
     .video.primary_bitrate        = 1800,                                   // Bitrate for primary channel
@@ -78,9 +77,12 @@ APPLICATION_CONFIGURATION APP_CFG = {
     .mqtt.port                    = 1883,                                   // Port number
     .mqtt.username                = "",                                     // Username (empty for anonimous)
     .mqtt.password                = "",                                     // Password (empty for disable)
-    .mqtt.topic                   = "mjsxj02hl",                            // Topic name
+    .mqtt.topic                   = "mjsxj02hl",                            // Name of the root topic
     .mqtt.qos                     = 1,                                      // Quality of Service (0, 1 or 2)
-    .mqtt.retain                  = false,                                  // Retained messages
+    .mqtt.retain                  = true,                                   // Retained messages
+    .mqtt.reconnection_interval   = 60,                                     // Reconnection interval (in seconds)
+    .mqtt.periodical_interval     = 60,                                     // Interval of periodic message (in seconds)
+    .mqtt.discovery               = "homeassistant",                        // Discovery prefix (https://www.home-assistant.io/docs/mqtt/discovery/#discovery-topic)
     
     // [night]
     .night.mode                   = 2,                                      // Night mode (0 = off, 1 = on, 2 = auto)
@@ -88,7 +90,7 @@ APPLICATION_CONFIGURATION APP_CFG = {
 };
 
 // Handler for ini parser
-static int parser_handler(void* cfg, const char* section, const char* name, const char* value) {
+static int parser_handler(void* cfg, const char *section, const char *name, const char *value) {
     bool result = true;
 
     APPLICATION_CONFIGURATION* config = (APPLICATION_CONFIGURATION*) cfg;
@@ -96,7 +98,9 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
     #define atob(v) strcmp(value, "true") == 0 || strcmp(value, "yes") == 0 || strcmp(value, "on") == 0 || strcmp(value, "1") == 0
     
     // [general]
-    if(MATCH("general", "led")) {
+    if(MATCH("general", "name")) {
+        config->general.name = strdup(value);
+    } else if(MATCH("general", "led")) {
         config->general.led = atob(value);
     
     // [logger]
@@ -136,10 +140,6 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
         config->video.flip = atob(value);
     } else if(MATCH("video", "mirror")) {
         config->video.mirror = atob(value);
-    } else if(MATCH("video", "primary_enable")) {
-        config->video.primary_enable = atob(value);
-    } else if(MATCH("video", "secondary_enable")) {
-        config->video.secondary_enable = atob(value);
     } else if(MATCH("video", "primary_type")) {
         config->video.primary_type = atoi(value);
     } else if(MATCH("video", "secondary_type")) {
@@ -224,6 +224,12 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
         config->mqtt.qos = atoi(value);
     } else if(MATCH("mqtt", "retain")) {
         config->mqtt.retain = atob(value);
+    } else if(MATCH("mqtt", "reconnection_interval")) {
+        config->mqtt.reconnection_interval = atoi(value);
+    } else if(MATCH("mqtt", "periodical_interval")) {
+        config->mqtt.periodical_interval = atoi(value);
+    } else if(MATCH("mqtt", "discovery")) {
+        config->mqtt.discovery = strdup(value);
 
     // [night]
     } else if(MATCH("night", "mode")) {
@@ -232,42 +238,37 @@ static int parser_handler(void* cfg, const char* section, const char* name, cons
         config->night.gray = atoi(value);
 
     // unknown
-    } else result = false;
+    } else result &= false;
 
-    if(result) {
-        logger("configs", "configs_init", LOGGER_LEVEL_FORCED, "%s success. Section: %s, name: %s, value: %s", "parser_handler()", section, name, value);
-    } else {
-        logger("configs", "configs_init", LOGGER_LEVEL_WARNING, "%s error! Section: %s, name: %s, value: %s", "parser_handler()", section, name, value);
-    }
+    if(result) LOGGER(LOGGER_LEVEL_INFO, "Parse success. Section: %s, name: %s, value: %s", section, name, value);
+    else LOGGER(LOGGER_LEVEL_WARNING, "Parse error! Section: %s, name: %s, value: %s", section, name, value);
     
     return result;
 }
 
 // Init application configs
 bool configs_init(char *filename) {
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function is called...");
     bool result = true;
-    logger("configs", "configs_init", LOGGER_LEVEL_DEBUG, "Function is called...");
-    logger("configs", "configs_init", LOGGER_LEVEL_DEBUG, "Filename: %s", filename);
-
+    
     // Read values from config file
-    if(ini_parse(filename, parser_handler, &APP_CFG) >= 0) {
-        logger("configs", "configs_init", LOGGER_LEVEL_INFO, "%s success.", "ini_parse()");
-    } else {
-        logger("configs", "configs_init", LOGGER_LEVEL_ERROR, "%s error!", "ini_parse()");
-        logger("configs", "configs_init", LOGGER_LEVEL_ERROR, "Configs filename: %s", filename);
-        if(configs_free()) {
-            logger("configs", "configs_init", LOGGER_LEVEL_INFO, "%s success.", "configs_free()");
-        } else logger("configs", "configs_init", LOGGER_LEVEL_WARNING, "%s error!", "configs_free()");
-        result = false;
+    LOGGER(LOGGER_LEVEL_INFO, "Filename: %s", filename);
+    if(result &= (ini_parse(filename, parser_handler, &APP_CFG) >= 0)) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "ini_parse()");
+    else {
+        LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "ini_parse()");
+        if(result &= configs_free()) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "configs_free()");
+        else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "configs_free()");
     }
     
-    logger("configs", "configs_init", LOGGER_LEVEL_DEBUG, "Function completed.");
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function completed (result = %s).", (result ? "true" : "false"));
     return result;
 }
 
 // Free application configs
 bool configs_free() {
-    logger("configs", "configs_free", LOGGER_LEVEL_DEBUG, "Function is called...");
-    logger("configs", "configs_free", LOGGER_LEVEL_DEBUG, "Function completed.");
-    return true;
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function is called...");
+    bool result = true;
+    LOGGER(LOGGER_LEVEL_DEBUG, "This function is a stub.");
+    LOGGER(LOGGER_LEVEL_DEBUG, "Function completed (result = %s).", (result ? "true" : "false"));
+    return result;
 }

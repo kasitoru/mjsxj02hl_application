@@ -11,17 +11,17 @@ static std::shared_ptr<xop::RtspServer> rtsp_server;
 // Default log printf function
 static int logprintf_default(const char *format, ...) {
     int result = 0;
-    char *message;
     va_list params;
     va_start(params, format);
-    if(vasprintf(&message, format, params) > 0) {
+    char *message;
+    if(vasprintf(&message, format, params) != -1) {
         result = printf("[rtspserver]: %s\n", message);
         free(message);
     }
     va_end(params);
     return result;
 }
-static int (*logprintf_function)(const char*, ...) = logprintf_default;
+static int (*logprintf_function)(const char *, ...) = logprintf_default;
 
 // Default connected callback function
 static void connected_default(uint32_t session_id, const char *peer_ip, uint16_t peer_port) { }
@@ -32,7 +32,7 @@ static void disconnected_default(uint32_t session_id, const char *peer_ip, uint1
 static void (*disconnected_function)(uint32_t session_id, const char *peer_ip, uint16_t peer_port) = disconnected_default;
 
 // Set log printf function
-bool rtspserver_logprintf(int (*function)(const char*, ...)) {
+bool rtspserver_logprintf(int (*function)(const char *, ...)) {
     logprintf_function = function;
     return true;
 }

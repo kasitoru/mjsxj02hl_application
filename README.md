@@ -2,7 +2,7 @@
 
 [![Donate](https://img.shields.io/badge/donate-Yandex-red.svg)](https://money.yandex.ru/to/4100110221014297)
 
-Application for Xiaomi Smart Camera Standard Edition (MJSXJ02HL) with RTSP and MQTT support.
+Application for Xiaomi Smart Camera Standard Edition (MJSXJ02HL) with RTSP and MQTT support. It is used in a [custom firmware](https://github.com/kasitoru/mjsxj02hl_firmware).
 
 ## Build
 
@@ -52,6 +52,7 @@ Default config `/usr/app/share/mjsxj02hl.conf`:
 
 ```ini
 [general]
+name = My Camera               ; Device name
 led = true                     ; Enable onboard LED indicator
 
 [logger]
@@ -75,8 +76,6 @@ humanoid = false               ; Display detected humanoids in rectangles
 gop = 1                        ; Group of pictures (GOP) every N*FPS (20)
 flip = false                   ; Flip image (all channels)
 mirror = false                 ; Mirror image (all channels)
-primary_enable = true          ; Enable video for primary channel
-secondary_enable = true        ; Enable video for secondary channel
 primary_type = 1               ; Video compression standard for primary channel (1 = h264, 2 = h265)
 secondary_type = 1             ; Video compression standard for secondary channel (1 = h264, 2 = h265)
 primary_bitrate = 1800         ; Bitrate for primary channel
@@ -121,9 +120,12 @@ server =                       ; Server address
 port = 1883                    ; Port number
 username =                     ; Username (empty for anonimous)
 password =                     ; Password (empty for disable)
-topic = mjsxj02hl              ; Topic name
+topic = mjsxj02hl              ; Name of the root topic
 qos = 1                        ; Quality of Service (0, 1 or 2)
-retain = false                 ; Retained messages
+retain = true                  ; Retained messages
+reconnection_interval = 60     ; Reconnection interval (in seconds)
+periodical_interval = 60       ; Interval of periodic message (in seconds)
+discovery = homeassistant      ; Discovery prefix (https://www.home-assistant.io/docs/mqtt/discovery/#discovery-topic)
 
 [night]
 mode = 2                       ; Night mode (0 = off, 1 = on, 2 = auto)
@@ -138,25 +140,29 @@ mjsxj02hl [<action> [options...]]
 
 Running without arguments starts the main thread of the application.
 
-***--config <filename>*** Specify the location of the configuration file for the main thread of application.
+***--config \<filename\>*** Specify the location of the configuration file for the main thread of application.
 
 ***--factory-reset*** Reset device settings to default values. Attention: this action cannot be undone!
 
-***--get-image <filename>*** Output the camera image to a file. Requires a running main thread of mjsxj02hl application.
+***--get-image \<filename\>*** Output the camera image to a file. Requires a running main thread of mjsxj02hl application.
 
 ***--help*** Display help message.
 
 ## RTSP
 
-Network URL: `rtsp://<ip-address>:<port>/<channel_name>`
+Network URL: `rtsp://[<rtsp_user>:<rtsp_password>@]<ip-address>:<port>/<channel_name>`
 
-Example: `rtsp://192.168.1.18:554/primary`
+Example: `rtsp://192.168.1.18:554/primary` or `rtsp://user:password@192.168.1.18:554/secondary`
 
 ## MQTT
 
+***<root_topic>***: The value is set in the settings file (section: `mqtt`, name: `topic`). It is recommended to use the same value for all devices.
+
+***<device_name>***: Value based on a parameter in the settings file (section: `general`, name: `name`). It is converted to lowercase, all characters except letters and numbers are cut off, spaces are replaced with underscores.
+
 ### Input topics
 
-**Topic: mjsxj02hl/cmd**
+**Topic: <root_topic>/<device_name>/cmd**
 
 Execute the specified command on the device.
 
@@ -171,16 +177,17 @@ Command | Parameters | Description | Example payload
 
 ### Output topics
 
-**Topic: mjsxj02hl/info**
+**Topic: <root_topic>/<device_name>/status**
+
+This is a topic where availability status of the device is published (`online` or `offline`).
+
+**Topic: <root_topic>/<device_name>/info**
 
 This is a topic where general device state is published.
 
 Field | Description
 ----- | -----------
-`sdk_version` | Version of localsdk library.
 `fw_version` | Version of the firmware.
-`startup` | Application startup timestamp.
-`timestamp` | Current timestamp.
 `ip_address` | IP address of the device.
 `total_ram` | The total size of RAM.
 `free_ram` | The size of the free RAM.
@@ -192,7 +199,7 @@ Field | Description
 `media_status` | Playback status (0 = stopped, 1 = playing, 2 = stopping).
 `image_url` | URL address of the JPEG image from the camera.
 
-**Topic: mjsxj02hl/alarm**
+**Topic: <root_topic>/<device_name>/alarm**
 
 This is a topic where motion detection events is published.
 
@@ -200,9 +207,8 @@ Field | Description
 ----- | -----------
 `motion` | Motion detection state.
 `humanoid` | Humanoid detection state.
-`timestamp` | Current timestamp.
 
-**Topic: mjsxj02hl/night**
+**Topic: <root_topic>/<device_name>/night**
 
 This is a topic where the state of night mode is published.
 
@@ -210,7 +216,6 @@ Field | Description
 ----- | -----------
 `state` | Night mode state.
 `gray` | Grayscale state.
-`timestamp` | Current timestamp.
 
 ## Third-party libraries
 

@@ -3,15 +3,16 @@
 
 #include <stdbool.h>
 
-#define MQTT_CLIENT_ID           "MJSXJ02HL"
-#define MQTT_DISCONNECT_TIMEOUT  10000
-#define MQTT_RECONNECT_INTERVAL  60
-#define MQTT_PERIODICAL_INTERVAL 300
+#define MQTT_TIMEOUT             5
 
 #define MQTT_INFO_TOPIC          "info"
 #define MQTT_ALARM_TOPIC         "alarm"
 #define MQTT_NIGHT_TOPIC         "night"
 #define MQTT_COMMAND_TOPIC       "cmd"
+#define MQTT_STATE_TOPIC         "state"
+
+#define MQTT_STATE_ONLINE        "online"
+#define MQTT_STATE_OFFLINE       "offline"
 
 // Init mqtt
 bool mqtt_init();
@@ -29,12 +30,18 @@ bool mqtt_is_ready();
 bool mqtt_free(bool force);
 
 // Get full topic
-char* mqtt_fulltopic(char *topic);
+char *mqtt_fulltopic(const char *topic);
+
+// Prepare string for use as MQTT paths/names
+char *mqtt_prepare_string(const char *string);
+
+// Get clien id
+char *mqtt_client_id();
 
 // Send data
-bool mqtt_send(char *topic, char *payload);
+bool mqtt_send(const char *topic, char *payload);
 
 // Send formatted data
-bool mqtt_sendf(char *topic, const char *format, ...);
+bool mqtt_sendf(const char *topic, const char *format, ...);
 
 #endif
