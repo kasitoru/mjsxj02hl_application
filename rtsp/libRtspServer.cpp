@@ -158,7 +158,7 @@ bool rtspserver_frame(uint32_t session_id, signed char *data, uint8_t type, uint
             // Send current frame
             if(data) {
                 frame.size = size;
-                frame.buffer.reset(new uint8_t[frame.size]);
+                frame.buffer.reset(new uint8_t[frame.size], std::default_delete<uint8_t[]>());
                 memcpy(frame.buffer.get(), data, frame.size);
                 rtsp_server->PushFrame(session_id, (frame.type != xop::AUDIO_FRAME ? xop::channel_0 : xop::channel_1), frame);
                 if(frame.type != xop::AUDIO_FRAME) {
@@ -171,7 +171,7 @@ bool rtspserver_frame(uint32_t session_id, signed char *data, uint8_t type, uint
     } else {
         uint32_t offset = ((frame.type == xop::AUDIO_FRAME) ? 0 : 4); // Skip 00 00 00 01 (for video frames)
         frame.size = size - offset;
-        frame.buffer.reset(new uint8_t[frame.size]);
+        frame.buffer.reset(new uint8_t[frame.size], std::default_delete<uint8_t[]>());
         memcpy(frame.buffer.get(), data + offset, frame.size);
         return rtsp_server->PushFrame(session_id, (frame.type != xop::AUDIO_FRAME ? xop::channel_0 : xop::channel_1), frame);
     }

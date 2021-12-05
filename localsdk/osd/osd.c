@@ -55,7 +55,7 @@ bool osd_init() {
         
         // Free OSD if error occurred
         if(!result) {
-            if(result &= osd_free()) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "osd_free()");
+            if(osd_free()) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "osd_free()");
             else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "osd_free()");
         }
     } else LOGGER(LOGGER_LEVEL_INFO, "OSD is disabled in the settings.");

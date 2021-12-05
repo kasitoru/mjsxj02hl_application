@@ -141,7 +141,7 @@ bool video_init() {
     
     // Free video if error occurred
     if(!result) {
-        if(result &= video_free()) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "video_free()");
+        if(video_free()) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "video_free()");
         else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "video_free()");
     }
     

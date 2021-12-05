@@ -1,3 +1,5 @@
+SKIP_EXTERNAL_LIBS = OFF
+
 CROSS_COMPILE = arm-himix100-linux-
 CCFLAGS = -march=armv7-a -mfpu=neon-vfpv4 -funsafe-math-optimizations
 LDPATH = /opt/hisi-linux/x86-arm/arm-himix100-linux/target/usr/app/lib
@@ -19,11 +21,23 @@ all: mkdirs mjsxj02hl
 mjsxj02hl: ./mjsxj02hl.c external-libs objects
 	$(CC) $(CCFLAGS) -L$(LDPATH) ./mjsxj02hl.c $(OUTPUT)/objects/*.o $(LDFLAGS) -o $(OUTPUT)/mjsxj02hl
 
+##############
+# PVS-STUDIO #
+##############
+
+PVS_ANALYZER = GA:1,2,3
+PVS_TYPE  = html
+
+analyze:
+	pvs-studio-analyzer trace -- make SKIP_EXTERNAL_LIBS=$(SKIP_EXTERNAL_LIBS)
+	pvs-studio-analyzer analyze --compiler $(CC) --compiler $(CXX) -e bin -e /opt -e /usr -e configs/inih -e mqtt/paho.mqtt.c -e rtsp/RtspServer -e yyjson
+	plog-converter -a $(PVS_ANALYZER) -t $(PVS_TYPE) -d V1019 -o PVS-Studio.$(PVS_TYPE) PVS-Studio.log
+
 #################
 # EXTERNAL LIBS #
 #################
 
-ifndef SKIP_EXTERNAL_LIBS
+ifeq ($(SKIP_EXTERNAL_LIBS), OFF)
 external-libs: clean-libs mkdir-libs build-libs install-libs
 else
 external-libs:

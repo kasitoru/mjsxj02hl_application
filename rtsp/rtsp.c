@@ -93,7 +93,7 @@ bool rtsp_init() {
                         bool primary_multicast = APP_CFG.rtsp.primary_multicast;
                         uint8_t primary_video_type = librtspserver_video_type(APP_CFG.video.primary_type);
                         uint8_t primary_audio_type = (audio_is_enabled(LOCALSDK_VIDEO_PRIMARY_CHANNEL) ? LIBRTSPSERVER_TYPE_G711A : LIBRTSPSERVER_TYPE_NONE);
-                        if(primary_session = rtspserver_session(primary_name, primary_multicast, primary_video_type, LOCALSDK_VIDEO_FRAMERATE, primary_audio_type, 0, 0, false)) {
+                        if((primary_session = rtspserver_session(primary_name, primary_multicast, primary_video_type, LOCALSDK_VIDEO_FRAMERATE, primary_audio_type, 0, 0, false))) {
                             LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "rtspserver_session(primary)");
                             primary_result = true;
                         } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "rtspserver_session(primary)");
@@ -106,7 +106,7 @@ bool rtsp_init() {
                         bool secondary_multicast = APP_CFG.rtsp.secondary_multicast;
                         uint8_t secondary_video_type = librtspserver_video_type(APP_CFG.video.secondary_type);
                         uint8_t secondary_audio_type = (audio_is_enabled(LOCALSDK_VIDEO_SECONDARY_CHANNEL) ? LIBRTSPSERVER_TYPE_G711A : LIBRTSPSERVER_TYPE_NONE);
-                        if(secondary_session = rtspserver_session(secondary_name, secondary_multicast, secondary_video_type, LOCALSDK_VIDEO_FRAMERATE, secondary_audio_type, 0, 0, false)) {
+                        if((secondary_session = rtspserver_session(secondary_name, secondary_multicast, secondary_video_type, LOCALSDK_VIDEO_FRAMERATE, secondary_audio_type, 0, 0, false))) {
                             LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "rtspserver_session(secondary)");
                             secondary_result = true;
                         } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "rtspserver_session(secondary)");

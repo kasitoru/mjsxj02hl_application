@@ -35,15 +35,17 @@ char *mqtt_prepare_string(const char *string) {
     size_t j = 0;
     size_t length = strlen(string) + 1;
     char *device_name = malloc(length);
-    memset(device_name, '\0', length);
-    for(size_t i = 0; string[i] != '\0'; i++) {
-        char chr = tolower(string[i]);
-        if(isspace(chr) || (chr == '/')) {
-            device_name[i-j] = '_';
-        } else if(isalnum(chr)) {
-            device_name[i-j] = chr;
-        } else j++;
-    }
+    if(device_name != NULL) {
+        memset(device_name, '\0', length);
+        for(size_t i = 0; string[i] != '\0'; i++) {
+            char chr = tolower(string[i]);
+            if(isspace(chr) || (chr == '/')) {
+                device_name[i-j] = '_';
+            } else if(isalnum(chr)) {
+                device_name[i-j] = chr;
+            } else j++;
+        }
+    } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "malloc(length)");
     
     LOGGER(LOGGER_LEVEL_DEBUG, "Function completed.");
     return device_name;
@@ -55,15 +57,27 @@ char *mqtt_client_id() {
     char *client_id = "";
     
     char *mqtt_topic = mqtt_prepare_string(APP_CFG.mqtt.topic);
-    char *general_name = mqtt_prepare_string(APP_CFG.general.name);
-    char *dev_id = device_id();
-    char *prep_id = mqtt_prepare_string(dev_id);
-    free(dev_id);
-    if(asprintf(&client_id, "%s_%s_%s", mqtt_topic, general_name, prep_id) != -1) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(client_id)");
-    else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(client_id)");
-    free(prep_id);
-    free(general_name);
-    free(mqtt_topic);
+    if(mqtt_topic != NULL) {
+        LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_prepare_string(APP_CFG.mqtt.topic)");
+        char *general_name = mqtt_prepare_string(APP_CFG.general.name);
+        if(general_name != NULL) {
+            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_prepare_string(APP_CFG.general.name)");
+            char *dev_id = device_id();
+            if(dev_id != NULL) {
+                LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "device_id()");
+                char *prep_id = mqtt_prepare_string(dev_id);
+                if(prep_id != NULL) {
+                    LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_prepare_string(dev_id)");
+                    if(asprintf(&client_id, "%s_%s_%s", mqtt_topic, general_name, prep_id) != -1) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(client_id)");
+                    else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(client_id)");
+                    free(prep_id);
+                } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "mqtt_prepare_string(dev_id)");
+                free(dev_id);
+            } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "device_id()");
+            free(general_name);
+        } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "mqtt_prepare_string(APP_CFG.general.name)");
+        free(mqtt_topic);
+    } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "mqtt_prepare_string(APP_CFG.mqtt.topic)");
     
     LOGGER(LOGGER_LEVEL_DEBUG, "Function completed.");
     return client_id;
@@ -75,9 +89,12 @@ char *mqtt_fulltopic(const char *topic) {
     char *payload = "";
     
     char *general_name = mqtt_prepare_string(APP_CFG.general.name);
-    if(asprintf(&payload, "%s/%s/%s", APP_CFG.mqtt.topic, general_name, topic) != -1) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(payload)");
-    else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(payload)");
-    free(general_name);
+    if(general_name != NULL) {
+        LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_prepare_string(APP_CFG.general.name)");
+        if(asprintf(&payload, "%s/%s/%s", APP_CFG.mqtt.topic, general_name, topic) != -1) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(payload)");
+        else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(payload)");
+        free(general_name);
+    } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "mqtt_prepare_string(APP_CFG.general.name)");
     
     LOGGER(LOGGER_LEVEL_DEBUG, "Function completed.");
     return payload;
@@ -132,7 +149,7 @@ static void *mqtt_periodical(void *arg) {
     
     bool endless_cycle = (bool) arg;
     bool first = endless_cycle;
-    do {
+    do { //-V1044
         // First iteration
         if(first) {
             first = false;
@@ -349,7 +366,7 @@ static int mqtt_message_callback(void *context, char *topicName, int topicLen, M
         if(result &= yyjson_is_str(json_action)) {
             LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_is_str(json_action)");
             // Get image
-            if(result &= (strcmp(yyjson_get_str(json_action), "get_image") == 0)) {
+            if(strcmp(yyjson_get_str(json_action), "get_image") == 0) {
                 LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "strcmp(get_image)");
                 yyjson_val *json_filename = yyjson_obj_get(json_root, "filename");
                 if(result &= yyjson_is_str(json_filename)) {
@@ -359,7 +376,7 @@ static int mqtt_message_callback(void *context, char *topicName, int topicLen, M
                     } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "local_sdk_video_get_jpeg()");
                 } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "yyjson_is_str(json_filename)");
             // Set volume
-            } else if(result &= (strcmp(yyjson_get_str(json_action), "set_volume") == 0)) {
+            } else if(strcmp(yyjson_get_str(json_action), "set_volume") == 0) {
                 LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "strcmp(set_volume)");
                 yyjson_val *json_value = yyjson_obj_get(json_root, "value");
                 if(result &= yyjson_is_int(json_value)) {
@@ -369,7 +386,7 @@ static int mqtt_message_callback(void *context, char *topicName, int topicLen, M
                     } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "speaker_set_volume()");
                 } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "yyjson_is_int(json_value)");
             // Play media
-            } else if(result &= (strcmp(yyjson_get_str(json_action), "play_media") == 0)) {
+            } else if(strcmp(yyjson_get_str(json_action), "play_media") == 0) {
                 LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "strcmp(play_media)");
                 yyjson_val *json_filename = yyjson_obj_get(json_root, "filename");
                 if(result &= yyjson_is_str(json_filename)) {
@@ -400,19 +417,19 @@ static int mqtt_message_callback(void *context, char *topicName, int topicLen, M
                     } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "pthread_create(playmedia_thread)");
                 } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "yyjson_is_str(json_filename)");
             // Stop playback
-            } else if(result &= (strcmp(yyjson_get_str(json_action), "stop_media") == 0)) {
+            } else if(strcmp(yyjson_get_str(json_action), "stop_media") == 0) {
                 LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "strcmp(stop_media)");
                 if(result &= speaker_stop_media()) {
                     LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "speaker_stop_media()");
                 } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "speaker_stop_media()");
             // Restart
-            } else if(result &= (strcmp(yyjson_get_str(json_action), "restart") == 0)) {
+            } else if(strcmp(yyjson_get_str(json_action), "restart") == 0) {
                 LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "strcmp(restart)");
                 if(result &= (system("restart.sh &") == 0)) {
                     LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "system(restart.sh)");
                 } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "system(restart.sh)");
             // Reboot
-            } else if(result &= (strcmp(yyjson_get_str(json_action), "reboot") == 0)) {
+            } else if(strcmp(yyjson_get_str(json_action), "reboot") == 0) {
                 LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "strcmp(reboot)");
                 if(result &= (system("reboot &") == 0)) {
                     LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "system(reboot)");
@@ -511,7 +528,7 @@ static bool mqtt_initialization(bool first_init) {
                         if(result &= (MQTTClient_subscribe(MQTTclient, command_topic, true) == MQTTCLIENT_SUCCESS)) {
                             LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "MQTTClient_subscribe(MQTT_COMMAND_TOPIC)");
                             // Periodic data sending
-                            if(result &= (pthread_create(&periodical_thread, NULL, mqtt_periodical, (void *) true) == 0)) {
+                            if(result &= (pthread_create(&periodical_thread, NULL, mqtt_periodical, (void *) true) == 0)) { //-V566
                                 LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "pthread_create(periodical_thread)");
                             } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "pthread_create(periodical_thread)");
                         } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "MQTTClient_subscribe(MQTT_COMMAND_TOPIC)");
@@ -526,7 +543,7 @@ static bool mqtt_initialization(bool first_init) {
         
         // Reconnect (only for first init)
         if((result == false) && (first_init == true)) {
-            if(result &= (pthread_create(&reconnection_thread, NULL, mqtt_reconnection, NULL) == 0)) {
+            if(pthread_create(&reconnection_thread, NULL, mqtt_reconnection, NULL) == 0) {
                 LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "pthread_create(reconnection_thread)");
             } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "pthread_create(reconnection_thread)");
         }
