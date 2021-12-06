@@ -75,7 +75,7 @@ static bool mqtt_homeassistant_json_sensor(yyjson_mut_doc *json_doc, yyjson_mut_
     
     // Sensor name
     char *sensor_name = "";
-    if(result &= (asprintf(&sensor_name, "%s_%s", topic_name, json_field) != -1)) {
+    if(result &= (asprintf(&sensor_name, "%s_%s_%s_%s", mqtt_prepare_string(APP_CFG.mqtt.topic), mqtt_prepare_string(APP_CFG.general.name), topic_name, json_field) != -1)) {
         LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(sensor_name)");
         if(result &= yyjson_mut_obj_add_str(json_doc, json_root, "name", sensor_name)) {
             LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(name)");
@@ -129,7 +129,7 @@ static bool mqtt_homeassistant_json_binary_sensor(yyjson_mut_doc *json_doc, yyjs
     
     // Sensor name
     char *sensor_name = "";
-    if(result &= (asprintf(&sensor_name, "%s_%s", topic_name, json_field) != -1)) {
+    if(result &= (asprintf(&sensor_name, "%s_%s_%s_%s", mqtt_prepare_string(APP_CFG.mqtt.topic), mqtt_prepare_string(APP_CFG.general.name), topic_name, json_field) != -1)) {
         LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(sensor_name)");
         if(result &= yyjson_mut_obj_add_str(json_doc, json_root, "name", sensor_name)) {
             LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(name)");
