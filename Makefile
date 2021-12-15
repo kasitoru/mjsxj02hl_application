@@ -68,7 +68,7 @@ install-libs:
 	-cp -arf $(LIBDIR)/. $(LDPATH)
 
 libipchw.a:
-	cmake -S./ipctool -B$(OUTPUT)/objects/ipctool -DCMAKE_C_COMPILER=$(CC) -DCMAKE_C_FLAGS="$(CCFLAGS)" -DCMAKE_CXX_COMPILER=$(CXX) -DCMAKE_CXX_FLAGS="$(CCFLAGS)" -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release
+	cmake -S./ipctool -B$(OUTPUT)/objects/ipctool -DCMAKE_C_COMPILER=$(CC) -DCMAKE_C_FLAGS="$(CCFLAGS)" -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release
 	make -C $(OUTPUT)/objects/ipctool
 	cp -f $(OUTPUT)/objects/ipctool/libipchw.a $(OUTPUT)/objects/
 	cp -f $(OUTPUT)/objects/ipctool/ipctool $(OUTPUT)/
