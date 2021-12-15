@@ -69,15 +69,17 @@ char *firmware_version() {
 
 // Get device id
 char *device_id() {
-    size_t size = 0;
     size_t length = 64;
-    char *buffer = malloc(length);
-    // https://github.com/OpenIPC/ipctool/blob/5deac9f4f1fd2913b8b34a2d0a0b511e85e4055d/src/hal_hisi.c#L1288-L1300
-    for(uint32_t address = 0x12020414; address >= 0x12020400; address -= 4) {
-        uint32_t value;
-        if(!mem_reg(address, &value, OP_READ)) break;
-        size += snprintf(buffer + size, length - size, "%08x", value);
-    }
+    char *buffer = "";
+    if(buffer = malloc(length)) {
+        size_t size = 0;
+        // https://github.com/OpenIPC/ipctool/blob/5deac9f4f1fd2913b8b34a2d0a0b511e85e4055d/src/hal_hisi.c#L1288-L1300
+        for(uint32_t address = 0x12020414; address >= 0x12020400; address -= 4) {
+            uint32_t value;
+            if(!mem_reg(address, &value, OP_READ)) break;
+            size += snprintf(buffer + size, length - size, "%08x", value);
+        }
+    } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "malloc()");
     return buffer;
 }
 
