@@ -66,14 +66,6 @@ char *firmware_version() {
     return fw_ver;
 }
 
-// Get device id
-char *device_id() {
-    char *file_contents = get_file_contents("/usr/app/share/.device_id");
-    char *dev_id = prepare_string(file_contents);
-    free(file_contents);
-    return dev_id;
-}
-
 // Log printf function
 static int logprintf(const char *format, ...) {
     int result = 0;

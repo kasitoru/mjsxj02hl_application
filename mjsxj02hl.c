@@ -16,6 +16,7 @@
 #include "./configs/configs.h"
 #include "./mqtt/mqtt.h"
 #include "./rtsp/rtsp.h"
+#include "./ipctool/include/ipchw.h"
 
 // Signal callback
 void signal_callback(int signal) {
@@ -138,9 +139,9 @@ int main(int argc, char **argv) {
     free(fw_ver);
     
     // Device id
-    char *dev_id = device_id();
+    const char *dev_id = getchipid();
     LOGGER(LOGGER_LEVEL_FORCED, "Device ID: %s", dev_id);
-    free(dev_id);
+    free((char *) dev_id);
     
     // Main thread
     if(configs_init(config_filename)) { // Init configs

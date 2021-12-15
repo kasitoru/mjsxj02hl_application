@@ -63,9 +63,9 @@ char *mqtt_client_id() {
         char *general_name = mqtt_prepare_string(APP_CFG.general.name);
         if(general_name != NULL) {
             LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_prepare_string(APP_CFG.general.name)");
-            char *dev_id = device_id();
+            const char *dev_id = getchipid();
             if(dev_id != NULL) {
-                LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "device_id()");
+                LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "getchipid()");
                 char *prep_id = mqtt_prepare_string(dev_id);
                 if(prep_id != NULL) {
                     LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_prepare_string(dev_id)");
@@ -73,8 +73,8 @@ char *mqtt_client_id() {
                     else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(client_id)");
                     free(prep_id);
                 } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "mqtt_prepare_string(dev_id)");
-                free(dev_id);
-            } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "device_id()");
+                free((char *) dev_id);
+            } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "getchipid()");
             free(general_name);
         } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "mqtt_prepare_string(APP_CFG.general.name)");
         free(mqtt_topic);

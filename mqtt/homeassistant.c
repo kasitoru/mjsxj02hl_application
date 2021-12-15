@@ -10,6 +10,7 @@
 #include "./../localsdk/init.h"
 #include "./../configs/configs.h"
 #include "./../yyjson/src/yyjson.h"
+#include "./../ipctool/include/ipchw.h"
 
 // Device info
 static bool mqtt_homeassistant_json_device(yyjson_mut_doc *json_doc, yyjson_mut_val *json_root) {
@@ -220,8 +221,8 @@ bool mqtt_homeassistant_discovery(int type, char *topic_name, char *json_field, 
                     if(result &= (asprintf(&object_id, "%s_%s", topic_name, json_field) != -1)) {
                         LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(object_id)");
                         char *discovery_topic = "";
-                        char *client_id = mqtt_client_id();
-                        if(result &= (asprintf(&discovery_topic, "%s/%s/%s/%s/config", APP_CFG.mqtt.discovery, sensor_type, client_id, object_id) != -1)) {
+                        const char *dev_id = getchipid();
+                        if(result &= (asprintf(&discovery_topic, "%s/%s/%s/%s/config", APP_CFG.mqtt.discovery, sensor_type, dev_id, object_id) != -1)) {
                             LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(discovery_topic)");
                             
                             // Send
@@ -231,7 +232,7 @@ bool mqtt_homeassistant_discovery(int type, char *topic_name, char *json_field, 
                             
                             free(discovery_topic);
                         } LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(discovery_topic)");
-                        free(client_id);
+                        free((char *) dev_id);
                         free(object_id);
                     } LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(object_id)");
                     free((void *)json);
