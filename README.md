@@ -38,10 +38,10 @@ make update-libs
 make
 ```
 
-To save time, you can disable the build of external libraries:
+To save time, you can disable the build of external shared libraries:
 
 ```bash
-make SKIP_EXTERNAL_LIBS=ON
+make SKIP_SHARED_LIBS=ON
 ```
 
 ...and skip step №5.
@@ -224,3 +224,4 @@ Field | Description
 * inih: https://github.com/benhoyt/inih
 * paho.mqtt.c: https://github.com/eclipse/paho.mqtt.c
 * RtspServer: https://github.com/PHZ76/RtspServer
+* ipctool: https://github.com/OpenIPC/ipctool

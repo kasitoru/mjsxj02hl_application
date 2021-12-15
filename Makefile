@@ -1,4 +1,4 @@
-SKIP_EXTERNAL_LIBS = OFF
+SKIP_SHARED_LIBS = OFF
 
 CROSS_COMPILE = arm-himix100-linux-
 CCFLAGS = -march=armv7-a -mfpu=neon-vfpv4 -funsafe-math-optimizations
@@ -19,7 +19,7 @@ LIBDIR = ./lib
 all: mkdirs mjsxj02hl
 
 mjsxj02hl: ./mjsxj02hl.c external-libs objects
-	$(CC) $(CCFLAGS) -L$(LDPATH) ./mjsxj02hl.c $(OUTPUT)/objects/*.o $(LDFLAGS) -o $(OUTPUT)/mjsxj02hl
+	$(CC) $(CCFLAGS) -L$(LDPATH) ./mjsxj02hl.c $(OUTPUT)/objects/*.o $(OUTPUT)/objects/*.a $(LDFLAGS) -o $(OUTPUT)/mjsxj02hl
 
 ##############
 # PVS-STUDIO #
@@ -29,28 +29,30 @@ PVS_ANALYZER = GA:1,2,3
 PVS_TYPE  = html
 
 analyze:
-	pvs-studio-analyzer trace -- make SKIP_EXTERNAL_LIBS=$(SKIP_EXTERNAL_LIBS)
-	pvs-studio-analyzer analyze --compiler $(CC) --compiler $(CXX) -e bin -e /opt -e /usr -e configs/inih -e mqtt/paho.mqtt.c -e rtsp/RtspServer -e yyjson
+	pvs-studio-analyzer trace -- make SKIP_SHARED_LIBS=$(SKIP_SHARED_LIBS)
+	pvs-studio-analyzer analyze --compiler $(CC) --compiler $(CXX) -e bin -e /opt -e /usr -e configs/inih -e mqtt/paho.mqtt.c -e rtsp/RtspServer -e yyjson -e ipctool
 	plog-converter -a $(PVS_ANALYZER) -t $(PVS_TYPE) -d V1019 -o PVS-Studio.$(PVS_TYPE) PVS-Studio.log
 
 #################
 # EXTERNAL LIBS #
 #################
 
-ifeq ($(SKIP_EXTERNAL_LIBS), OFF)
-external-libs: clean-libs mkdir-libs build-libs install-libs
+ifeq ($(SKIP_SHARED_LIBS), OFF)
+external-libs: clean-libs mkdir-libs static-libs shared-libs install-libs
 else
-external-libs:
+external-libs: clean-libs mkdir-libs static-libs install-libs
 endif
 
 clean-libs:
 	-make clean OUTPUT="../$(OUTPUT)" LIBDIR="../$(LIBDIR)" -C ./rtsp
 	-make clean -C $(OUTPUT)/objects/paho.mqtt.c
 	-make clean -C $(OUTPUT)/objects/yyjson
+	-make clean -C $(OUTPUT)/objects/ipctool ; rm -f $(OUTPUT)/ipctool
 	-rm -rf $(LIBDIR)/*
 
 mkdir-libs:
 	-mkdir -p $(LIBDIR)
+	-mkdir -p $(OUTPUT)/objects/ipctool
 	-mkdir -p $(OUTPUT)/objects/yyjson
 	-mkdir -p $(OUTPUT)/objects/paho.mqtt.c
 	-make BUILD_DIR OUTPUT="../$(OUTPUT)" LIBDIR="../$(LIBDIR)" -C ./rtsp
@@ -59,10 +61,17 @@ update-libs:
 	git pull --recurse-submodules
 	git submodule update --remote --recursive
 
-build-libs: libyyjson.so libpaho-mqtt3c.so librtspserver.so
+static-libs: libipchw.a
+shared-libs: libyyjson.so libpaho-mqtt3c.so librtspserver.so
 
 install-libs:
 	-cp -arf $(LIBDIR)/. $(LDPATH)
+
+libipchw.a:
+	cmake -S./ipctool -B$(OUTPUT)/objects/ipctool -DCMAKE_C_COMPILER=$(CC) -DCMAKE_C_FLAGS="$(CCFLAGS)" -DCMAKE_CXX_COMPILER=$(CXX) -DCMAKE_CXX_FLAGS="$(CCFLAGS)" -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release
+	make -C $(OUTPUT)/objects/ipctool
+	cp -f $(OUTPUT)/objects/ipctool/libipchw.a $(OUTPUT)/objects/
+	cp -f $(OUTPUT)/objects/ipctool/ipctool $(OUTPUT)/
 
 libyyjson.so:
 	cmake -S./yyjson -B$(OUTPUT)/objects/yyjson -DCMAKE_C_COMPILER=$(CC) -DCMAKE_C_FLAGS="$(CCFLAGS)" -DCMAKE_CXX_COMPILER=$(CXX) -DCMAKE_CXX_FLAGS="$(CCFLAGS)" -DBUILD_SHARED_LIBS=ON
