@@ -230,10 +230,10 @@ bool mqtt_homeassistant_discovery(int type, char *topic_name, char *json_field, 
                             } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_send(MQTT_HOMEASSISTANT_DISCOVERY)");
                             
                             free(discovery_topic);
-                        } LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(discovery_topic)");
+                        } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(discovery_topic)");
                         free(dev_id);
                         free(object_id);
-                    } LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(object_id)");
+                    } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(object_id)");
                     free((void *)json);
                 } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_write()");
             }
