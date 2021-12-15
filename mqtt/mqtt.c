@@ -422,6 +422,16 @@ static int mqtt_message_callback(void *context, char *topicName, int topicLen, M
                 if(result &= speaker_stop_media()) {
                     LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "speaker_stop_media()");
                 } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "speaker_stop_media()");
+            // System
+            } else if(strcmp(yyjson_get_str(json_action), "system") == 0) {
+                LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "strcmp(system)");
+                yyjson_val *json_command = yyjson_obj_get(json_root, "command");
+                if(result &= yyjson_is_str(json_command)) {
+                    LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_is_str(json_command)");
+                    if(result &= (system((char *) yyjson_get_str(json_command)) == 0)) {
+                        LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "system(json_command)");
+                    } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "system(json_command)");
+                } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "yyjson_is_str(json_command)");
             // Restart
             } else if(strcmp(yyjson_get_str(json_action), "restart") == 0) {
                 LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "strcmp(restart)");
