@@ -21,6 +21,7 @@
 #include "./../localsdk/speaker/speaker.h"
 #include "./../configs/configs.h"
 #include "./../yyjson/src/yyjson.h"
+#include "./../ipctool/include/ipchw.h"
 
 static MQTTClient MQTTclient;
 static pthread_t periodical_thread;
@@ -171,6 +172,10 @@ static void *mqtt_periodical(void *arg) {
         if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, "ip_address", NULL, NULL, false)) {
             LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, ip_address)");
         } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, ip_address)");
+        // info/hw_temp
+        if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, "hw_temp", "temperature", "°C", false)) {
+            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, hw_temp)");
+        } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, hw_temp)");
         // info/total_ram
         if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, "total_ram", NULL, "byte(s)", false)) {
             LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, total_ram)");
@@ -253,6 +258,10 @@ static void *mqtt_periodical(void *arg) {
         } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "getifaddrs()");
         if(yyjson_mut_obj_add_str(json_doc, json_root, "ip_address", ip_address)) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(ip_address)");
         else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(ip_address)");
+        // Temperature
+        float hw_temp = gethwtemp();
+        if(yyjson_mut_obj_add_real(json_doc, json_root, "hw_temp", hw_temp)) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_real(hw_temp)");
+        else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_real(hw_temp)");
         // RAM
         unsigned long total_ram = 0;
         unsigned long free_ram = 0;

@@ -190,6 +190,7 @@ Field | Description
 ----- | -----------
 `fw_version` | Version of the firmware.
 `ip_address` | IP address of the device.
+`hw_temp` | Temperature from chip's internal sensor.
 `total_ram` | The total size of RAM.
 `free_ram` | The size of the free RAM.
 `total_sdmem` | The total size of SD-card.
