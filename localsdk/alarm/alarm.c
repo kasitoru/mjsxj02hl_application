@@ -172,7 +172,7 @@ bool alarm_switch(bool state) {
     LOGGER(LOGGER_LEVEL_DEBUG, "Function is called...");
     bool result = true;
 
-    if (APP_CFG.alarm.enable == false) {
+    if (APP_CFG.alarm.enable == true) {
         LOGGER(LOGGER_LEVEL_INFO, "State: %s", (state ? "true" : "false"));
 
         // Switch alarm for motion
