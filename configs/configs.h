@@ -61,6 +61,7 @@ typedef struct {
     
     // [alarm]
     struct {
+        bool enable;
         int motion_sens;
         int humanoid_sens;
         int motion_timeout;

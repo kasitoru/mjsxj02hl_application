@@ -50,6 +50,7 @@ APPLICATION_CONFIGURATION APP_CFG = {
     .speaker.type                 = LOCALSDK_SPEAKER_PCM_TYPE,              // Default file format
     
     // [alarm]
+    .alarm.enable                 = true,                                   // Alarms on/off
     .alarm.motion_sens            = 150,                                    // Motion sensitivity (1-255)
     .alarm.humanoid_sens          = 150,                                    // Humanoid sensitivity (1-255)
     .alarm.motion_timeout         = 60,                                     // Motion timeout (in seconds)
@@ -168,6 +169,8 @@ static int parser_handler(void* cfg, const char *section, const char *name, cons
         config->speaker.type = atoi(value);
 
     // [alarm]
+    } else if(MATCH("alarm", "enable")) {
+        config->alarm.enable = atob(value);
     } else if(MATCH("alarm", "motion_sens")) {
         config->alarm.motion_sens = atoi(value);
     } else if(MATCH("alarm", "humanoid_sens")) {

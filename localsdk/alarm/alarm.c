@@ -170,6 +170,11 @@ static int alarm_state_callback(LOCALSDK_ALARM_EVENT_INFO *eventInfo) {
 // Enable or disable alarm
 bool alarm_switch(bool state) {
     LOGGER(LOGGER_LEVEL_DEBUG, "Function is called...");
+    if (APP_CFG.alarm.enable == false) {
+        LOGGER(LOGGER_LEVEL_INFO, "Alarm switch ignored, because alarms are disabled");
+        return true;
+    }
+
     bool result = true;
     
     LOGGER(LOGGER_LEVEL_INFO, "State: %s", (state ? "true" : "false"));
@@ -189,6 +194,11 @@ bool alarm_switch(bool state) {
 // Init alarm
 bool alarm_init() {
     LOGGER(LOGGER_LEVEL_DEBUG, "Function is called...");
+    if (APP_CFG.alarm.enable == false) {
+        LOGGER(LOGGER_LEVEL_INFO, "Alarm init skipped, because alarms are disabled");
+        return true;
+    }
+
     bool result = true;
     
     int changed_resolution_type;
