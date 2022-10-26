@@ -19,6 +19,7 @@
 #include "./night/night.h"
 #include "./../logger/logger.h"
 #include "./../configs/configs.h"
+#include "./../ipctool/src/tools.h"
 
 // Read file into string
 static char *get_file_contents(char *filename) {
@@ -68,10 +69,18 @@ char *firmware_version() {
 
 // Get device id
 char *device_id() {
-    char *file_contents = get_file_contents("/usr/app/share/.device_id");
-    char *dev_id = prepare_string(file_contents);
-    free(file_contents);
-    return dev_id;
+    size_t length = 64;
+    char *buffer = "";
+    if(buffer = malloc(length)) {
+        size_t size = 0;
+        // https://github.com/OpenIPC/ipctool/blob/5deac9f4f1fd2913b8b34a2d0a0b511e85e4055d/src/hal_hisi.c#L1288-L1300
+        for(uint32_t address = 0x12020414; address >= 0x12020400; address -= 4) {
+            uint32_t value;
+            if(!mem_reg(address, &value, OP_READ)) break;
+            size += snprintf(buffer + size, length - size, "%08x", value);
+        }
+    } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "malloc()");
+    return buffer;
 }
 
 // Log printf function

@@ -38,10 +38,10 @@ make update-libs
 make
 ```
 
-To save time, you can disable the build of external libraries:
+To save time, you can disable the build of external shared libraries:
 
 ```bash
-make SKIP_EXTERNAL_LIBS=ON
+make SKIP_SHARED_LIBS=ON
 ```
 
 ...and skip step №5.
@@ -173,6 +173,7 @@ Command | Parameters | Description | Example payload
 `set_volume` | `value` (integer) | Set volume level for speaker (0-100). | { "action": "set_volume", "value": 100 }
 `play_media` | `filename` (string), `type` (string, optional), `volume` (integer, optional) | Play the specified media file. Two types are supported: "pcm" (WAV, 8000 hz, 16-bit, mono) and "g711" (A-Law, 8000 hz, 16-bit, mono). | { "action": "play_media", "filename": "/mnt/mmc/media.wav", "type": "pcm", "volume": 75 }
 `stop_media` | | Stop current playback. | { "action": "stop_media" }
+`system` | `command` (string) | Execute the system (shell) command. | { "action": "system", "command": "poweroff -f" }
 `restart` | | Restart the main thread of mjsxj02hl application | { "action": "restart" }
 `reboot` | | Reboot the device. | { "action": "reboot" }
 
@@ -190,6 +191,7 @@ Field | Description
 ----- | -----------
 `fw_version` | Version of the firmware.
 `ip_address` | IP address of the device.
+`hw_temp` | Temperature from chip's internal sensor.
 `total_ram` | The total size of RAM.
 `free_ram` | The size of the free RAM.
 `total_sdmem` | The total size of SD-card.
@@ -224,3 +226,4 @@ Field | Description
 * inih: https://github.com/benhoyt/inih
 * paho.mqtt.c: https://github.com/eclipse/paho.mqtt.c
 * RtspServer: https://github.com/PHZ76/RtspServer
+* ipctool: https://github.com/OpenIPC/ipctool

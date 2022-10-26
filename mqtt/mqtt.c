@@ -21,6 +21,7 @@
 #include "./../localsdk/speaker/speaker.h"
 #include "./../configs/configs.h"
 #include "./../yyjson/src/yyjson.h"
+#include "./../ipctool/include/ipchw.h"
 
 static MQTTClient MQTTclient;
 static pthread_t periodical_thread;
@@ -154,77 +155,81 @@ static void *mqtt_periodical(void *arg) {
         if(first) {
             first = false;
             
-            // Home Assistant Discovery
-            
-            // info/fw_version
-            if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, "fw_version", NULL, NULL, false)) {
-                LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, fw_version)");
-            } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, fw_version)");
-            // info/ip_address
-            if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, "ip_address", NULL, NULL, false)) {
-                LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, ip_address)");
-            } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, ip_address)");
-            // info/total_ram
-            if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, "total_ram", NULL, "byte(s)", false)) {
-                LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, total_ram)");
-            } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, total_ram)");
-            // info/free_ram
-            if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, "free_ram", NULL, "byte(s)", false)) {
-                LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, free_ram)");
-            } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, free_ram)");
-            // info/total_sdmem
-            if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, "total_sdmem", NULL, "byte(s)", false)) {
-                LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, total_sdmem)");
-            } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, total_sdmem)");
-            // info/free_sdmem
-            if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, "free_sdmem", NULL, "byte(s)", false)) {
-                LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, free_sdmem)");
-            } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, free_sdmem)");
-            // info/total_configs
-            if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, "total_configs", NULL, "byte(s)", false)) {
-                LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, total_configs)");
-            } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, total_configs)");
-            // info/free_configs
-            if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, "free_configs", NULL, "byte(s)", false)) {
-                LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, free_configs)");
-            } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, free_configs)");
-            // info/volume_level
-            if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, "volume_level", NULL, "%", false)) {
-                LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, volume_level)");
-            } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, volume_level)");
-            // info/media_status
-            if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, "media_status", NULL, NULL, false)) {
-                LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, media_status)");
-            } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, media_status)");
-            // info/image_url
-            if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, "fw_version", NULL, NULL, false)) {
-                LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, fw_version)");
-            } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, fw_version)");
-            
-            // alarm/motion
-            if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_BINARY_SENSOR, MQTT_ALARM_TOPIC, "motion", "motion", NULL, true)) {
-                LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_ALARM_TOPIC, motion)");
-            } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_ALARM_TOPIC, motion)");
-            // alarm/humanoid
-            if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_BINARY_SENSOR, MQTT_ALARM_TOPIC, "humanoid", "motion", NULL, true)) {
-                LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_ALARM_TOPIC, humanoid)");
-            } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_ALARM_TOPIC, humanoid)");
-            
-            // night/state
-            if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_BINARY_SENSOR, MQTT_NIGHT_TOPIC, "state", NULL, NULL, true)) {
-                LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_NIGHT_TOPIC, state)");
-            } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_NIGHT_TOPIC, state)");
-            // night/gray
-            if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_BINARY_SENSOR, MQTT_NIGHT_TOPIC, "gray", NULL, NULL, true)) {
-                LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_NIGHT_TOPIC, gray)");
-            } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_NIGHT_TOPIC, gray)");
-            
             // Send online state
             char *state_topic = mqtt_fulltopic(MQTT_STATE_TOPIC);
             if(mqtt_send(state_topic, MQTT_STATE_ONLINE)) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_send(MQTT_STATE_TOPIC)");
             else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_send(MQTT_STATE_TOPIC)");
             free(state_topic);
         }
+        
+        // Home Assistant Discovery
+        
+        // info/fw_version
+        if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, "fw_version", NULL, NULL, false)) {
+            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, fw_version)");
+        } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, fw_version)");
+        // info/ip_address
+        if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, "ip_address", NULL, NULL, false)) {
+            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, ip_address)");
+        } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, ip_address)");
+        // info/hw_temp
+        if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, "hw_temp", "temperature", "°C", false)) {
+            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, hw_temp)");
+        } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, hw_temp)");
+        // info/total_ram
+        if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, "total_ram", NULL, "byte(s)", false)) {
+            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, total_ram)");
+        } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, total_ram)");
+        // info/free_ram
+        if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, "free_ram", NULL, "byte(s)", false)) {
+            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, free_ram)");
+        } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, free_ram)");
+        // info/total_sdmem
+        if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, "total_sdmem", NULL, "byte(s)", false)) {
+            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, total_sdmem)");
+        } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, total_sdmem)");
+        // info/free_sdmem
+        if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, "free_sdmem", NULL, "byte(s)", false)) {
+            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, free_sdmem)");
+        } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, free_sdmem)");
+        // info/total_configs
+        if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, "total_configs", NULL, "byte(s)", false)) {
+            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, total_configs)");
+        } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, total_configs)");
+        // info/free_configs
+        if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, "free_configs", NULL, "byte(s)", false)) {
+            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, free_configs)");
+        } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, free_configs)");
+        // info/volume_level
+        if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, "volume_level", NULL, "%", false)) {
+            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, volume_level)");
+        } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, volume_level)");
+        // info/media_status
+        if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, "media_status", NULL, NULL, false)) {
+            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, media_status)");
+        } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, media_status)");
+        // info/image_url
+        if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, "fw_version", NULL, NULL, false)) {
+            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, fw_version)");
+        } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, fw_version)");
+        
+        // alarm/motion
+        if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_BINARY_SENSOR, MQTT_ALARM_TOPIC, "motion", "motion", NULL, true)) {
+            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_ALARM_TOPIC, motion)");
+        } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_ALARM_TOPIC, motion)");
+        // alarm/humanoid
+        if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_BINARY_SENSOR, MQTT_ALARM_TOPIC, "humanoid", "motion", NULL, true)) {
+            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_ALARM_TOPIC, humanoid)");
+        } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_ALARM_TOPIC, humanoid)");
+        
+        // night/state
+        if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_BINARY_SENSOR, MQTT_NIGHT_TOPIC, "state", NULL, NULL, true)) {
+            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_NIGHT_TOPIC, state)");
+        } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_NIGHT_TOPIC, state)");
+        // night/gray
+        if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_BINARY_SENSOR, MQTT_NIGHT_TOPIC, "gray", NULL, NULL, true)) {
+            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_NIGHT_TOPIC, gray)");
+        } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_NIGHT_TOPIC, gray)");
         
         // Send system info
         yyjson_mut_doc *json_doc = yyjson_mut_doc_new(NULL);
@@ -253,6 +258,10 @@ static void *mqtt_periodical(void *arg) {
         } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "getifaddrs()");
         if(yyjson_mut_obj_add_str(json_doc, json_root, "ip_address", ip_address)) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(ip_address)");
         else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(ip_address)");
+        // Temperature
+        float hw_temp = gethwtemp();
+        if(yyjson_mut_obj_add_real(json_doc, json_root, "hw_temp", hw_temp)) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_real(hw_temp)");
+        else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_real(hw_temp)");
         // RAM
         unsigned long total_ram = 0;
         unsigned long free_ram = 0;
@@ -422,6 +431,16 @@ static int mqtt_message_callback(void *context, char *topicName, int topicLen, M
                 if(result &= speaker_stop_media()) {
                     LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "speaker_stop_media()");
                 } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "speaker_stop_media()");
+            // System
+            } else if(strcmp(yyjson_get_str(json_action), "system") == 0) {
+                LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "strcmp(system)");
+                yyjson_val *json_command = yyjson_obj_get(json_root, "command");
+                if(result &= yyjson_is_str(json_command)) {
+                    LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_is_str(json_command)");
+                    if(result &= (system((char *) yyjson_get_str(json_command)) == 0)) {
+                        LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "system(json_command)");
+                    } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "system(json_command)");
+                } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "yyjson_is_str(json_command)");
             // Restart
             } else if(strcmp(yyjson_get_str(json_action), "restart") == 0) {
                 LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "strcmp(restart)");

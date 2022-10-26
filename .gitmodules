@@ -10,3 +10,6 @@
 [submodule "rtsp/RtspServer"]
 	path = rtsp/RtspServer
 	url = https://github.com/PHZ76/RtspServer
+[submodule "ipctool"]
+	path = ipctool
+	url = https://github.com/OpenIPC/ipctool
