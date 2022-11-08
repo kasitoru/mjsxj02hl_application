@@ -1,6 +1,6 @@
 # MJSXJ02HL application
 
-[![Donate](https://img.shields.io/badge/donate-Yandex-red.svg)](https://money.yandex.ru/to/4100110221014297)
+[![Donate](https://img.shields.io/badge/donate-YooMoney-blueviolet.svg)](https://yoomoney.ru/to/4100110221014297)
 
 Application for Xiaomi Smart Camera Standard Edition (MJSXJ02HL) with RTSP and MQTT support. It is used in a [custom firmware](https://github.com/kasitoru/mjsxj02hl_firmware).
 
