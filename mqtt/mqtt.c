@@ -213,14 +213,16 @@ static void *mqtt_periodical(void *arg) {
             LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, fw_version)");
         } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_INFO_TOPIC, fw_version)");
         
-        // alarm/motion
-        if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_BINARY_SENSOR, MQTT_ALARM_TOPIC, "motion", "motion", NULL, true)) {
-            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_ALARM_TOPIC, motion)");
-        } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_ALARM_TOPIC, motion)");
-        // alarm/humanoid
-        if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_BINARY_SENSOR, MQTT_ALARM_TOPIC, "humanoid", "motion", NULL, true)) {
-            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_ALARM_TOPIC, humanoid)");
-        } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_ALARM_TOPIC, humanoid)");
+        if(APP_CFG.alarm.enable == true) {
+            // alarm/motion
+            if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_BINARY_SENSOR, MQTT_ALARM_TOPIC, "motion", "motion", NULL, true)) {
+                LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_ALARM_TOPIC, motion)");
+            } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_ALARM_TOPIC, motion)");
+            // alarm/humanoid
+            if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_BINARY_SENSOR, MQTT_ALARM_TOPIC, "humanoid", "motion", NULL, true)) {
+                LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_ALARM_TOPIC, humanoid)");
+            } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_SENSOR, MQTT_ALARM_TOPIC, humanoid)");
+        }
         
         // night/state
         if(mqtt_homeassistant_discovery(MQTT_HOMEASSISTANT_BINARY_SENSOR, MQTT_NIGHT_TOPIC, "state", NULL, NULL, true)) {
