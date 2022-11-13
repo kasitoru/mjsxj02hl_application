@@ -238,7 +238,10 @@ bool mqtt_homeassistant_discovery(int type, char *topic_name, char *json_field, 
                 } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_write()");
             }
         } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "mqtt_homeassistant_json_device()");
-    
+        
+        // Free resources
+        yyjson_mut_doc_free(json_doc);
+        
     } else LOGGER(LOGGER_LEVEL_INFO, "Home Assistant Discovery is disabled in the settings or discovery prefix not set.");
     
     LOGGER(LOGGER_LEVEL_DEBUG, "Function completed (result = %s).", (result ? "true" : "false"));
