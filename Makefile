@@ -77,7 +77,7 @@ libyyjson.so:
 	cmake -S./yyjson -B$(OUTPUT)/objects/yyjson -DCMAKE_C_COMPILER=$(CC) -DCMAKE_C_FLAGS="$(CCFLAGS)" -DCMAKE_CXX_COMPILER=$(CXX) -DCMAKE_CXX_FLAGS="$(CCFLAGS)" -DBUILD_SHARED_LIBS=ON
 	make -C $(OUTPUT)/objects/yyjson
 	cp -f $(OUTPUT)/objects/yyjson/libyyjson.so $(LIBDIR)/
-	ln -s libyyjson.so $(LIBDIR)/libyyjson.so.0.5.1
+	ln -s libyyjson.so $(LIBDIR)/libyyjson.so.0.6.0
 
 libpaho-mqtt3c.so:
 	cmake -S./mqtt/paho.mqtt.c -B$(OUTPUT)/objects/paho.mqtt.c -DCMAKE_C_COMPILER=$(CC) -DCMAKE_C_FLAGS="$(CCFLAGS)"
