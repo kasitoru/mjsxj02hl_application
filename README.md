@@ -1,8 +1,11 @@
 # MJSXJ02HL application
 
-[![Donate](https://img.shields.io/badge/donate-Yandex-red.svg)](https://money.yandex.ru/to/4100110221014297)
+[![Donate](https://img.shields.io/badge/donate-YooMoney-blueviolet.svg)](https://yoomoney.ru/to/4100110221014297)
 
 Application for Xiaomi Smart Camera Standard Edition (MJSXJ02HL) with RTSP and MQTT support. It is used in a [custom firmware](https://github.com/kasitoru/mjsxj02hl_firmware).
+
+**Attention! This firmware is no longer supported by the author. We recommend using [OpenIPC](https://github.com/OpenIPC/device-mjsxj02hl).**
+
 
 ## Build
 
@@ -93,6 +96,7 @@ volume = 70                    ; Speaker volume level (0-100)
 type = 1                       ; Default file format (1 = PCM, 2 = G711)
 
 [alarm]
+enable = true                  ; Enable alarms
 motion_sens = 150              ; Motion sensitivity (1-255)
 humanoid_sens = 150            ; Humanoid sensitivity (1-255)
 motion_timeout = 60            ; Motion timeout (in seconds)
