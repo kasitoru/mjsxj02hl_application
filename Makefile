@@ -69,21 +69,21 @@ install-libs:
 
 libipchw.a:
 	cmake -S./ipctool -B$(OUTPUT)/objects/ipctool -DCMAKE_C_COMPILER=$(CC) -DCMAKE_C_FLAGS="$(CCFLAGS)" -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release
-	make -C $(OUTPUT)/objects/ipctool
+	make -C $(OUTPUT)/objects/ipctool ipchw ipctool
 	cp -f $(OUTPUT)/objects/ipctool/libipchw.a $(OUTPUT)/objects/
 	cp -f $(OUTPUT)/objects/ipctool/ipctool $(OUTPUT)/
 
 libyyjson.so:
-	cmake -S./yyjson -B$(OUTPUT)/objects/yyjson -DCMAKE_C_COMPILER=$(CC) -DCMAKE_C_FLAGS="$(CCFLAGS)" -DCMAKE_CXX_COMPILER=$(CXX) -DCMAKE_CXX_FLAGS="$(CCFLAGS)" -DBUILD_SHARED_LIBS=ON
+	cmake -S./yyjson -B$(OUTPUT)/objects/yyjson -DCMAKE_C_COMPILER=$(CC) -DCMAKE_C_FLAGS="$(CCFLAGS)" -DBUILD_SHARED_LIBS=ON
 	make -C $(OUTPUT)/objects/yyjson
 	cp -f $(OUTPUT)/objects/yyjson/libyyjson.so $(LIBDIR)/
-	ln -s libyyjson.so $(LIBDIR)/libyyjson.so.0.6.0
+	ln -s libyyjson.so $(LIBDIR)/libyyjson.so.0.8.0
 
 libpaho-mqtt3c.so:
 	cmake -S./mqtt/paho.mqtt.c -B$(OUTPUT)/objects/paho.mqtt.c -DCMAKE_C_COMPILER=$(CC) -DCMAKE_C_FLAGS="$(CCFLAGS)"
 	make -C $(OUTPUT)/objects/paho.mqtt.c
 	cp -f $(OUTPUT)/objects/paho.mqtt.c/src/libpaho-mqtt3c.so $(LIBDIR)/
-	ln -s libpaho-mqtt3c.so $(LIBDIR)/libpaho-mqtt3c.so.1.3.12
+	ln -s libpaho-mqtt3c.so $(LIBDIR)/libpaho-mqtt3c.so.1.3.13
 	ln -s libpaho-mqtt3c.so $(LIBDIR)/libpaho-mqtt3c.so.1
 
 librtspserver.so:
