@@ -17,7 +17,7 @@ static char *mqtt_homeassistant_json_device_name = "";
 static char *mqtt_homeassistant_json_fw_version = "";
 static char *mqtt_homeassistant_json_state_topic = "";
 
-static char *mqtt_homeassistant_json_sensor_name = "";
+//static char *mqtt_homeassistant_json_sensor_name = "";
 static char *mqtt_homeassistant_json_object_id = "";
 static char *mqtt_homeassistant_json_unique_id = "";
 static char *mqtt_homeassistant_json_topic_name = "";
@@ -94,12 +94,12 @@ static bool mqtt_homeassistant_json_sensor(yyjson_mut_doc *json_doc, yyjson_mut_
     // Sensor name
     char *mqtt_topic = mqtt_prepare_string(APP_CFG.mqtt.topic);
     char *general_name = mqtt_prepare_string(APP_CFG.general.name);
-    if(result &= (asprintf(&mqtt_homeassistant_json_sensor_name, "%s_%s_%s_%s", mqtt_topic, general_name, topic_name, json_field) != -1)) {
-        LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(mqtt_homeassistant_json_sensor_name)");
-        if(result &= yyjson_mut_obj_add_str(json_doc, json_root, "name", mqtt_homeassistant_json_sensor_name)) {
-            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(name)");
+    //if(result &= (asprintf(&mqtt_homeassistant_json_sensor_name, "%s_%s_%s_%s", mqtt_topic, general_name, topic_name, json_field) != -1)) {
+    //    LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(mqtt_homeassistant_json_sensor_name)");
+    //    if(result &= yyjson_mut_obj_add_str(json_doc, json_root, "name", mqtt_homeassistant_json_sensor_name)) {
+    //        LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(name)");
             // Object id
-            if(result &= (asprintf(&mqtt_homeassistant_json_object_id, "%s_%s", topic_name, json_field) != -1)) {
+            if(result &= (asprintf(&mqtt_homeassistant_json_object_id, "%s_%s_%s_%s", mqtt_topic, general_name, topic_name, json_field) != -1)) {
                 LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(mqtt_homeassistant_json_object_id)");
                 if(result &= yyjson_mut_obj_add_str(json_doc, json_root, "object_id", mqtt_homeassistant_json_object_id)) {
                     LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(object_id)");
@@ -140,14 +140,10 @@ static bool mqtt_homeassistant_json_sensor(yyjson_mut_doc *json_doc, yyjson_mut_
                         } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(unique_id)");
                     } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(mqtt_homeassistant_json_unique_id)");
                     free(client_id);
-                    
-                    
-                    
                 } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(object_id)");
             } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(mqtt_homeassistant_json_object_id)");
-                    
-        } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(name)");
-    } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(mqtt_homeassistant_json_sensor_name)");
+    //    } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(name)");
+    //} else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(mqtt_homeassistant_json_sensor_name)");
     free(general_name);
     free(mqtt_topic);
     
@@ -163,12 +159,12 @@ static bool mqtt_homeassistant_json_binary_sensor(yyjson_mut_doc *json_doc, yyjs
     // Sensor name
     char *mqtt_topic = mqtt_prepare_string(APP_CFG.mqtt.topic);
     char *general_name = mqtt_prepare_string(APP_CFG.general.name);
-    if(result &= (asprintf(&mqtt_homeassistant_json_sensor_name, "%s_%s_%s_%s", mqtt_topic, general_name, topic_name, json_field) != -1)) {
-        LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(mqtt_homeassistant_json_sensor_name)");
-        if(result &= yyjson_mut_obj_add_str(json_doc, json_root, "name", mqtt_homeassistant_json_sensor_name)) {
-            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(name)");
+    //if(result &= (asprintf(&mqtt_homeassistant_json_sensor_name, "%s_%s_%s_%s", mqtt_topic, general_name, topic_name, json_field) != -1)) {
+    //    LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(mqtt_homeassistant_json_sensor_name)");
+    //    if(result &= yyjson_mut_obj_add_str(json_doc, json_root, "name", mqtt_homeassistant_json_sensor_name)) {
+    //        LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(name)");
             // Object id
-            if(result &= (asprintf(&mqtt_homeassistant_json_object_id, "%s_%s", topic_name, json_field) != -1)) {
+            if(result &= (asprintf(&mqtt_homeassistant_json_object_id, "%s_%s_%s_%s", mqtt_topic, general_name, topic_name, json_field) != -1)) {
                 LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(mqtt_homeassistant_json_object_id)");
                 if(result &= yyjson_mut_obj_add_str(json_doc, json_root, "object_id", mqtt_homeassistant_json_object_id)) {
                     LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(object_id)");
@@ -212,8 +208,8 @@ static bool mqtt_homeassistant_json_binary_sensor(yyjson_mut_doc *json_doc, yyjs
                     free(client_id);
                 } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(object_id)");
             } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(mqtt_homeassistant_json_object_id)");
-        } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(name)");
-    } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(mqtt_homeassistant_json_sensor_name)");
+    //    } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(name)");
+    //} else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(mqtt_homeassistant_json_sensor_name)");
     free(general_name);
     free(mqtt_topic);
     
@@ -286,7 +282,7 @@ bool mqtt_homeassistant_discovery(int type, char *topic_name, char *json_field, 
                 free(mqtt_homeassistant_json_topic_name);
                 free(mqtt_homeassistant_json_unique_id);
                 free(mqtt_homeassistant_json_object_id);
-                free(mqtt_homeassistant_json_sensor_name);
+                //free(mqtt_homeassistant_json_sensor_name);
             }
             
             // Free device resources
