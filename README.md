@@ -16,7 +16,16 @@ tar -zxf arm-himix100-linux.tgz
 sudo ./arm-himix100-linux.install
 ```
 
-2. Copy the libraries from directory `/usr/app/lib` of the original firmware to directory `/opt/hisi-linux/x86-arm/arm-himix100-linux/target/usr/app/lib`.
+2. Copy the libraries from directory `/usr/app/lib` of the original firmware to directory `/opt/hisi-linux/x86-arm/arm-himix100-linux/target/usr/app/lib`:
+
+```bash
+sudo mkdir -p /opt/hisi-linux/x86-arm/arm-himix100-linux/target/usr/app/lib
+sudo chmod 777 /opt/hisi-linux/x86-arm/arm-himix100-linux/target/usr/app/lib
+
+git clone https://github.com/kasitoru/mjsxj02hl_firmware
+cp -a ./mjsxj02hl_firmware/firmware/app/lib/. /opt/hisi-linux/x86-arm/arm-himix100-linux/target/usr/app/lib/
+rm -Rf mjsxj02hl_firmware
+```
 
 3. Clone the repository:
 
@@ -25,18 +34,12 @@ git clone https://github.com/kasitoru/mjsxj02hl_application
 cd mjsxj02hl_application
 ```
 
-4. Changing the permissions for the folder `/opt/hisi-linux/x86-arm/arm-himix100-linux/target/usr/app/lib`:
-
-```bash
-sudo chmod 755 /opt/hisi-linux/x86-arm/arm-himix100-linux/target/usr/app/lib
-```
-
-5. Update submodules (optional):
+4. Update submodules (optional):
 ```bash
 make update-libs
 ```
 
-6. Build application:
+5. Build application:
 ```bash
 make
 ```
@@ -47,7 +50,7 @@ To save time, you can disable the build of external shared libraries:
 make SKIP_SHARED_LIBS=ON
 ```
 
-...and skip step №5.
+...and skip step №4.
 
 ## Configuration
 
