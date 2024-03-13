@@ -76,15 +76,12 @@ libipchw.a:
 libyyjson.so:
 	cmake -S./yyjson -B$(OUTPUT)/objects/yyjson -DCMAKE_C_COMPILER=$(CC) -DCMAKE_C_FLAGS="$(CCFLAGS)" -DBUILD_SHARED_LIBS=ON
 	make -C $(OUTPUT)/objects/yyjson
-	cp -f $(OUTPUT)/objects/yyjson/libyyjson.so $(LIBDIR)/
-	ln -s libyyjson.so $(LIBDIR)/libyyjson.so.0.8.0
+	cp -fP $(OUTPUT)/objects/yyjson/libyyjson.so* $(LIBDIR)/
 
 libpaho-mqtt3c.so:
 	cmake -S./mqtt/paho.mqtt.c -B$(OUTPUT)/objects/paho.mqtt.c -DCMAKE_C_COMPILER=$(CC) -DCMAKE_C_FLAGS="$(CCFLAGS)"
 	make -C $(OUTPUT)/objects/paho.mqtt.c
-	cp -f $(OUTPUT)/objects/paho.mqtt.c/src/libpaho-mqtt3c.so $(LIBDIR)/
-	ln -s libpaho-mqtt3c.so $(LIBDIR)/libpaho-mqtt3c.so.1.3.13
-	ln -s libpaho-mqtt3c.so $(LIBDIR)/libpaho-mqtt3c.so.1
+	cp -fP $(OUTPUT)/objects/paho.mqtt.c/src/libpaho-mqtt3c.so* $(LIBDIR)/
 
 librtspserver.so:
 	make -C ./rtsp
