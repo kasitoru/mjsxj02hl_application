@@ -94,56 +94,52 @@ static bool mqtt_homeassistant_json_sensor(yyjson_mut_doc *json_doc, yyjson_mut_
     // Sensor name
     char *mqtt_topic = mqtt_prepare_string(APP_CFG.mqtt.topic);
     char *general_name = mqtt_prepare_string(APP_CFG.general.name);
-    //if(result &= (asprintf(&mqtt_homeassistant_json_sensor_name, "%s_%s_%s_%s", mqtt_topic, general_name, topic_name, json_field) != -1)) {
-    //    LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(mqtt_homeassistant_json_sensor_name)");
-    //    if(result &= yyjson_mut_obj_add_str(json_doc, json_root, "name", mqtt_homeassistant_json_sensor_name)) {
-    //        LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(name)");
-            // Object id
-            if(result &= (asprintf(&mqtt_homeassistant_json_object_id, "%s_%s_%s_%s", mqtt_topic, general_name, topic_name, json_field) != -1)) {
-                LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(mqtt_homeassistant_json_object_id)");
-                if(result &= yyjson_mut_obj_add_str(json_doc, json_root, "object_id", mqtt_homeassistant_json_object_id)) {
-                    LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(object_id)");
-                    // Unique id
-                    char *client_id = mqtt_client_id();
-                    if(result &= (asprintf(&mqtt_homeassistant_json_unique_id, "%s_%s_%s", client_id, topic_name, json_field) != -1)) {
-                        LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(mqtt_homeassistant_json_unique_id)");
-                        if(result &= yyjson_mut_obj_add_str(json_doc, json_root, "unique_id", mqtt_homeassistant_json_unique_id)) {
-                            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(unique_id)");
-                            // Device class
-                            if(device_class != NULL) {
-                                if(result &= yyjson_mut_obj_add_str(json_doc, json_root, "device_class", device_class)) {
-                                    LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(device_class)");
-                                } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(device_class)");
-                            }
-                            // Units of measurement
-                            if(unit_of_measurement != NULL) {
-                                if(result &= yyjson_mut_obj_add_str(json_doc, json_root, "unit_of_measurement", unit_of_measurement)) {
-                                    LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(unit_of_measurement)");
-                                } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(unit_of_measurement)");
-                            }
-                            // Enable by default
-                            if(result &= yyjson_mut_obj_add_bool(json_doc, json_root, "enabled_by_default", enabled)) {
-                                LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_bool(enabled_by_default)");
-                                // State topic
-                                mqtt_homeassistant_json_topic_name = mqtt_fulltopic(topic_name);
-                                if(result &= yyjson_mut_obj_add_str(json_doc, json_root, "state_topic", mqtt_homeassistant_json_topic_name)) {
-                                    LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_json_binary_sensor(state_topic)");
-                                    // Value template
-                                    if(result &= (asprintf(&mqtt_homeassistant_json_value_template, "{{ value_json.%s }}", json_field) != -1)) {
-                                        LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(mqtt_homeassistant_json_value_template)");
-                                        if(result &= yyjson_mut_obj_add_str(json_doc, json_root, "value_template", mqtt_homeassistant_json_value_template)) {
-                                            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(value_template)");
-                                        } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(value_template)");
-                                    } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(mqtt_homeassistant_json_value_template)");
-                                } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(state_topic)");
-                            } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_bool(enabled_by_default)");
-                        } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(unique_id)");
-                    } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(mqtt_homeassistant_json_unique_id)");
-                    free(client_id);
-                } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(object_id)");
-            } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(mqtt_homeassistant_json_object_id)");
-    //    } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(name)");
-    //} else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(mqtt_homeassistant_json_sensor_name)");
+
+    // Object id
+    if(result &= (asprintf(&mqtt_homeassistant_json_object_id, "%s_%s_%s_%s", mqtt_topic, general_name, topic_name, json_field) != -1)) {
+        LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(mqtt_homeassistant_json_object_id)");
+        if(result &= yyjson_mut_obj_add_str(json_doc, json_root, "object_id", mqtt_homeassistant_json_object_id)) {
+            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(object_id)");
+            // Unique id
+            char *client_id = mqtt_client_id();
+            if(result &= (asprintf(&mqtt_homeassistant_json_unique_id, "%s_%s_%s", client_id, topic_name, json_field) != -1)) {
+                LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(mqtt_homeassistant_json_unique_id)");
+                if(result &= yyjson_mut_obj_add_str(json_doc, json_root, "unique_id", mqtt_homeassistant_json_unique_id)) {
+                    LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(unique_id)");
+                    // Device class
+                    if(device_class != NULL) {
+                        if(result &= yyjson_mut_obj_add_str(json_doc, json_root, "device_class", device_class)) {
+                            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(device_class)");
+                        } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(device_class)");
+                    }
+                    // Units of measurement
+                    if(unit_of_measurement != NULL) {
+                        if(result &= yyjson_mut_obj_add_str(json_doc, json_root, "unit_of_measurement", unit_of_measurement)) {
+                            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(unit_of_measurement)");
+                        } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(unit_of_measurement)");
+                    }
+                    // Enable by default
+                    if(result &= yyjson_mut_obj_add_bool(json_doc, json_root, "enabled_by_default", enabled)) {
+                        LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_bool(enabled_by_default)");
+                        // State topic
+                        mqtt_homeassistant_json_topic_name = mqtt_fulltopic(topic_name);
+                        if(result &= yyjson_mut_obj_add_str(json_doc, json_root, "state_topic", mqtt_homeassistant_json_topic_name)) {
+                            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_json_binary_sensor(state_topic)");
+                            // Value template
+                            if(result &= (asprintf(&mqtt_homeassistant_json_value_template, "{{ value_json.%s }}", json_field) != -1)) {
+                                LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(mqtt_homeassistant_json_value_template)");
+                                if(result &= yyjson_mut_obj_add_str(json_doc, json_root, "value_template", mqtt_homeassistant_json_value_template)) {
+                                    LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(value_template)");
+                                } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(value_template)");
+                            } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(mqtt_homeassistant_json_value_template)");
+                        } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(state_topic)");
+                    } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_bool(enabled_by_default)");
+                } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(unique_id)");
+            } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(mqtt_homeassistant_json_unique_id)");
+            free(client_id);
+        } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(object_id)");
+    } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(mqtt_homeassistant_json_object_id)");
+
     free(general_name);
     free(mqtt_topic);
     
@@ -159,57 +155,53 @@ static bool mqtt_homeassistant_json_binary_sensor(yyjson_mut_doc *json_doc, yyjs
     // Sensor name
     char *mqtt_topic = mqtt_prepare_string(APP_CFG.mqtt.topic);
     char *general_name = mqtt_prepare_string(APP_CFG.general.name);
-    //if(result &= (asprintf(&mqtt_homeassistant_json_sensor_name, "%s_%s_%s_%s", mqtt_topic, general_name, topic_name, json_field) != -1)) {
-    //    LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(mqtt_homeassistant_json_sensor_name)");
-    //    if(result &= yyjson_mut_obj_add_str(json_doc, json_root, "name", mqtt_homeassistant_json_sensor_name)) {
-    //        LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(name)");
-            // Object id
-            if(result &= (asprintf(&mqtt_homeassistant_json_object_id, "%s_%s_%s_%s", mqtt_topic, general_name, topic_name, json_field) != -1)) {
-                LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(mqtt_homeassistant_json_object_id)");
-                if(result &= yyjson_mut_obj_add_str(json_doc, json_root, "object_id", mqtt_homeassistant_json_object_id)) {
-                    LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(object_id)");
-                    // Unique id
-                    char *client_id = mqtt_client_id();
-                    if(result &= (asprintf(&mqtt_homeassistant_json_unique_id, "%s_%s_%s", client_id, topic_name, json_field) != -1)) {
-                        LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(mqtt_homeassistant_json_unique_id)");
-                        if(result &= yyjson_mut_obj_add_str(json_doc, json_root, "unique_id", mqtt_homeassistant_json_unique_id)) {
-                            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(unique_id)");
-                            // Device class
-                            if(device_class != NULL) {
-                                if(result &= yyjson_mut_obj_add_str(json_doc, json_root, "device_class", device_class)) {
-                                    LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(device_class)");
-                                } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(device_class)");
-                            }
-                            // Enable by default
-                            if(result &= yyjson_mut_obj_add_bool(json_doc, json_root, "enabled_by_default", enabled)) {
-                                LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_bool(enabled_by_default)");
-                                // State topic
-                                mqtt_homeassistant_json_topic_name = mqtt_fulltopic(topic_name);
-                                if(result &= yyjson_mut_obj_add_str(json_doc, json_root, "state_topic", mqtt_homeassistant_json_topic_name)) {
-                                    LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_json_binary_sensor(state_topic)");
-                                    // Value template
-                                    if(result &= (asprintf(&mqtt_homeassistant_json_value_template, "{{ value_json.%s }}", json_field) != -1)) {
-                                        LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(mqtt_homeassistant_json_value_template)");
-                                        if(result &= yyjson_mut_obj_add_str(json_doc, json_root, "value_template", mqtt_homeassistant_json_value_template)) {
-                                            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(value_template)");
-                                            // Payload values
-                                            if(result &= yyjson_mut_obj_add_bool(json_doc, json_root, "payload_on", true)) {
-                                                LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_bool(payload_on)");
-                                                if(result &= yyjson_mut_obj_add_bool(json_doc, json_root, "payload_off", false)) {
-                                                    LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_bool(payload_off)");
-                                                } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_bool(payload_off)");
-                                            } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_bool(payload_on)");
-                                        } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(value_template)");
-                                    } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(mqtt_homeassistant_json_value_template)");
-                                } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(state_topic)");
-                            } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_bool(enabled_by_default)");
-                        } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(unique_id)");
-                    } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(mqtt_homeassistant_json_unique_id)");
-                    free(client_id);
-                } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(object_id)");
-            } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(mqtt_homeassistant_json_object_id)");
-    //    } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(name)");
-    //} else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(mqtt_homeassistant_json_sensor_name)");
+
+    // Object id
+    if(result &= (asprintf(&mqtt_homeassistant_json_object_id, "%s_%s_%s_%s", mqtt_topic, general_name, topic_name, json_field) != -1)) {
+        LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(mqtt_homeassistant_json_object_id)");
+        if(result &= yyjson_mut_obj_add_str(json_doc, json_root, "object_id", mqtt_homeassistant_json_object_id)) {
+            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(object_id)");
+            // Unique id
+            char *client_id = mqtt_client_id();
+            if(result &= (asprintf(&mqtt_homeassistant_json_unique_id, "%s_%s_%s", client_id, topic_name, json_field) != -1)) {
+                LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(mqtt_homeassistant_json_unique_id)");
+                if(result &= yyjson_mut_obj_add_str(json_doc, json_root, "unique_id", mqtt_homeassistant_json_unique_id)) {
+                    LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(unique_id)");
+                    // Device class
+                    if(device_class != NULL) {
+                        if(result &= yyjson_mut_obj_add_str(json_doc, json_root, "device_class", device_class)) {
+                            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(device_class)");
+                        } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(device_class)");
+                    }
+                    // Enable by default
+                    if(result &= yyjson_mut_obj_add_bool(json_doc, json_root, "enabled_by_default", enabled)) {
+                        LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_bool(enabled_by_default)");
+                        // State topic
+                        mqtt_homeassistant_json_topic_name = mqtt_fulltopic(topic_name);
+                        if(result &= yyjson_mut_obj_add_str(json_doc, json_root, "state_topic", mqtt_homeassistant_json_topic_name)) {
+                            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_json_binary_sensor(state_topic)");
+                            // Value template
+                            if(result &= (asprintf(&mqtt_homeassistant_json_value_template, "{{ value_json.%s }}", json_field) != -1)) {
+                                LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(mqtt_homeassistant_json_value_template)");
+                                if(result &= yyjson_mut_obj_add_str(json_doc, json_root, "value_template", mqtt_homeassistant_json_value_template)) {
+                                    LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(value_template)");
+                                    // Payload values
+                                    if(result &= yyjson_mut_obj_add_bool(json_doc, json_root, "payload_on", true)) {
+                                        LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_bool(payload_on)");
+                                        if(result &= yyjson_mut_obj_add_bool(json_doc, json_root, "payload_off", false)) {
+                                            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_bool(payload_off)");
+                                        } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_bool(payload_off)");
+                                    } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_bool(payload_on)");
+                                } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(value_template)");
+                            } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(mqtt_homeassistant_json_value_template)");
+                        } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(state_topic)");
+                    } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_bool(enabled_by_default)");
+                } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(unique_id)");
+            } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(mqtt_homeassistant_json_unique_id)");
+            free(client_id);
+        } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "yyjson_mut_obj_add_str(object_id)");
+    } else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "asprintf(mqtt_homeassistant_json_object_id)");
+
     free(general_name);
     free(mqtt_topic);
     
