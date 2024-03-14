@@ -17,7 +17,6 @@ static char *mqtt_homeassistant_json_device_name = "";
 static char *mqtt_homeassistant_json_fw_version = "";
 static char *mqtt_homeassistant_json_state_topic = "";
 
-//static char *mqtt_homeassistant_json_sensor_name = "";
 static char *mqtt_homeassistant_json_object_id = "";
 static char *mqtt_homeassistant_json_unique_id = "";
 static char *mqtt_homeassistant_json_topic_name = "";
@@ -274,7 +273,6 @@ bool mqtt_homeassistant_discovery(int type, char *topic_name, char *json_field, 
                 free(mqtt_homeassistant_json_topic_name);
                 free(mqtt_homeassistant_json_unique_id);
                 free(mqtt_homeassistant_json_object_id);
-                //free(mqtt_homeassistant_json_sensor_name);
             }
             
             // Free device resources
