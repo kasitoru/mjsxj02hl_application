@@ -124,7 +124,7 @@ static bool mqtt_homeassistant_json_sensor(yyjson_mut_doc *json_doc, yyjson_mut_
                         // State topic
                         mqtt_homeassistant_json_topic_name = mqtt_fulltopic(topic_name);
                         if(result &= yyjson_mut_obj_add_str(json_doc, json_root, "state_topic", mqtt_homeassistant_json_topic_name)) {
-                            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_json_binary_sensor(state_topic)");
+                            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(state_topic)");
                             // Value template
                             if(result &= (asprintf(&mqtt_homeassistant_json_value_template, "{{ value_json.%s }}", json_field) != -1)) {
                                 LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(mqtt_homeassistant_json_value_template)");
@@ -179,7 +179,7 @@ static bool mqtt_homeassistant_json_binary_sensor(yyjson_mut_doc *json_doc, yyjs
                         // State topic
                         mqtt_homeassistant_json_topic_name = mqtt_fulltopic(topic_name);
                         if(result &= yyjson_mut_obj_add_str(json_doc, json_root, "state_topic", mqtt_homeassistant_json_topic_name)) {
-                            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "mqtt_homeassistant_json_binary_sensor(state_topic)");
+                            LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "yyjson_mut_obj_add_str(state_topic)");
                             // Value template
                             if(result &= (asprintf(&mqtt_homeassistant_json_value_template, "{{ value_json.%s }}", json_field) != -1)) {
                                 LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "asprintf(mqtt_homeassistant_json_value_template)");
