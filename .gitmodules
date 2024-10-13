@@ -9,7 +9,7 @@
 	url = https://github.com/benhoyt/inih
 [submodule "rtsp/RtspServer"]
 	path = rtsp/RtspServer
-	url = https://github.com/PHZ76/RtspServer
+	url = https://github.com/ZoneMinder/RtspServer
 [submodule "ipctool"]
 	path = ipctool
 	url = https://github.com/OpenIPC/ipctool
