@@ -9,6 +9,9 @@
 #include <signal.h>
 #include <sysexits.h>
 #include <string.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <sys/file.h>
 
 #include "./logger/logger.h"
 #include "./localsdk/localsdk.h"
@@ -97,12 +100,41 @@ int main(int argc, char **argv) {
         } else if(strcmp(argv[1], "--get-image") == 0) { // Get image
             if(argc == 3) {
                 if(system("pidof -o %PPID mjsxj02hl > /dev/null") == EX_OK) {
-                    if(local_sdk_video_get_jpeg(LOCALSDK_VIDEO_SECONDARY_CHANNEL, argv[2]) == LOCALSDK_OK) {
-                        return EX_OK;
-                    } else {
-                        printf("Error: local_sdk_video_get_jpeg() failed!\n");
-                        return EX_SOFTWARE;
+                    int lock_fd = open("/tmp/mjsxj02hl_get_image.lock", O_CREAT | O_RDWR, 0666);
+                    if(lock_fd < 0) {
+                        printf("Error: unable to open snapshot lock file (errno=%d)\n", errno);
+                        return EX_CANTCREAT;
                     }
+
+                    int waited_ms = 0;
+                    while(flock(lock_fd, LOCK_EX | LOCK_NB) != 0) {
+                        if(waited_ms >= 2000) {
+                            printf("Error: snapshot is busy, try again later.\n");
+                            close(lock_fd);
+                            return EX_TEMPFAIL;
+                        }
+                        usleep(100000);
+                        waited_ms += 100;
+                    }
+
+                    // Best-effort: request I-frame before snapshot
+                    local_sdk_video_force_I_frame(LOCALSDK_VIDEO_SECONDARY_CHANNEL);
+
+                    int attempt = 0;
+                    for(attempt = 0; attempt < 3; attempt++) {
+                        if(local_sdk_video_get_jpeg(LOCALSDK_VIDEO_SECONDARY_CHANNEL, argv[2]) == LOCALSDK_OK) {
+                            flock(lock_fd, LOCK_UN);
+                            close(lock_fd);
+                            return EX_OK;
+                        }
+                        usleep(150000);
+                        local_sdk_video_force_I_frame(LOCALSDK_VIDEO_SECONDARY_CHANNEL);
+                    }
+
+                    flock(lock_fd, LOCK_UN);
+                    close(lock_fd);
+                    printf("Error: local_sdk_video_get_jpeg() failed after retries!\n");
+                    return EX_SOFTWARE;
                 } else {
                     printf("Error: main thread of mjsxj02hl application is not running!\n");
                     return EX_UNAVAILABLE;
