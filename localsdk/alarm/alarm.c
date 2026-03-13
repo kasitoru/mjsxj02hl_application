@@ -12,6 +12,7 @@
 
 static pthread_t timeout_thread;
 static int alarm_time_motion, alarm_time_humanoid;
+static bool alarm_initialized = false;
 
 // MQTT send info
 static bool alarm_state_mqtt(bool motion, bool humanoid) {
@@ -221,6 +222,9 @@ bool alarm_init() {
         } else LOGGER(LOGGER_LEVEL_ERROR, "%s error!", "inner_change_resulu_type(LOCALSDK_VIDEO_RESOLUTION_640x360)");
     } else LOGGER(LOGGER_LEVEL_INFO, "Alarm init skipped, because alarms are disabled");
     
+    // Mark as initialized if successful
+    if(result) alarm_initialized = true;
+    
     // Free alarm if error occurred
     if(!result) {
         if(alarm_free()) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "alarm_free()");
@@ -235,6 +239,11 @@ bool alarm_init() {
 bool alarm_free() {
     LOGGER(LOGGER_LEVEL_DEBUG, "Function is called...");
     bool result = true;
+    
+    if(!alarm_initialized) {
+        LOGGER(LOGGER_LEVEL_DEBUG, "alarm_free() skipped, alarm was not initialized.");
+        return result;
+    }
     
     // Disable alarm
     if(result &= alarm_switch(false)) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "alarm_switch(false)");
@@ -253,6 +262,8 @@ bool alarm_free() {
     // Alarm exit
     if(result &= (local_sdk_alarm_exit() == LOCALSDK_OK)) LOGGER(LOGGER_LEVEL_DEBUG, "%s success.", "local_sdk_alarm_exit()");
     else LOGGER(LOGGER_LEVEL_WARNING, "%s error!", "local_sdk_alarm_exit()");
+    
+    alarm_initialized = false;
     
     LOGGER(LOGGER_LEVEL_DEBUG, "Function completed (result = %s).", (result ? "true" : "false"));
     return result;
