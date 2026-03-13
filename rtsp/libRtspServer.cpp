@@ -8,6 +8,7 @@
 #include "xop/RtspServer.h"
 #include "xop/H264Source.h"
 #include "xop/H265Source.h"
+#include "xop/DigestAuthenticator.h"
 
 static std::shared_ptr<xop::EventLoop> event_loop(new xop::EventLoop());
 static std::shared_ptr<xop::RtspServer> rtsp_server;
@@ -62,7 +63,7 @@ bool rtspserver_create(uint16_t port, char *username, char *password) {
 	    logprintf_function("The RTSP server is running on port %d.", port);
 	    // Digest authentication
 	    if(username && username[0]) {
-	        rtsp_server->SetAuthConfig("RTSP", std::string(username), std::string(password));
+	        rtsp_server->SetAuthenticator(std::make_shared<xop::DigestAuthenticator>("RTSP", std::string(username), std::string(password)));
 	        logprintf_function("Digest authentication is enabled.");
 	    }
 		return true;
