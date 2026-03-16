@@ -81,7 +81,7 @@ int main(int argc, char **argv) {
     srand(time(NULL));
     
     // Default path of config file
-    char *config_filename = "/usr/app/share/mjsxj02hl.conf";
+    char *config_filename = "/configs/mjsxj02hl.conf";
     
     // Running with arguments
     if(argc > 1) {
