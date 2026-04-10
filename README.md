@@ -54,7 +54,7 @@ make SKIP_SHARED_LIBS=ON
 
 ## Configuration
 
-Default config `/usr/app/share/mjsxj02hl.conf`:
+Default config `/configs/mjsxj02hl.conf`:
 
 ```ini
 [general]
