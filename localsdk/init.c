@@ -61,7 +61,7 @@ char *prepare_string(char *string) {
 
 // Get firmware version
 char *firmware_version() {
-    char *file_contents = get_file_contents("/usr/app/share/.version");
+    char *file_contents = get_file_contents("/backk/share/.version");
     char *fw_ver = prepare_string(file_contents);
     free(file_contents);
     return fw_ver;

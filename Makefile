@@ -58,6 +58,7 @@ mkdir-libs:
 	-make BUILD_DIR OUTPUT="../$(OUTPUT)" LIBDIR="../$(LIBDIR)" -C ./rtsp
 
 update-libs:
+	git submodule sync --recursive
 	git pull --recurse-submodules
 	git submodule update --remote --recursive
 

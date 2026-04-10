@@ -1,12 +1,48 @@
 #include <stdint.h>
 #include <stdarg.h>
+#include <vector>
+#include <string>
+#include <cstring>
 
 #include "libRtspServer.h"
 #include "xop/RtspServer.h"
-#include "xop/H264Parser.h"
+#include "xop/H264Source.h"
+#include "xop/H265Source.h"
+#include "xop/DigestAuthenticator.h"
 
 static std::shared_ptr<xop::EventLoop> event_loop(new xop::EventLoop());
 static std::shared_ptr<xop::RtspServer> rtsp_server;
+
+static bool find_start_code(const uint8_t *data, size_t size, size_t from, size_t *sc_pos, size_t *sc_len) {
+    for (size_t i = from; i + 3 < size; ++i) {
+        if (data[i] == 0x00 && data[i + 1] == 0x00) {
+            if (data[i + 2] == 0x01) {
+                *sc_pos = i;
+                *sc_len = 3;
+                return true;
+            }
+            if (i + 3 < size && data[i + 2] == 0x00 && data[i + 3] == 0x01) {
+                *sc_pos = i;
+                *sc_len = 4;
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+static bool push_frame(xop::MediaSessionId session_id, xop::MediaChannelId channel_id, uint8_t type, int64_t timestamp, const uint8_t *data, size_t size) {
+    if (size == 0) {
+        return false;
+    }
+
+    xop::AVFrame frame;
+    frame.type = type;
+    frame.timestamp = timestamp;
+    frame.last = 1;
+    frame.buffer.assign(data, data + size);
+    return rtsp_server->PushFrame(session_id, channel_id, frame);
+}
 
 // Default log printf function
 static int logprintf_default(const char *format, ...) {
@@ -30,6 +66,8 @@ static void (*connected_function)(uint32_t session_id, const char *peer_ip, uint
 // Default disconnected callback function
 static void disconnected_default(uint32_t session_id, const char *peer_ip, uint16_t peer_port) { }
 static void (*disconnected_function)(uint32_t session_id, const char *peer_ip, uint16_t peer_port) = disconnected_default;
+
+
 
 // Set log printf function
 bool rtspserver_logprintf(int (*function)(const char *, ...)) {
@@ -56,7 +94,7 @@ bool rtspserver_create(uint16_t port, char *username, char *password) {
 	    logprintf_function("The RTSP server is running on port %d.", port);
 	    // Digest authentication
 	    if(username && username[0]) {
-	        rtsp_server->SetAuthConfig("RTSP", std::string(username), std::string(password));
+	        rtsp_server->SetAuthenticator(std::make_shared<xop::DigestAuthenticator>("RTSP", std::string(username), std::string(password)));
 	        logprintf_function("Digest authentication is enabled.");
 	    }
 		return true;
@@ -129,8 +167,8 @@ uint32_t rtspserver_session(char *name, bool multicast, uint8_t video_type, uint
 // Get current timestamp
 uint32_t rtspserver_timestamp(uint8_t source, uint32_t samplerate) {
     switch(source) {
-        case LIBRTSPSERVER_TYPE_H264:  return xop::H264Source::GetTimestamp();
-        case LIBRTSPSERVER_TYPE_H265:  return xop::H265Source::GetTimestamp();
+        case LIBRTSPSERVER_TYPE_H264:  return (uint32_t)xop::H264Source::GetTimestamp();
+        case LIBRTSPSERVER_TYPE_H265:  return (uint32_t)xop::H265Source::GetTimestamp();
         case LIBRTSPSERVER_TYPE_AAC:   return xop::AACSource::GetTimestamp(samplerate);
         case LIBRTSPSERVER_TYPE_G711A: return xop::G711ASource::GetTimestamp();
         case LIBRTSPSERVER_TYPE_VP8:   return xop::VP8Source::GetTimestamp();
@@ -141,39 +179,61 @@ uint32_t rtspserver_timestamp(uint8_t source, uint32_t samplerate) {
 // Send media frame
 bool rtspserver_frame(uint32_t session_id, signed char *data, uint8_t type, uint32_t size, uint32_t timestamp, bool split_video) {
     if(!rtsp_server) { return false; }
-    xop::AVFrame frame = {0};
-    frame.type = type;
-    frame.timestamp = timestamp;
+    xop::MediaChannelId channel_id = (type != xop::AUDIO_FRAME ? xop::channel_0 : xop::channel_1);
+    const uint8_t *buffer = (const uint8_t*)data;
+
     // Prepare and send
     if(split_video) {
-        xop::Nal nal;
-        uint32_t endpoint = ((uint32_t) data) + size;
-        while(true) {
-            // Divide the video package into separate frames
-            if(frame.type != xop::AUDIO_FRAME) {
-                nal = xop::H264Parser::findNal((const uint8_t*) data, size);
-                data = (signed char *) nal.first;
-                size = ((uint32_t) nal.second) - ((uint32_t) nal.first) + 1;
-            }
-            // Send current frame
-            if(data) {
-                frame.size = size;
-                frame.buffer.reset(new uint8_t[frame.size], std::default_delete<uint8_t[]>());
-                memcpy(frame.buffer.get(), data, frame.size);
-                rtsp_server->PushFrame(session_id, (frame.type != xop::AUDIO_FRAME ? xop::channel_0 : xop::channel_1), frame);
-                if(frame.type != xop::AUDIO_FRAME) {
-                    data = (signed char *) nal.second;
-                    size = endpoint - ((uint32_t) nal.second) + 1;
-                } else break;
-            } else break;
+        if (type == xop::AUDIO_FRAME) {
+            return push_frame(session_id, channel_id, type, (int64_t)timestamp, buffer, size);
         }
-        return true;
+
+        size_t pos = 0;
+        size_t sc_pos = 0;
+        size_t sc_len = 0;
+        bool pushed = false;
+
+        while (find_start_code(buffer, size, pos, &sc_pos, &sc_len)) {
+            size_t nal_start = sc_pos;
+            size_t next_sc_pos = 0;
+            size_t next_sc_len = 0;
+            size_t nal_end = size;
+
+            if (find_start_code(buffer, size, sc_pos + sc_len, &next_sc_pos, &next_sc_len)) {
+                nal_end = next_sc_pos;
+            }
+
+            if (nal_end > nal_start && !push_frame(session_id, channel_id, type, (int64_t)timestamp, buffer + nal_start, nal_end - nal_start)) {
+                return false;
+            }
+
+            pushed = (nal_end > nal_start);
+            pos = nal_end;
+            if (pos >= size) {
+                break;
+            }
+        }
+
+        if (pushed) {
+            return true;
+        }
+
+        return push_frame(session_id, channel_id, type, (int64_t)timestamp, buffer, size);
     } else {
-        uint32_t offset = ((frame.type == xop::AUDIO_FRAME) ? 0 : 4); // Skip 00 00 00 01 (for video frames)
-        frame.size = size - offset;
-        frame.buffer.reset(new uint8_t[frame.size], std::default_delete<uint8_t[]>());
-        memcpy(frame.buffer.get(), data + offset, frame.size);
-        return rtsp_server->PushFrame(session_id, (frame.type != xop::AUDIO_FRAME ? xop::channel_0 : xop::channel_1), frame);
+        // For non-split mode, strip the first start code if present
+        uint32_t offset = 0;
+        if (type != xop::AUDIO_FRAME) {
+            // Check for start code at the beginning (0x00 0x00 0x01 or 0x00 0x00 0x00 0x01)
+            if (size >= 3 && data[0] == 0x00 && data[1] == 0x00 && data[2] == 0x01) {
+                offset = 3;
+            } else if (size >= 4 && data[0] == 0x00 && data[1] == 0x00 && data[2] == 0x00 && data[3] == 0x01) {
+                offset = 4;
+            }
+        }
+        if (size <= offset) {
+            return false;
+        }
+        return push_frame(session_id, channel_id, type, (int64_t)timestamp, buffer + offset, size - offset);
     }
 }
 
@@ -199,4 +259,3 @@ bool rtspserver_free(uint32_t count, ...) {
     }
     return result;
 }
-
